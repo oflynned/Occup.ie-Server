@@ -1,7 +1,11 @@
+let propertyModel = require('../../models/property');
+
 function validatePayload(data) {
-    let keyValidation = validateKeys(["type", "address"], data);
-    let addressKeyValidation = validateKeys(["house_number", "street", "area", "city", "county", "eircode"], data["address"]);
-    return keyValidation && addressKeyValidation;
+    let result = propertyModel.validate(data);
+    return {
+        valid: result["error"] !== true,
+        result: result
+    }
 }
 
 function validateKeys(keysList, comparatorObject) {

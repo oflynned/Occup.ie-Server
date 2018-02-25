@@ -10,9 +10,12 @@ let createPropertyUseCase = require('../use_cases/landlord/create_property_listi
 module.exports = function (db) {
     router.post('/', (req, res) => {
         let payload = req.body;
+        let payloadValidation = createPropertyUseCase.validatePayload(payload);
 
-        if (!createPropertyUseCase.validatePayload(payload))
+        if (!payloadValidation["valid"]) {
             res.status(400);
+            res.json(payloadValidation["result"])
+        }
 
         createPropertyUseCase.createListing(db, payload)
             .then((property) => {

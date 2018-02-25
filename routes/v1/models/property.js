@@ -1,24 +1,21 @@
 const Joi = require("joi");
-let dynamo = require("../persistence/dynamo_db/config");
 
-let property = dynamo.define("Property", {
-    hashKey: "uuid",
-    timestamps: true,
-    schema: {
-        type: Joi.string(),
-        address: {
-            uuid: dynamo.types.uuid(),
-            house_number: Joi.number(),
-            street: Joi.string(),
-            area: Joi.string(),
-            city: Joi.string(),
-            county: Joi.string(),
-            eircode: Joi.string()
-        }
+const schema = Joi.object().keys({
+    type: Joi.string().valid(["rent", "house_share"]).required(),
+    address: {
+        house_number: Joi.string().required(),
+        street: Joi.string().required(),
+        area: Joi.string().required(),
+        city: Joi.string().required(),
+        county: Joi.string().required(),
+        eircode: Joi.string().required()
     }
 });
 
+function validate(payload) {
+    return Joi.validate(payload, schema);
+}
+
 module.exports = {
-    property: property,
-    dynamo: dynamo
+    validate: validate
 };
