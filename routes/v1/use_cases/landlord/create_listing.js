@@ -1,5 +1,4 @@
-const COLLECTION = "properties";
-
+const collection = require("../../common/collections").listings;
 let propertyModel = require('../../models/property');
 
 function validatePayload(data) {
@@ -11,7 +10,7 @@ function validatePayload(data) {
 
 function validatePropertyIsUnique(db, data) {
     return new Promise((res, rej) => {
-        db.get(COLLECTION)
+        db.get(collection)
             .find({address: data})
             .then((properties) => {
                 if (properties.length === 0)
@@ -25,7 +24,7 @@ function validatePropertyIsUnique(db, data) {
 
 function createListing(db, data) {
     return new Promise((res, rej) => {
-        db.get(COLLECTION)
+        db.get(collection)
             .insert(data)
             .then((property) => res(property))
             .catch((err) => rej(err))

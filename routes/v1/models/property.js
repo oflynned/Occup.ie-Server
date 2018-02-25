@@ -15,25 +15,40 @@ const schema = Joi.object().keys({
     details: {
         dwelling: Joi.valid(["apartment", "house", "flat"]),
         description: Joi.string(),
-        lat: Joi.string(),
-        lng: Joi.string(),
-        move_in_date: Joi.date()
+        lat: Joi.number(),
+        lng: Joi.number(),
+        move_in_date: Joi.date(),
+        lease_length: Joi.number(), // months
+        min_target_age_category: Joi.number(),
+        max_target_age_category: Joi.number(),
+        target_sex: Joi.string().valid(["male", "female", "other"])
     },
     bathrooms: Joi.array().items(Joi.object({
-
+        size: Joi.string().valid(["ensuite", "separate"])
     })),
     bedrooms: Joi.array().items(Joi.object({
-
+        size: Joi.string().valid(["single", "double", "twin"]),
+        monthly_cost: Joi.number() // monthly cost
+    })),
+    images: Joi.array().items(Joi.object({
+        uuid: Joi.string()
     })),
     facilities: {
         furnished: Joi.boolean(),
         bill_estimate: Joi.string(),
         ber: Joi.string()
+    },
+    listing: {
+        created: Joi.date(),
+        updated: Joi.date(),
+        expiry: Joi.date(),
+        plan: Joi.string(),
+        status: Joi.string()
     }
 });
 
-function validate(payload) {
-    return Joi.validate(payload, schema);
+function validate(o) {
+    return Joi.validate(o, schema);
 }
 
 module.exports = {

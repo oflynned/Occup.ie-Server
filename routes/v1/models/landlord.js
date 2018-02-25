@@ -1,15 +1,12 @@
 const Joi = require("joi");
 
 const schema = Joi.object.keys({
-    email: Joi.string().email(),
     forename: Joi.string(),
     surname: Joi.string(),
-    facebook_id: Joi.string(),
-    facebook_token: Joi.string(),
+    phone_number: Joi.number(),
+    phone_verified: Joi.boolean(),
     identity_verified: Joi.boolean(),
-    profile_picture: Joi.string(),
-    age: Joi.number(),
-    sex: Joi.string().validate(["male", "female", "other"])
+    profile_picture: Joi.string()
 });
 
 function validate(o) {
