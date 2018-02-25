@@ -1,35 +1,44 @@
+const COLLECTION = "properties";
+
 let propertyModel = require('../../models/property');
 
 function validatePayload(data) {
-    let result = propertyModel.validate(data);
-    return {
-        valid: result["error"] !== true,
-        result: result
-    }
+    return new Promise((res, rej) => {
+        let result = propertyModel.validate(data);
+        console.log(result);
+        if (result["error"] === null) {
+            res();
+        } else {
+            rej(result["error"]);
+        }
+    })
 }
 
-function validateKeys(keysList, comparatorObject) {
-    return keysList === Object.keys(comparatorObject)
+function validatePropertyIsUnique(db, data) {
+    return new Promise((res, rej) => {
+        db.get(COLLECTION)
+            .find({address: data})
+            .then((properties) => {
+                if (properties.length === 0)
+                    res();
+                else
+                    throw new Error("Property is not unique");
+            })
+            .catch((err) => rej(err))
+    })
 }
 
 function createListing(db, data) {
     return new Promise((res, rej) => {
-        db.get('properties')
+        db.get(COLLECTION)
             .insert(data)
             .then((property) => res(property))
             .catch((err) => rej(err))
     })
 }
 
-function saveImages() {
-
-}
-
-function compressImages() {
-
-}
-
 module.exports = {
     validatePayload: validatePayload,
+    validatePropertyIsUnique: validatePropertyIsUnique,
     createListing: createListing
 };

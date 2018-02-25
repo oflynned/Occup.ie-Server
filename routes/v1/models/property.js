@@ -9,6 +9,26 @@ const schema = Joi.object().keys({
         city: Joi.string().required(),
         county: Joi.string().required(),
         eircode: Joi.string().required()
+    },
+
+    landlord_uuid: Joi.string(),
+    details: {
+        dwelling: Joi.valid(["apartment", "house", "flat"]),
+        description: Joi.string(),
+        lat: Joi.string(),
+        lng: Joi.string(),
+        move_in_date: Joi.date()
+    },
+    bathrooms: Joi.array().items(Joi.object({
+
+    })),
+    bedrooms: Joi.array().items(Joi.object({
+
+    })),
+    facilities: {
+        furnished: Joi.boolean(),
+        bill_estimate: Joi.string(),
+        ber: Joi.string()
     }
 });
 

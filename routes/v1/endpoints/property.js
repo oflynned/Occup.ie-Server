@@ -1,59 +1,44 @@
 let express = require('express');
 let router = express.Router();
 
-let fs = require('fs');
-let path = require('path');
-let uuid = require('uuid');
-
 let createPropertyUseCase = require('../use_cases/landlord/create_property_listing');
+let retrievePropertyUseCase = require('../use_cases/landlord/retrieve_property_listing');
 
 module.exports = function (db) {
     router.post('/', (req, res) => {
         let payload = req.body;
-        let payloadValidation = createPropertyUseCase.validatePayload(payload);
-
-        if (!payloadValidation["valid"]) {
-            res.status(400);
-            res.json(payloadValidation["result"])
-        }
-
-        createPropertyUseCase.createListing(db, payload)
-            .then((property) => {
-                res.status(201);
-                res.json(property)
-            })
-            .catch((err) => {
-                res.status(500);
-                res.json(err);
-            })
+        createPropertyUseCase.validatePayload(payload)
+            .then(() => createPropertyUseCase.validatePropertyIsUnique(db, payload["address"]))
+            .then(() => createPropertyUseCase.createListing(db, payload))
+            .then((data) => res.status(201).json(data))
+            .catch((err) => res.status(400).send(err))
     });
 
     router.get('/', (req, res) => {
-        let collection = db.get('properties');
-        collection.find()
-            .then((properties) => {
-                res.status(200).json(properties);
-            })
-            .catch((err) => {
-                res.status(500).json(err);
-            })
+        retrievePropertyUseCase.getListings(db)
+            .then((properties) => res.status(200).json(properties))
+            .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-
-    });
-
-    router.get('/filter', (req, res) => {
-
+        retrievePropertyUseCase.getListings(db, uuid)
+            .then((properties) => res.status(200).json(properties))
+            .catch((err) => res.status(500).json(err))
     });
 
     router.put('/:uuid', (req, res) => {
-
+        let uuid = req.params["uuid"];
+        retrievePropertyUseCase.modifyListing(db, uuid, req.body)
+            .then(() => res.status(200).send())
+            .catch((err) => res.status(500).send(err))
     });
 
     router.delete('/:uuid', (req, res) => {
-
+        let uuid = req.params["uuid"];
+        retrievePropertyUseCase.deleteListing(db, uuid)
+            .then((property) => res.status(200).send(property))
+            .catch((err) => res.status(500).send(err))
     });
 
     return router;
