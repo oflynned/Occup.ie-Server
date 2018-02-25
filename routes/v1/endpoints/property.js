@@ -4,7 +4,7 @@ let router = express.Router();
 let createPropertyUseCase = require('../use_cases/landlord/create_property_listing');
 let retrievePropertyUseCase = require('../use_cases/landlord/retrieve_property_listing');
 
-module.exports = function (db) {
+module.exports = (db) => {
     router.post('/', (req, res) => {
         let payload = req.body;
         createPropertyUseCase.validatePayload(payload)

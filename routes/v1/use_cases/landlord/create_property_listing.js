@@ -5,12 +5,7 @@ let propertyModel = require('../../models/property');
 function validatePayload(data) {
     return new Promise((res, rej) => {
         let result = propertyModel.validate(data);
-        console.log(result);
-        if (result["error"] === null) {
-            res();
-        } else {
-            rej(result["error"]);
-        }
+        result["error"] === null ? res() : rej(result["error"])
     })
 }
 
