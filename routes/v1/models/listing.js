@@ -10,32 +10,28 @@ const schema = Joi.object().keys({
         county: Joi.string().required(),
         eircode: Joi.string().required()
     },
-
-    landlord_uuid: Joi.string(),
     details: {
-        dwelling: Joi.valid("studio", "apartment", "house", "room"),
-        description: Joi.string(),
-        lat: Joi.number(),
-        lng: Joi.number(),
+        dwelling: Joi.valid("studio", "apartment", "house", "room").required(),
+        description: Joi.string().required(),
+        lat: Joi.number().required(),
+        lng: Joi.number().required(),
         stay_caveats: Joi.string(),
-        move_in_date: Joi.date(),
-        lease_length: Joi.number(),
-        min_target_age_category: Joi.number().min(18),
-        max_target_age_category: Joi.number().min(18),
-        target_sex: Joi.string().valid("male", "female", "other", "couple")
+        move_in_date: Joi.date().required(),
+        lease_length: Joi.number().required(),
+        min_target_age_category: Joi.number().min(18).required(),
+        max_target_age_category: Joi.number().min(18).required(),
+        target_profession: Joi.string().required(),
+        target_sex: Joi.string().valid("male", "female", "other", "couple").required()
     },
     bathrooms: Joi.array().items(Joi.object({
-        size: Joi.string().valid("ensuite", "separate")
+        size: Joi.string().valid("ensuite", "separate").required()
     })),
     bedrooms: Joi.array().items(Joi.object({
-        size: Joi.string().valid("single", "double", "twin"),
-        monthly_cost: Joi.number(),
-        deposit: Joi.number()
+        size: Joi.string().valid("single", "double", "twin").required(),
+        monthly_cost: Joi.number().required(),
+        deposit: Joi.number().required()
     })),
-    images: Joi.array().items(Joi.object({
-        uuid: Joi.string(),
-        index: Joi.number()
-    })),
+    images: Joi.array().items(Joi.string().required()),
     facilities: {
         washing_machine: Joi.boolean(),
         dryer: Joi.boolean(),
@@ -45,13 +41,14 @@ const schema = Joi.object().keys({
         central_heating: Joi.boolean()
     },
     listing: {
-        created: Joi.date(),
+        landlord_uuid: Joi.string().required(),
+        created: Joi.date().required(),
         updated: Joi.date(),
-        expires: Joi.date(),
-        plan: Joi.string(),
-        status: Joi.string(),
-        owner_occupied: Joi.boolean(),
-        furnished: Joi.boolean(),
+        expires: Joi.date().required(),
+        plan: Joi.string().required(),
+        status: Joi.string().required(),
+        owner_occupied: Joi.boolean().required(),
+        furnished: Joi.boolean().required(),
         bill_estimate: Joi.string(),
         ber: Joi.string()
     }
