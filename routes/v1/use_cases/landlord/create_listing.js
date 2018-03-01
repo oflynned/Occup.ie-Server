@@ -1,9 +1,10 @@
 const collection = require("../../common/collections").listings;
-let propertyModel = require('../../models/property');
+let listingModel = require('../../models/listing');
+let record = require("../common/create_record");
 
 function validatePayload(data) {
     return new Promise((res, rej) => {
-        let result = propertyModel.validate(data);
+        let result = listingModel.validate(data);
         result["error"] === null ? res() : rej(result["error"])
     })
 }
@@ -23,12 +24,7 @@ function validatePropertyIsUnique(db, data) {
 }
 
 function createListing(db, data) {
-    return new Promise((res, rej) => {
-        db.get(collection)
-            .insert(data)
-            .then((property) => res(property))
-            .catch((err) => rej(err))
-    })
+    return record.createRecord(db, data, collection);
 }
 
 module.exports = {

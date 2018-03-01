@@ -1,11 +1,10 @@
 let ObjectId = require('mongodb').ObjectID;
 const collection = require("../../common/collections").listings;
 
-function getListings(db, id) {
-    let searchFilter = id === undefined ? {} : {_id: ObjectId(id)};
+function getListings(db, filter={}) {
     return new Promise((res, rej) => {
         db.get(collection)
-            .find(searchFilter)
+            .find(filter)
             .then((properties) => res(properties))
             .catch((err) => rej(err))
     })

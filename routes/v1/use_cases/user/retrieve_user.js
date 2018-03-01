@@ -1,7 +1,7 @@
 let ObjectId = require('mongodb').ObjectID;
-const collection = require("../../common/collections").Landlords;
+const collection = require("../../common/collections").users;
 
-function getLandlords(db, filter={}) {
+function getUsers(db, filter = {}) {
     return new Promise((res, rej) => {
         db.get(collection)
             .find(filter)
@@ -10,18 +10,16 @@ function getLandlords(db, filter={}) {
     })
 }
 
-function modifyLandlord(db, id, data) {
+function modifyUser(db, id, data) {
     return new Promise((res, rej) => {
         db.get(collection)
             .update({_id: ObjectId(id)}, {"$set": data})
-            .then(() => {
-                res(data)
-            })
+            .then(() => res(data))
             .catch((err) => rej(err));
     })
 }
 
-function deleteLandlord(db, id) {
+function deleteUser(db, id) {
     return new Promise((res, rej) => {
         db.get(collection)
             .remove({_id: ObjectId(id)})
@@ -31,7 +29,7 @@ function deleteLandlord(db, id) {
 }
 
 module.exports = {
-    getLandlords: getLandlords,
-    modifyLandlord: modifyLandlord,
-    deleteLandlord: deleteLandlord
+    getUsers: getUsers,
+    modifyUser: modifyUser,
+    deleteUser: deleteUser
 };

@@ -1,3 +1,9 @@
+let multer = require('multer');
+
+function uploadImage() {
+
+}
+
 function createBucketItem() {
     let imagePath = path.join(process.cwd(), "public", "images", "michael_d.jpg");
     let fileContents = fs.readFileSync(imagePath);
