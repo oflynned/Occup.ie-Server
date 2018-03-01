@@ -1,5 +1,6 @@
 module.exports = {
     listings: "listings",
     landlords: "landlords",
-    users: "users"
+    users: "users",
+    applications: "applications"
 };
