@@ -2,16 +2,16 @@ let express = require('express');
 let router = express.Router();
 let ObjectId = require('mongodb').ObjectID;
 
-let createListingUseCase = require('../use_cases/landlord/create_listing');
-let retrieveListingUseCase = require('../use_cases/landlord/retrieve_listing');
+let createApplicationUseCase = require('../use_cases/user/create_application');
+let retrieveApplicationUseCase = require('../use_cases/landlord/retrieve_application');
 
 module.exports = (db) => {
     router.post('/', (req, res) => {
         let payload = req.body;
-        createListingUseCase.validatePayload(payload)
-            .then(() => createListingUseCase.validatePropertyIsUnique(db, payload["address"]))
+        createApplicationUseCase.validatePayload(payload)
+            .then(() => createApplicationUseCase.validateApplicationIsUnique(db, payload))
             .then(() => {
-                createListingUseCase.createListing(db, payload)
+                createApplicationUseCase.createApplication(db, payload)
                     .then((data) => res.status(201).json(data))
                     .catch((err) => res.status(500).json(err))
             })
@@ -19,23 +19,23 @@ module.exports = (db) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveListingUseCase.getListings(db)
+        retrieveApplicationUseCase.getApplications(db)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.getListings(db, {_id: ObjectId(uuid)})
+        retrieveApplicationUseCase.getApplications(db, {_id: ObjectId(uuid)})
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        createListingUseCase.validatePayload(req.data)
+        createApplicationUseCase.validatePayload(req.data)
             .then(() => {
-                retrieveListingUseCase.modifyListing(db, uuid, req.body)
+                retrieveApplicationUseCase.modifyListing(db, uuid, req.body)
                     .then(() => res.status(200).send())
                     .catch((err) => res.status(500).json(err))
             })
@@ -45,7 +45,7 @@ module.exports = (db) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.deleteListing(db, uuid)
+        retrieveApplicationUseCase.deleteApplication(db, uuid)
             .then((property) => res.status(200).json(property))
             .catch((err) => res.status(500).json(err))
     });
