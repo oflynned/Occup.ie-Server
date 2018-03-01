@@ -18,7 +18,7 @@ const schema = Joi.object().keys({
         lat: Joi.number(),
         lng: Joi.number(),
         move_in_date: Joi.date(),
-        lease_length: Joi.number(), // months
+        lease_length: Joi.number(),
         min_target_age_category: Joi.number(),
         max_target_age_category: Joi.number(),
         target_sex: Joi.string().valid(["male", "female", "other"])
@@ -28,7 +28,7 @@ const schema = Joi.object().keys({
     })),
     bedrooms: Joi.array().items(Joi.object({
         size: Joi.string().valid(["single", "double", "twin"]),
-        monthly_cost: Joi.number() // monthly cost
+        monthly_cost: Joi.number()
     })),
     images: Joi.array().items(Joi.object({
         uuid: Joi.string()
