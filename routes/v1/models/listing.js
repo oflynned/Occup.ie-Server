@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 const schema = Joi.object().keys({
-    type: Joi.string().valid(["rent", "house_share"]).required(),
+    type: Joi.string().valid("rent", "house_share").required(),
     address: {
         house_number: Joi.string().required(),
         street: Joi.string().required(),
@@ -13,37 +13,47 @@ const schema = Joi.object().keys({
 
     landlord_uuid: Joi.string(),
     details: {
-        dwelling: Joi.valid(["apartment", "house", "flat"]),
+        dwelling: Joi.valid("studio", "apartment", "house", "room"),
         description: Joi.string(),
         lat: Joi.number(),
         lng: Joi.number(),
+        stay_caveats: Joi.string(),
         move_in_date: Joi.date(),
         lease_length: Joi.number(),
-        min_target_age_category: Joi.number(),
-        max_target_age_category: Joi.number(),
-        target_sex: Joi.string().valid(["male", "female", "other"])
+        min_target_age_category: Joi.number().min(18),
+        max_target_age_category: Joi.number().min(18),
+        target_sex: Joi.string().valid("male", "female", "other", "couple")
     },
     bathrooms: Joi.array().items(Joi.object({
-        size: Joi.string().valid(["ensuite", "separate"])
+        size: Joi.string().valid("ensuite", "separate")
     })),
     bedrooms: Joi.array().items(Joi.object({
-        size: Joi.string().valid(["single", "double", "twin"]),
-        monthly_cost: Joi.number()
+        size: Joi.string().valid("single", "double", "twin"),
+        monthly_cost: Joi.number(),
+        deposit: Joi.number()
     })),
     images: Joi.array().items(Joi.object({
-        uuid: Joi.string()
+        uuid: Joi.string(),
+        index: Joi.number()
     })),
     facilities: {
+        washing_machine: Joi.boolean(),
+        dryer: Joi.boolean(),
+        parking: Joi.boolean(),
         furnished: Joi.boolean(),
-        bill_estimate: Joi.string(),
-        ber: Joi.string()
+        wifi: Joi.boolean(),
+        central_heating: Joi.boolean()
     },
     listing: {
         created: Joi.date(),
         updated: Joi.date(),
-        expiry: Joi.date(),
+        expires: Joi.date(),
         plan: Joi.string(),
-        status: Joi.string()
+        status: Joi.string(),
+        owner_occupied: Joi.boolean(),
+        furnished: Joi.boolean(),
+        bill_estimate: Joi.string(),
+        ber: Joi.string()
     }
 });
 
