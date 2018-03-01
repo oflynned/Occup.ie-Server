@@ -7,14 +7,6 @@ let logger = require('morgan');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 
-const config = require('./config/db');
-let db = require('monk')(config.mongoUrl);
-
-let index = require('./routes/v1/endpoints/index');
-let user = require('./routes/v1/endpoints/user')(db);
-let landlord = require('./routes/v1/endpoints/landlord')(db);
-let listing = require('./routes/v1/endpoints/listing')(db);
-
 let app = express();
 
 app.set('views', path.join(__dirname, 'views'));
@@ -27,7 +19,16 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+let index = require('./routes/v1/endpoints/index');
 app.use('/', index);
+
+const config = require('./config/db');
+let db = require('monk')(config.mongoUrl);
+
+let user = require('./routes/v1/endpoints/user')(db);
+let listing = require('./routes/v1/endpoints/listing')(db);
+let landlord = require('./routes/v1/endpoints/landlord')(db);
+
 app.use('/api/v1/user', user);
 app.use('/api/v1/listing', listing);
 app.use('/api/v1/landlord', landlord);
