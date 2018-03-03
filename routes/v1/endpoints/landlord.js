@@ -9,7 +9,7 @@ module.exports = (db, col) => {
     const collection = col["landlords"];
 
     router.post("/", (req, res) => {
-        createLandlordUseCase.validatePayload(db)
+        createLandlordUseCase.validatePayload(req.body)
             .then(() => {
                 createLandlordUseCase.createAccount(db, collection, req.body)
                     .then((data) => res.status(201).json(data))
