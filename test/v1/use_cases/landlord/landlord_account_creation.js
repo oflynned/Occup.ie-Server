@@ -32,9 +32,7 @@ describe("landlord account creation tests", () => {
         let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
         delete landlord["forename"];
         model.validate(landlord)
-            .then(() => {
-                done(new Error("landlord schema incorrectly validated"));
-            })
+            .then(() => done(new Error("landlord schema incorrectly validated")))
             .catch((err) => done())
     });
 

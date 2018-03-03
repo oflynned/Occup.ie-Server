@@ -4,7 +4,7 @@ const schema = Joi.object().keys({
     forename: Joi.string().required(),
     surname: Joi.string().required(),
     email: Joi.string().email().required(),
-    phone_number: Joi.number().required(),
+    phone_number: Joi.string().required(),
     phone_verified: Joi.boolean(),
     identity_verified: Joi.boolean(),
     profile_picture: Joi.string().required()
@@ -23,7 +23,7 @@ function generate(forename, surname, email, phoneNumber) {
 }
 
 function validate(o) {
-    return Joi.validate(o, schema);
+    return Joi.validate(o, schema, {allowUnknown: true})
 }
 
 module.exports = {
