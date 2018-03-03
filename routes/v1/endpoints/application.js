@@ -3,7 +3,7 @@ let router = express.Router();
 let ObjectId = require('mongodb').ObjectID;
 
 let createApplicationUseCase = require('../use_cases/user/create_application');
-let retrieveApplicationUseCase = require('../use_cases/common/application_retrieval');
+let retrieveApplicationUseCase = require('../use_cases/application/application_retrieval');
 
 module.exports = (db) => {
     router.post('/', (req, res) => {
