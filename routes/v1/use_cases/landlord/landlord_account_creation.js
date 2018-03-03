@@ -1,5 +1,5 @@
 let landlord = require("../../models/landlord");
-let record = require("../common/record_creation");
+let record = require("../common/record");
 
 function validatePayload(data) {
     return landlord.validate(data)

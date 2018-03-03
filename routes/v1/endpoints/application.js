@@ -5,7 +5,9 @@ let ObjectId = require('mongodb').ObjectID;
 let createApplicationUseCase = require('../use_cases/user/create_application');
 let retrieveApplicationUseCase = require('../use_cases/application/application_retrieval');
 
-module.exports = (db) => {
+module.exports = (db, col) => {
+    const collection = col["applications"];
+
     router.post('/', (req, res) => {
         let payload = req.body;
         createApplicationUseCase.validatePayload(payload)

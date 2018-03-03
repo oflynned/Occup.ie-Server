@@ -1,6 +1,4 @@
 let assert = require("assert");
-let chai = require("chai");
-let should = require("should");
 
 const config = require('../../../../config/db');
 const db = require('monk')(config.mongoUrl);

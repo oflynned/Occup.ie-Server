@@ -1,6 +1,5 @@
-const collection = require("../../common/collections").users;
 let user = require("../../models/user");
-let record = require("../common/record_creation");
+let record = require("../common/record");
 
 function validatePayload(data) {
     return new Promise((res, rej) => {
@@ -9,7 +8,7 @@ function validatePayload(data) {
     })
 }
 
-function validateUserIsUnique(db, data) {
+function validateUserIsUnique(db, collection, data) {
     return new Promise((res, rej) => {
         db.get(collection)
             .find({facebook_id: data["facebook_id"]})
@@ -23,24 +22,18 @@ function validateUserIsUnique(db, data) {
     })
 }
 
-function generateUser() {
-    return user.generate("Emma", "Sheeran", 22, "female")
-}
-
 function generateUserObject(payload) {
-    return new Promise((res, rej) => {
-        res({
-            email: payload["email"],
-            forename: payload["forename"],
-            surname: payload["surname"],
-            facebook_id: payload["facebook_id"],
-            facebook_token: payload["facebook_token"],
-            identity_verified: false,
-            profile_picture: payload["profile_picture"],
-            age: payload["age"],
-            sex: payload["sex"],
-            profession: payload["profession"]
-        })
+    return Promise.resolve({
+        email: payload["email"],
+        forename: payload["forename"],
+        surname: payload["surname"],
+        facebook_id: payload["facebook_id"],
+        facebook_token: payload["facebook_token"],
+        identity_verified: false,
+        profile_picture: payload["profile_picture"],
+        age: payload["age"],
+        sex: payload["sex"],
+        profession: payload["profession"]
     });
 }
 
@@ -59,14 +52,13 @@ function getUserParams(user, updatedUser) {
     return user;
 }
 
-function createAccount(db, data) {
+function createAccount(db, collection, data) {
     return record.createRecord(db, data, collection)
 }
 
 module.exports = {
     validatePayload: validatePayload,
     validateUserIsUnique: validateUserIsUnique,
-    generateUser: generateUser,
     generateUserObject: generateUserObject,
     getUserParams: getUserParams,
     createAccount: createAccount

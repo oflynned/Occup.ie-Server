@@ -24,10 +24,11 @@ app.use('/', index);
 
 const config = require('./config/db');
 let db = require('monk')(config.mongoUrl);
+let collection = require('./routes/v1/common/collections').production;
 
-let user = require('./routes/v1/endpoints/user')(db);
-let listing = require('./routes/v1/endpoints/listing')(db);
-let landlord = require('./routes/v1/endpoints/landlord')(db);
+let user = require('./routes/v1/endpoints/user')(db, collection);
+let listing = require('./routes/v1/endpoints/listing')(db, collection);
+let landlord = require('./routes/v1/endpoints/landlord')(db, collection);
 
 app.use('/api/v1/user', user);
 app.use('/api/v1/listing', listing);

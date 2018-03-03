@@ -1,7 +1,6 @@
 let ObjectId = require('mongodb').ObjectID;
-const collection = require("../../common/collections").listings;
 
-function getListings(db, filter={}) {
+function getListings(db, collection, filter = {}) {
     return new Promise((res, rej) => {
         db.get(collection)
             .find(filter)
@@ -10,7 +9,7 @@ function getListings(db, filter={}) {
     })
 }
 
-function modifyListing(db, id, data) {
+function modifyListing(db, collection, id, data) {
     return new Promise((res, rej) => {
         db.get(collection)
             .update({_id: ObjectId(id)}, {"$set": data})
@@ -21,7 +20,7 @@ function modifyListing(db, id, data) {
     })
 }
 
-function deleteListing(db, id) {
+function deleteListing(db, collection, id) {
     return new Promise((res, rej) => {
         db.get(collection)
             .remove({_id: ObjectId(id)})

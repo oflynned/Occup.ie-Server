@@ -1,6 +1,13 @@
-let ObjectId = require('mongodb').ObjectID;
+function createRecord(db, data, collection) {
+    return new Promise((res, rej) => {
+        db.get(collection)
+            .insert(data)
+            .then((record) => res(record))
+            .catch((err) => rej(err))
+    })
+}
 
-function getUsers(db, collection, filter = {}) {
+function getRecords(db, collection, filter = {}) {
     return new Promise((res, rej) => {
         db.get(collection)
             .find(filter)
@@ -9,16 +16,18 @@ function getUsers(db, collection, filter = {}) {
     })
 }
 
-function modifyUser(db, collection, data, id) {
+function modifyRecord(db, collection, data, id) {
     return new Promise((res, rej) => {
         db.get(collection)
             .update({_id: ObjectId(id)}, {"$set": data})
-            .then(() => res(data))
+            .then(() => {
+                res(data)
+            })
             .catch((err) => rej(err));
     })
 }
 
-function deleteUser(db, collection, id) {
+function deleteRecord(db, collection, id) {
     return new Promise((res, rej) => {
         db.get(collection)
             .remove({_id: ObjectId(id)})
@@ -28,7 +37,8 @@ function deleteUser(db, collection, id) {
 }
 
 module.exports = {
-    getUsers: getUsers,
-    modifyUser: modifyUser,
-    deleteUser: deleteUser
+    createRecord: createRecord,
+    getRecords: getRecords,
+    modifyRecord: modifyRecord,
+    deleteRecord: deleteRecord
 };

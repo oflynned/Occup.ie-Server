@@ -5,13 +5,15 @@ let router = express.Router();
 let createUserUseCase = require("../use_cases/user/user_account_creation");
 let retrieveUserUseCase = require("../use_cases/user/user_account_retrieval");
 
-module.exports = (db) => {
+module.exports = (db, col) => {
+    const collection = col["users"];
+
     router.post("/", (req, res) => {
         createUserUseCase.validatePayload(req.body)
-            .then(() => createUserUseCase.validateUserIsUnique(db, req.body))
+            .then(() => createUserUseCase.validateUserIsUnique(db, collection, req.body))
             .then(() => {
                 createUserUseCase.generateUserObject(req.body)
-                    .then((data) => createUserUseCase.createAccount(db, data))
+                    .then((data) => createUserUseCase.createAccount(db, collection, data))
                     .then((data) => res.status(201).json(data))
                     .catch((err) => res.status(500).json(err))
             })
@@ -19,14 +21,14 @@ module.exports = (db) => {
     });
 
     router.get("/", (req, res) => {
-        retrieveUserUseCase.getUsers(db)
+        retrieveUserUseCase.getUsers(db, collection)
             .then((users) => res.status(200).json(users))
             .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveUserUseCase.getUsers(db, {_id: ObjectId(uuid)})
+        retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)})
             .then((user) => res.status(200).json(user))
             .catch((err) => res.status(500).json(err))
     });
@@ -35,9 +37,9 @@ module.exports = (db) => {
         let uuid = req.params["uuid"];
         createUserUseCase.validatePayload(req.body)
             .then(() => {
-                retrieveUserUseCase.getUsers(db, {_id: ObjectId(uuid)})
+                retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)})
                     .then((user) => createUserUseCase.getUserParams(user[0], req.body))
-                    .then((user) => retrieveUserUseCase.modifyUser(db, uuid, user))
+                    .then((user) => retrieveUserUseCase.modifyUser(db, collection, user, uuid))
                     .then((user) => res.status(200).json(user))
                     .catch((err) => res.status(500).json(err))
             })
@@ -46,13 +48,9 @@ module.exports = (db) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveUserUseCase.deleteUser(db, uuid)
+        retrieveUserUseCase.deleteUser(db, collection, uuid)
             .then((user) => res.status(200).send(user))
             .catch((err) => res.status(500).send(err))
-    });
-
-    router.post('/verify', (req, res) => {
-        res.status(200).send("TODO verify")
     });
 
     return router;

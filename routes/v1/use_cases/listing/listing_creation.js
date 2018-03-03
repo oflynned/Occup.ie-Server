@@ -1,6 +1,6 @@
 const collection = require("../../common/collections").listings;
 let listingModel = require('../../models/listing');
-let record = require("../common/record_creation");
+let record = require("../common/record");
 
 function validatePayload(data) {
     return new Promise((res, rej) => {
