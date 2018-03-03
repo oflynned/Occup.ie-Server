@@ -10,5 +10,11 @@ module.exports = {
         landlords: "landlords_dev",
         users: "users_dev",
         applications: "applications_dev"
+    },
+    test: {
+        listings: "listings_test",
+        landlords: "landlords_test",
+        users: "users_test",
+        applications: "applications_test"
     }
 };

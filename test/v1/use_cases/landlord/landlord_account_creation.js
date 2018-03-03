@@ -2,7 +2,7 @@ let assert = require("assert");
 
 const config = require('../../../../config/db');
 const db = require('monk')(config.mongoUrl);
-const collection = require("../../../../routes/v1/common/collections").development.landlords;
+const collection = require("../../../../config/collections").development.landlords;
 
 let model = require("../../../../routes/v1/models/landlord");
 let useCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
@@ -18,7 +18,7 @@ describe("landlord account creation tests", () => {
     it("generated landlord should follow schema", (done) => {
         let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
         model.validate(landlord);
-        useCase.createAccount(db, landlord, collection)
+        useCase.createAccount(db, collection, landlord)
             .then((record) => {
                 assert.equal(record, landlord);
                 assert.equal(record["phone_verified"], false);

@@ -28,7 +28,7 @@ function getLandlordParams(landlord, updatedLandlord) {
     return landlord;
 }
 
-function createAccount(db, data, collection) {
+function createAccount(db, collection, data) {
     return record.createRecord(db, data, collection)
 }
 

@@ -1,4 +1,4 @@
-const collection = require("../../common/collections").listings;
+const collection = require("../../../../config/collections").listings;
 let listingModel = require('../../models/listing');
 let record = require("../common/record");
 

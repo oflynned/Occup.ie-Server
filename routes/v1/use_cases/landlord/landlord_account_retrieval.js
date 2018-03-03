@@ -1,7 +1,6 @@
 let record = require("../common/record");
 
 function getLandlords(db, collection, filter = {}) {
-    console.log(collection);
     return record.getRecords(db, collection, filter)
 }
 

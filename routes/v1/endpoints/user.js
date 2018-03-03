@@ -5,8 +5,8 @@ let router = express.Router();
 let createUserUseCase = require("../use_cases/user/user_account_creation");
 let retrieveUserUseCase = require("../use_cases/user/user_account_retrieval");
 
-module.exports = (db, col) => {
-    const collection = col["users"];
+module.exports = (db, env) => {
+    const collection = env["users"];
 
     router.post("/", (req, res) => {
         createUserUseCase.validatePayload(req.body)

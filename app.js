@@ -1,38 +1,36 @@
-// setup environmental variable reading
-require('dotenv').config();
+module.exports = (env) => {
+    let express = require('express');
+    let path = require('path');
+    let logger = require('morgan');
+    let cookieParser = require('cookie-parser');
+    let bodyParser = require('body-parser');
 
-let express = require('express');
-let path = require('path');
-let logger = require('morgan');
-let cookieParser = require('cookie-parser');
-let bodyParser = require('body-parser');
+    let app = express();
 
-let app = express();
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'handlebars');
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'handlebars');
+    app.use(logger('dev'));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(cookieParser());
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
+    app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.static(path.join(__dirname, 'public')));
+    let index = require('./routes/v1/endpoints/index');
+    app.use('/', index);
 
-let index = require('./routes/v1/endpoints/index');
-app.use('/', index);
+    const config = require('./config/db');
+    let db = require('monk')(config.mongoUrl);
 
-const config = require('./config/db');
-let db = require('monk')(config.mongoUrl);
-let collection = require('./routes/v1/common/collections').production;
+    let user = require('./routes/v1/endpoints/user')(db, env);
+    let listing = require('./routes/v1/endpoints/listing')(db, env);
+    let landlord = require('./routes/v1/endpoints/landlord')(db, env);
 
-let user = require('./routes/v1/endpoints/user')(db, collection);
-let listing = require('./routes/v1/endpoints/listing')(db, collection);
-let landlord = require('./routes/v1/endpoints/landlord')(db, collection);
+    app.use('/api/v1/user', user);
+    app.use('/api/v1/listing', listing);
+    app.use('/api/v1/landlord', landlord);
 
-app.use('/api/v1/user', user);
-app.use('/api/v1/listing', listing);
-app.use('/api/v1/landlord', landlord);
-
-module.exports = app;
+    return app;
+};
 

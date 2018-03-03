@@ -1,5 +1,5 @@
 let ObjectId = require('mongodb').ObjectID;
-const collection = require("../../common/collections").applications;
+const collection = require("../../../../config/collections").applications;
 
 function getApplications(db, filter={}) {
     return new Promise((res, rej) => {

@@ -8,6 +8,7 @@ function createRecord(db, data, collection) {
 }
 
 function getRecords(db, collection, filter = {}) {
+    console.log(collection);
     return new Promise((res, rej) => {
         db.get(collection)
             .find(filter)
