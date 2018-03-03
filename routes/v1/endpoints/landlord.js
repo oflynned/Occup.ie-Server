@@ -1,7 +1,7 @@
 let express = require('express');
 let router = express.Router();
 
-let createLandlordUseCase = require("../use_cases/landlord/create_landlord");
+let createLandlordUseCase = require("../use_cases/landlord/landlord_account_creation");
 let retrieveLandlordUseCase = require("../use_cases/landlord/retrieve_landlord");
 
 module.exports = (db) => {

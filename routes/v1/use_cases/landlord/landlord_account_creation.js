@@ -11,12 +11,14 @@ function generateLandlord() {
 }
 
 function generateLandlordObject(payload) {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
         res({
             forename: payload["forename"],
             surname: payload["surname"],
             email: payload["email"],
-            phone_number: payload["facebook_id"],
+            phone_number: payload["phone_number"],
+            phone_verified: payload["phone_verified"],
+            identity_verified: payload["identity_verified"],
             profile_picture: payload["profile_picture"]
         })
     });

@@ -10,21 +10,19 @@ const schema = Joi.object().keys({
     profile_picture: Joi.string().required()
 });
 
-function generate(forename, surname) {
-    let landlord = {
+function generate(forename, surname, email, phoneNumber) {
+    return {
         forename: forename,
         surname: surname,
-        phoneNumber: "+353 86 123 4567",
+        email: email,
+        phone_number: phoneNumber,
         phone_verified: false,
         identity_verified: false,
         profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg"
     };
-
-    validate(landlord, schema);
-    return landlord;
 }
 
-function validate(o, schema) {
+function validate(o) {
     return Joi.validate(o, schema);
 }
 
