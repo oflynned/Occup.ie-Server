@@ -1,6 +1,6 @@
 const chai = require("chai");
-const env = require("../../../../config/collections").test;
-const app = require("../../../../app")(env);
+const env = require("../../../config/collections").test;
+const app = require("../../../app")(env);
 
 function postResource(endpoint, data) {
     return new Promise((res, rej) => {

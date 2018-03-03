@@ -34,5 +34,8 @@
     "serve-static": "^1.13.2",
     "should": "^13.2.1",
     "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "nyc": "^11.4.1"
   }
 }

@@ -15,7 +15,7 @@ describe("landlord account creation tests", () => {
     before(() => dropDb());
     afterEach(() => dropDb());
 
-    it("generated landlord should follow schema", (done) => {
+    it("should follow landlord schema for generate account", (done) => {
         let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
         model.validate(landlord);
         useCase.createAccount(db, collection, landlord)
@@ -28,7 +28,7 @@ describe("landlord account creation tests", () => {
             .catch((err) => done(err));
     });
 
-    it("missing params should throw an error", (done) => {
+    it("should throw an error on missing params", (done) => {
         let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
         delete landlord["forename"];
         model.validate(landlord)
@@ -36,7 +36,7 @@ describe("landlord account creation tests", () => {
             .catch((err) => done())
     });
 
-    it("junk params should be discarded", (done) => {
+    it("should discard junk params", (done) => {
         let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
         landlord["parameter"] = "junk";
 
@@ -45,6 +45,7 @@ describe("landlord account creation tests", () => {
 
         assert.notEqual(record, landlord);
         assert.equal("parameter" in landlord, true);
+
         delete landlord["parameter"];
         assert.deepEqual(record, landlord);
 

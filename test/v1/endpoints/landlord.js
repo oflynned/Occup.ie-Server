@@ -4,14 +4,14 @@ const chaiHttp = require("chai-http");
 const expect = chai.expect;
 const ObjectId = require("mongodb").ObjectId;
 
-const config = require('../../../../config/db');
+const config = require('../../../config/db');
 const db = require('monk')(config.mongoUrl);
-const env = require("../../../../config/collections").test;
+const env = require("../../../config/collections").test;
 const collection = env.landlords;
 
-const model = require("../../../../routes/v1/models/landlord");
-const creationUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
-const retrievalUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
+const model = require("../../../routes/v1/models/landlord");
+const creationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
+const retrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
 const helper = require("./helper");
 
 function dropDb() {
@@ -21,7 +21,7 @@ function dropDb() {
 function seedDb() {
     const landlord1 = model.generate("John", "Smith", "john.smith@test.com", "0");
     const landlord2 = model.generate("Emma", "Sheeran", "emma.sheeran@test.com", "1");
-    const landlord3 = model.generate("Edmond", "O'Flynn", "edmond.oflynn@test.com", "2");
+    const landlord3 = model.generate("Edmond", "Ó Floinn", "edmond.ofloinn@test.com", "2");
 
     return Promise.all([
         creationUseCase.createAccount(db, collection, landlord1),
@@ -30,7 +30,7 @@ function seedDb() {
     ]);
 }
 
-describe("api landlord account creation", () => {
+describe("api landlord account management", () => {
     beforeEach((done) => {
         dropDb()
             .then(() => seedDb())
@@ -46,7 +46,7 @@ describe("api landlord account creation", () => {
     });
 
     it('should return status 201 and new resource if creating a new landlord', (done) => {
-        let newLandlord = model.generate("New", "User", "new.user@test.com", "4");
+        let newLandlord = model.generate("New", "Landlord", "new.user@test.com", "4");
 
         dropDb()
             .then(() => retrievalUseCase.getLandlords(db, collection))

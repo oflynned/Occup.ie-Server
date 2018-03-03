@@ -4,8 +4,21 @@ let record = require("../common/record");
 function validatePayload(data) {
     return new Promise((res, rej) => {
         let results = user.validate(data);
-        results["error"] === null ? res() : rej(results["error"]);
+        results["error"] === null ? res() : rej(new Error("bad_request"));
     })
+}
+
+function getUserAge(birthday) {
+    let date = birthday.split("-");
+    let ageDiffMillis = Date.now() - new Date(date[0], date[1], date[2]).getTime();
+    let ageDate = new Date(ageDiffMillis);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
+
+function validateUserAge(data) {
+    return new Promise((res, rej) => {
+        getUserAge(data["dob"]) >= 18 ? res() : rej(new Error("underage_user"));
+    });
 }
 
 function validateUserIsUnique(db, collection, data) {
@@ -16,7 +29,7 @@ function validateUserIsUnique(db, collection, data) {
                 if (users.length === 0)
                     res();
                 else
-                    throw new Error("User is not unique");
+                    throw new Error("user_not_unique");
             })
             .catch((err) => rej(err))
     })
@@ -57,6 +70,7 @@ function createAccount(db, collection, data) {
 }
 
 module.exports = {
+    validateUserAge: validateUserAge,
     validatePayload: validatePayload,
     validateUserIsUnique: validateUserIsUnique,
     generateUserObject: generateUserObject,

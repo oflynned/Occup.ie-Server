@@ -1,33 +1,27 @@
-let ObjectId = require('mongodb').ObjectID;
+let record = require("../common/record");
+
+function doesUserExist(db, collection, filter) {
+    return new Promise((res, rej) => {
+        record.getRecords(db, collection, filter)
+            .then((records) => records.length > 0 ? res() : rej())
+            .catch((err) => new Error("User doesn't exist"))
+    })
+}
 
 function getUsers(db, collection, filter = {}) {
-    return new Promise((res, rej) => {
-        db.get(collection)
-            .find(filter)
-            .then((records) => res(records))
-            .catch((err) => rej(err))
-    })
+    return record.getRecords(db, collection, filter)
 }
 
 function modifyUser(db, collection, data, id) {
-    return new Promise((res, rej) => {
-        db.get(collection)
-            .update({_id: ObjectId(id)}, {"$set": data})
-            .then(() => res(data))
-            .catch((err) => rej(err));
-    })
+    return record.modifyRecord(db, collection, data, id)
 }
 
 function deleteUser(db, collection, id) {
-    return new Promise((res, rej) => {
-        db.get(collection)
-            .remove({_id: ObjectId(id)})
-            .then((record) => res(record))
-            .catch((err) => rej(err))
-    })
+    return record.deleteRecord(db, collection, id)
 }
 
 module.exports = {
+    doesUserExist: doesUserExist,
     getUsers: getUsers,
     modifyUser: modifyUser,
     deleteUser: deleteUser

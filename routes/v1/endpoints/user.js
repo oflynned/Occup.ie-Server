@@ -10,14 +10,26 @@ module.exports = (db, env) => {
 
     router.post("/", (req, res) => {
         createUserUseCase.validatePayload(req.body)
+            .then(() => createUserUseCase.validateUserAge(req.body))
             .then(() => createUserUseCase.validateUserIsUnique(db, collection, req.body))
-            .then(() => {
-                createUserUseCase.generateUserObject(req.body)
-                    .then((data) => createUserUseCase.createAccount(db, collection, data))
-                    .then((data) => res.status(201).json(data))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => createUserUseCase.generateUserObject(req.body))
+            .then((data) => createUserUseCase.createAccount(db, collection, data))
+            .then((data) => res.status(201).json(data))
+            .catch((err) => {
+                console.log(err);
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).json(err);
+                        break;
+                    case "user_not_unique":
+                    case "underage_user":
+                        res.status(403).json(err);
+                        break;
+                    default:
+                        res.status(500).json(err);
+                        break;
+                }
             })
-            .catch((err) => res.status(400).json(err))
     });
 
     router.get("/", (req, res) => {
@@ -28,22 +40,33 @@ module.exports = (db, env) => {
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)})
-            .then((user) => res.status(200).json(user))
-            .catch((err) => res.status(500).json(err))
+        retrieveUserUseCase.doesUserExist(db, collection, {_id: ObjectId(uuid)})
+            .then(() => {
+                retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)})
+                    .then((users) => res.status(200).json(users[0]))
+                    .catch((err) => res.status(500).json(err))
+            })
+            .catch((err) => res.status(404).json(err))
     });
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createUserUseCase.validatePayload(req.body)
-            .then(() => {
-                retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)})
-                    .then((user) => createUserUseCase.getUserParams(user[0], req.body))
-                    .then((user) => retrieveUserUseCase.modifyUser(db, collection, user, uuid))
-                    .then((user) => res.status(200).json(user))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)}))
+            .then((users) => createUserUseCase.getUserParams(users[0], req.body))
+            .then((user) => retrieveUserUseCase.modifyUser(db, collection, user, uuid))
+            .then((user) => res.status(200).json(user))
+            .catch((err) => {
+                console.log(err);
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).json(err);
+                        break;
+                    default:
+                        res.status(500).json(err);
+                        break;
+                }
             })
-            .catch((err) => res.status(400).json(err))
     });
 
     router.delete('/:uuid', (req, res) => {
@@ -54,4 +77,5 @@ module.exports = (db, env) => {
     });
 
     return router;
-};
+}
+;
