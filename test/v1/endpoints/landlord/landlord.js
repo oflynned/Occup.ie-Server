@@ -59,6 +59,18 @@ describe("api landlord account creation", () => {
             .catch((err) => done(err))
     });
 
+    it('should return 400 for missing parameters on creating a new landlord', (done) => {
+        let newLandlord = model.generate("New", "User", "new.user@test.com", "4");
+        delete newLandlord["forename"];
+
+        helper.postResource(`/api/v1/landlord`, newLandlord)
+            .then(() => done(new Error("Failed validation for incorrect parameters on landlord creation")))
+            .catch((err) => {
+                assert.equal(err.response.status, 400);
+                done()
+            })
+    });
+
     it("should return a list and status 200 if requesting existing landlords", (done) => {
         helper.getResource("/api/v1/landlord")
             .then((res) => {
@@ -124,7 +136,7 @@ describe("api landlord account creation", () => {
             .catch((err) => done(err))
     });
 
-    it('should return status 200 if deleting resource', (done) => {
+    it('should return status 200 if deleting resource and assert old record is gone', (done) => {
         let deletedRecord = {};
 
         retrievalUseCase.getLandlords(db, collection, {forename: "Emma"})
