@@ -1,14 +1,15 @@
 let express = require('express');
 let router = express.Router();
 
+const collection = require("../common/collections").development.landlords;
 let createLandlordUseCase = require("../use_cases/landlord/landlord_account_creation");
-let retrieveLandlordUseCase = require("../use_cases/landlord/retrieve_landlord");
+let retrieveLandlordUseCase = require("../use_cases/common/landlord_account_retrieval");
 
 module.exports = (db) => {
     router.post("/", (req, res) => {
         createLandlordUseCase.validatePayload(db)
             .then(() => {
-                createLandlordUseCase.createAccount(db, req.body)
+                createLandlordUseCase.createAccount(db, req.body, collection)
                     .then((data) => res.status(201).json(data))
                     .catch((err) => res.status(500).json(err))
             })

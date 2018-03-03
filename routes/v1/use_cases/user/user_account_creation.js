@@ -1,6 +1,6 @@
 const collection = require("../../common/collections").users;
 let user = require("../../models/user");
-let record = require("../common/create_record");
+let record = require("../common/record_creation");
 
 function validatePayload(data) {
     return new Promise((res, rej) => {

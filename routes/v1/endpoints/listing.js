@@ -2,8 +2,8 @@ let express = require('express');
 let router = express.Router();
 let ObjectId = require('mongodb').ObjectID;
 
-let createListingUseCase = require('../use_cases/landlord/new_listing_creation');
-let retrieveListingUseCase = require('../use_cases/landlord/retrieve_listing');
+let createListingUseCase = require('../use_cases/landlord/listing_creation');
+let retrieveListingUseCase = require('../use_cases/common/listing_retrieval');
 
 module.exports = (db) => {
     router.post('/', (req, res) => {

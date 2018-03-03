@@ -1,27 +1,20 @@
-const collection = require("../../common/collections").landlords;
 let landlord = require("../../models/landlord");
-let record = require("../common/create_record");
+let record = require("../common/record_creation");
 
 function validatePayload(data) {
     return landlord.validate(data)
 }
 
-function generateLandlord() {
-    return landlord.generate("John", "Smith")
-}
-
 function generateLandlordObject(payload) {
-    return new Promise((res) => {
-        res({
-            forename: payload["forename"],
-            surname: payload["surname"],
-            email: payload["email"],
-            phone_number: payload["phone_number"],
-            phone_verified: payload["phone_verified"],
-            identity_verified: payload["identity_verified"],
-            profile_picture: payload["profile_picture"]
-        })
-    });
+    return {
+        forename: payload["forename"],
+        surname: payload["surname"],
+        email: payload["email"],
+        phone_number: payload["phone_number"],
+        phone_verified: payload["phone_verified"],
+        identity_verified: payload["identity_verified"],
+        profile_picture: payload["profile_picture"]
+    };
 }
 
 function getLandlordParams(landlord, updatedLandlord) {
@@ -35,13 +28,12 @@ function getLandlordParams(landlord, updatedLandlord) {
     return landlord;
 }
 
-function createAccount(db, data) {
+function createAccount(db, data, collection) {
     return record.createRecord(db, data, collection)
 }
 
 module.exports = {
     validatePayload: validatePayload,
-    generateLandlord: generateLandlord,
     getLandlordParams: getLandlordParams,
     generateLandlordObject: generateLandlordObject,
     createAccount: createAccount

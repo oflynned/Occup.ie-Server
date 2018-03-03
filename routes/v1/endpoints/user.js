@@ -2,8 +2,8 @@ let ObjectId = require("mongodb").ObjectId;
 let express = require('express');
 let router = express.Router();
 
-let createUserUseCase = require("../use_cases/user/create_user");
-let retrieveUserUseCase = require("../use_cases/user/retrieve_user");
+let createUserUseCase = require("../use_cases/user/user_account_creation");
+let retrieveUserUseCase = require("../use_cases/user/user_account_retrieval");
 
 module.exports = (db) => {
     router.post("/", (req, res) => {
