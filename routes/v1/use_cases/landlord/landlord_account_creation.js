@@ -1,40 +1,35 @@
 let landlord = require("../../models/landlord");
 let record = require("../common/record");
 
-function validatePayload(data) {
-    return landlord.validate(data)
-}
-
-function generateLandlordObject(payload) {
-    return {
-        forename: payload["forename"],
-        surname: payload["surname"],
-        email: payload["email"],
-        phone_number: payload["phone_number"],
-        phone_verified: payload["phone_verified"],
-        identity_verified: payload["identity_verified"],
-        profile_picture: payload["profile_picture"]
-    };
-}
-
-function getLandlordParams(landlord, updatedLandlord) {
-    landlord["forename"] = updatedLandlord["forename"] === undefined ? landlord["forename"] : updatedLandlord["forename"];
-    landlord["surname"] = updatedLandlord["surname"] === undefined ? landlord["surname"] : updatedLandlord["surname"];
-    landlord["email"] = updatedLandlord["email"] === undefined ? landlord["email"] : updatedLandlord["email"];
-    landlord["phone_number"] = updatedLandlord["phone_number"] === undefined ? landlord["phone_number"] : updatedLandlord["phone_number"];
-    landlord["profile_picture"] = updatedLandlord["profile_picture"] === undefined ? landlord["profile_picture"] : updatedLandlord["profile_picture"];
-
-    validatePayload(landlord);
-    return landlord;
-}
-
-function createAccount(db, collection, data) {
-    return record.createRecord(db, collection, data)
-}
-
 module.exports = {
-    validatePayload: validatePayload,
-    getLandlordParams: getLandlordParams,
-    generateLandlordObject: generateLandlordObject,
-    createAccount: createAccount
+    validatePayload: function (data) {
+        return landlord.validate(data)
+    },
+
+    getLandlordParams: function (obj, newObj) {
+        obj["forename"] = newObj["forename"] === undefined ? obj["forename"] : newObj["forename"];
+        obj["surname"] = newObj["surname"] === undefined ? obj["surname"] : newObj["surname"];
+        obj["profile_picture"] = newObj["profile_picture"] === undefined ? obj["profile_picture"] : newObj["profile_picture"];
+
+        // TODO allow updating of phone number, but validation has to revert back to false
+
+        landlord.validate(obj);
+        return obj;
+    },
+
+    generateLandlordObject: function (payload) {
+        return {
+            forename: payload["forename"],
+            surname: payload["surname"],
+            email: payload["email"],
+            phone_number: payload["phone_number"],
+            phone_verified: payload["phone_verified"],
+            identity_verified: payload["identity_verified"],
+            profile_picture: payload["profile_picture"]
+        };
+    },
+
+    createAccount: function (db, collection, data) {
+        return record.createRecord(db, collection, data)
+    }
 };
