@@ -16,18 +16,20 @@ module.exports = (db, col) => {
         let payload = req.body;
 
         createListingUseCase.validatePayload(payload)
+            .then(() => retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, payload["landlord_uuid"]))
             .then(() => retrieveLandlordUseCase.isLandlordIdentityVerified(db, landlordCol, payload["landlord_uuid"]))
             .then(() => retrieveLandlordUseCase.isLandlordPhoneVerified(db, landlordCol, payload["landlord_uuid"]))
             .then(() => createListingUseCase.validatePropertyIsUnique(db, listingCol, payload["address"]))
             .then(() => createListingUseCase.createListing(db, listingCol, payload))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
-                switch (err) {
+                switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
                         break;
                     case "unverified_phone":
                     case "unverified_identity":
+                    case "non_existent_landlord":
                         res.status(403).send();
                         break;
                     default:
