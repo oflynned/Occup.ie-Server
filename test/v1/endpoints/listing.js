@@ -58,7 +58,7 @@ function createLandlords() {
     return landlordCreationUseCase.createAccount(db, landlordCol, landlord)
 }
 
-function createListing(landlordUuid) {
+function createListingObject(landlordUuid) {
     const today = new Date();
     let expiry = new Date();
     expiry.setDate(today.getDate() + 21);
@@ -97,7 +97,7 @@ describe("api listing management", () => {
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
-            .then((uuid) => createListing(uuid))
+            .then((uuid) => createListingObject(uuid))
             .then((listing) => helper.postResource(`/api/v1/listing`, listing))
             .then((res) => assert.equal(res.status, 201))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
@@ -112,26 +112,52 @@ describe("api listing management", () => {
         landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"})
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
-            .then((uuid) => createListing(uuid))
+            .then((uuid) => createListingObject(uuid))
             .then((listing) => helper.postResource(`/api/v1/listing`, listing))
-            .then(() => done(new Error("Incorrectly accepted landlord without verified phone number")))
+            .then(() => done(new Error("Incorrectly accepted landlord listing creation without verified phone number")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
                 done()
             })
     });
 
-    it('should return 403 on creating a listing if the landlord is not id verified', (done) => {
+    it('should return 403 on creating a listing if the landlord is not government id verified', (done) => {
         landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"})
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
-            .then((uuid) => createListing(uuid))
+            .then((uuid) => createListingObject(uuid))
             .then((listing) => helper.postResource(`/api/v1/listing`, listing))
-            .then(() => done(new Error("Incorrectly accepted landlord without verified phone number")))
+            .then(() => done(new Error("Incorrectly accepted landlord list creation without verified government id")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
                 done()
             })
     });
-})
-;
+
+    it('should return 403 on creating a listing if the landlord uuid does not exist', (done) => {
+        const nonExistentUuid = ObjectId();
+        Promise.resolve(createListingObject(nonExistentUuid))
+            .then((listing) => helper.postResource(`/api/v1/listing`, listing))
+            .then(() => done(new Error("Incorrectly accepted new listing given non-existent landlord uuid")))
+            .catch((err) => {
+                assert.equal(err.response.status, 403);
+                done()
+            })
+    });
+
+    it('should return 200 on a get request given the listing id of a property that exists', (done) => {
+        done()
+    });
+
+    it('should return 404 on a get request given the listing id of a property that does not exist', (done) => {
+        done()
+    });
+
+    it('should return 200 on a landlord deleting a listing that exists successfully', (done) => {
+        done()
+    });
+
+    it('should return 404 on a landlord deleting a listing that does not exist', (done) => {
+        done()
+    });
+});

@@ -97,12 +97,9 @@ describe("api landlord account management", () => {
     it("should return status 404 if requesting a non-existing landlord by uuid", (done) => {
         const nonExistentUuid = ObjectId();
         helper.getResource(`/api/v1/landlord/${nonExistentUuid}`)
-            .then((res) => {
-                done("Failure by accepting validation of non-existent resource!")
-            })
+            .then(() => done("Failure by accepting validation of non-existent resource!"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
-                assert.equal(err.response.body.length, 0);
                 done()
             });
     });
@@ -145,10 +142,8 @@ describe("api landlord account management", () => {
                 return deletedRecord["_id"]
             })
             .then((uuid) => helper.deleteResource(`/api/v1/landlord/${uuid}`))
-            .then((res) => {
-                assert.equal(res.status, 200);
-                return retrievalUseCase.getLandlords(db, collection)
-            })
+            .then((res) => assert.equal(res.status, 200))
+            .then(() => retrievalUseCase.getLandlords(db, collection))
             .then((landlords) => {
                 assert.equal(landlords.length, 2);
                 assert.equal(!(deletedRecord in landlords), true);
