@@ -16,7 +16,6 @@ module.exports = (db, env) => {
             .then((data) => createUserUseCase.createAccount(db, collection, data))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
-                console.log(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).json(err);

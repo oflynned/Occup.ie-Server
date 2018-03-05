@@ -5,19 +5,36 @@ let ObjectId = require('mongodb').ObjectID;
 let createListingUseCase = require('../use_cases/listing/listing_creation');
 let retrieveListingUseCase = require('../use_cases/listing/listing_retrieval');
 
+let createLandlordUseCase = require('../use_cases/landlord/landlord_account_creation');
+let retrieveLandlordUseCase = require('../use_cases/landlord/landlord_account_retrieval');
+
 module.exports = (db, col) => {
-    const collection = col["listings"];
+    const landlordCol = col["landlords"];
+    const listingCol = col["listings"];
 
     router.post('/', (req, res) => {
         let payload = req.body;
+
         createListingUseCase.validatePayload(payload)
-            .then(() => createListingUseCase.validatePropertyIsUnique(db, collection, payload["address"]))
-            .then(() => {
-                createListingUseCase.createListing(db, payload)
-                    .then((data) => res.status(201).json(data))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => retrieveLandlordUseCase.isLandlordIdentityVerified(db, landlordCol, payload["landlord_uuid"]))
+            .then(() => retrieveLandlordUseCase.isLandlordPhoneVerified(db, landlordCol, payload["landlord_uuid"]))
+            .then(() => createListingUseCase.validatePropertyIsUnique(db, listingCol, payload["address"]))
+            .then(() => createListingUseCase.createListing(db, listingCol, payload))
+            .then((data) => res.status(201).json(data))
+            .catch((err) => {
+                switch (err) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    case "unverified_phone":
+                    case "unverified_identity":
+                        res.status(403).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
             })
-            .catch((err) => res.status(400).json(err))
     });
 
     router.get('/', (req, res) => {
