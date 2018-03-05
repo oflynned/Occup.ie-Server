@@ -1,6 +1,6 @@
 const ObjectId = require("mongodb").ObjectId;
 
-function createRecord(db, data, collection) {
+function createRecord(db, collection, data) {
     return new Promise((res, rej) => {
         db.get(collection)
             .insert(data)
@@ -21,10 +21,8 @@ function getRecords(db, collection, filter = {}) {
 function modifyRecord(db, collection, data, id) {
     return new Promise((res, rej) => {
         db.get(collection)
-            .update({_id: ObjectId(id)}, {"$set": data})
-            .then(() => {
-                res(data)
-            })
+            .update({_id: id}, {"$set": data})
+            .then(() => res(data))
             .catch((err) => rej(err));
     })
 }
