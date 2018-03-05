@@ -29,7 +29,7 @@ function getLandlordParams(landlord, updatedLandlord) {
 }
 
 function createAccount(db, collection, data) {
-    return record.createRecord(db, data, collection)
+    return record.createRecord(db, collection, data)
 }
 
 module.exports = {
