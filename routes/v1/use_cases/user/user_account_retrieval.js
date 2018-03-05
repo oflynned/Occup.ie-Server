@@ -4,8 +4,8 @@ module.exports = {
     doesUserExist: function (db, collection, filter) {
         return new Promise((res, rej) => {
             record.getRecords(db, collection, filter)
-                .then((records) => records.length > 0 ? res() : rej())
-                .catch(() => new Error("User doesn't exist"))
+                .then((records) => records.length > 0 ? res() : rej(new Error("user_already_exists")))
+                .catch((err) => rej(err))
         })
     },
 
