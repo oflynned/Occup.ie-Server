@@ -107,12 +107,9 @@ describe("api user account management", () => {
     it("should return status 404 if requesting a non-existing user by uuid", (done) => {
         const nonExistentUuid = ObjectId();
         helper.getResource(`/api/v1/user/${nonExistentUuid}`)
-            .then((res) => {
-                done("Failure by accepting validation of non-existent resource!")
-            })
+            .then(() => done("Failure by accepting validation of non-existent resource!"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
-                assert.equal(err.response.body.length, 0);
                 done()
             });
     });

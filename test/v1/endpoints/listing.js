@@ -33,7 +33,11 @@ function dropDb() {
 }
 
 function seedDb() {
-    return Promise.all([createLandlords()])
+    return createLandlord()
+        .then((landlord) => landlord["_id"])
+        .then((uuid) => createListingObject(uuid))
+        .then((listing) => listingCreationUseCase.createListing(db, listingCol, listing))
+        .then(() => createUsers())
 }
 
 function getDobFromAge(age) {
@@ -53,7 +57,7 @@ function createUsers() {
     ])
 }
 
-function createLandlords() {
+function createLandlord() {
     const landlord = landlordModel.generate("Emma", "Sheeran", "emma.sheeran@test.com", "0");
     return landlordCreationUseCase.createAccount(db, landlordCol, landlord)
 }
@@ -93,7 +97,9 @@ describe("api listing management", () => {
     });
 
     it('should return 201 on creating a listing if the landlord is verified', (done) => {
-        landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"})
+        dropDb()
+            .then(() => createLandlord())
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"}))
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
@@ -146,7 +152,15 @@ describe("api listing management", () => {
     });
 
     it('should return 200 on a get request given the listing id of a property that exists', (done) => {
-        done()
+        listingRetrievalUseCase.getListings(db, listingCol)
+            .then((listings) => listings[0]["landlord_uuid"])
+            .then((uuid) => helper.getResource(`/api/v1/listing/${uuid}`))
+            .then((res) => {
+                assert.equal(res.status, 200);
+                // assert.equal(res.body.length, 1);
+                done()
+            })
+            .catch((err) => done(err))
     });
 
     it('should return 404 on a get request given the listing id of a property that does not exist', (done) => {
