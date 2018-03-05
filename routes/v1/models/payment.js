@@ -4,10 +4,8 @@ const schema = Joi.object.keys({
 
 });
 
-function validate(o) {
-    return Joi.validate(o, schema);
-}
-
 module.exports = {
-    validate: validate
+    validate: function (o) {
+        return Joi.validate(o, schema);
+    }
 };

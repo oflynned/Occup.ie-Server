@@ -13,26 +13,23 @@ const schema = Joi.object().keys({
     profession: Joi.valid("student", "professional").required()
 });
 
-function generate(forename, surname, dob, sex, profession) {
-    return {
-        email: `${forename}.${surname}@test.com`,
-        forename: forename,
-        surname: surname,
-        facebook_id: `${forename}_${surname}_fb_id`,
-        facebook_token: `${forename}_${surname}_fb_token`,
-        identity_verified: false,
-        profile_picture: "http://f1.thejournal.ie/media/2013/08/james-larkin-2-337x500.jpg",
-        dob: dob,
-        sex: sex,
-        profession: profession
-    };
-}
-
-function validate(o) {
-    return Joi.validate(o, schema, {allowUnknown: true})
-}
-
 module.exports = {
-    generate: generate,
-    validate: validate
+    generate: function (forename, surname, dob, sex, profession) {
+        return {
+            email: `${forename.toLowerCase()}.${surname.toLowerCase()}@test.com`,
+            forename: forename,
+            surname: surname,
+            facebook_id: `${forename.toLowerCase()}_${surname.toLowerCase()}_fb_id`,
+            facebook_token: `${forename.toLowerCase()}_${surname.toLowerCase()}_fb_token`,
+            identity_verified: false,
+            profile_picture: "http://f1.thejournal.ie/media/2013/08/james-larkin-2-337x500.jpg",
+            dob: dob,
+            sex: sex,
+            profession: profession
+        };
+    },
+
+    validate: function (o) {
+        return Joi.validate(o, schema, {allowUnknown: true})
+    }
 };

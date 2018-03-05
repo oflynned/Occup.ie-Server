@@ -10,23 +10,19 @@ const schema = Joi.object().keys({
     profile_picture: Joi.string().required()
 });
 
-function generate(forename, surname, email, phoneNumber) {
-    return {
-        forename: forename,
-        surname: surname,
-        email: email,
-        phone_number: phoneNumber,
-        phone_verified: false,
-        identity_verified: false,
-        profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg"
-    };
-}
-
-function validate(o) {
-    return Joi.validate(o, schema, {allowUnknown: true})
-}
-
 module.exports = {
-    validate: validate,
-    generate: generate
+    validate: function (o) {
+        return Joi.validate(o, schema, {allowUnknown: true})
+    },
+    generate: function (forename, surname, email, phoneNumber) {
+        return {
+            forename: forename,
+            surname: surname,
+            email: email,
+            phone_number: phoneNumber,
+            phone_verified: false,
+            identity_verified: false,
+            profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg"
+        };
+    }
 };

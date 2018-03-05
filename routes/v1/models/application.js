@@ -7,10 +7,8 @@ const schema = Joi.object.keys({
     status: Joi.string().required().valid("pending", "accepted", "rejected", "ceased")
 });
 
-function validate(o) {
-    return Joi.validate(o, schema);
-}
-
 module.exports = {
-    validate: validate
+    validate: function (o) {
+        return Joi.validate(o, schema);
+    }
 };
