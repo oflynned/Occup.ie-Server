@@ -10,51 +10,92 @@ module.exports = (db, col) => {
 
     router.post("/", (req, res) => {
         createLandlordUseCase.validatePayload(req.body)
-            .then(() => {
-                createLandlordUseCase.createAccount(db, collection, req.body)
-                    .then((data) => res.status(201).json(data))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => createLandlordUseCase.createAccount(db, collection, req.body))
+            .then((data) => res.status(201).json(data))
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
             })
-            .catch((err) => res.status(400).json(err))
     });
 
     router.get("/", (req, res) => {
         retrieveLandlordUseCase.getLandlords(db, collection)
             .then((landlords) => res.status(200).json(landlords))
-            .catch((err) => res.status(500).json(err))
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         retrieveLandlordUseCase.doesLandlordExist(db, collection, {_id: ObjectId(uuid)})
-            .then(() => {
-                retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)})
-                    .then((landlords) => res.status(200).json(landlords[0]))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)}))
+            .then((landlords) => res.status(200).json(landlords[0]))
+            .catch((err) => {
+                console.log(err);
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    case "non_existent_landlord":
+                        res.status(404).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
             })
-            .catch((err) => res.status(404).json(err))
     });
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createLandlordUseCase.validatePayload(req.body)
-            .then(() => {
-                retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)})
-                    .then((landlords) => createLandlordUseCase.getLandlordParams(landlords[0], req.body))
-                    .then((landlord) => retrieveLandlordUseCase.modifyLandlord(db, collection, landlord, uuid))
-                    .then((landlord) => res.status(200).json(landlord))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)}))
+            .then((landlords) => createLandlordUseCase.getLandlordParams(landlords[0], req.body))
+            .then((landlord) => retrieveLandlordUseCase.modifyLandlord(db, collection, landlord, uuid))
+            .then((landlord) => res.status(200).json(landlord))
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
             })
-            .catch((err) => res.status(400).json(err))
     });
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         retrieveLandlordUseCase.deleteLandlord(db, collection, uuid)
             .then((landlord) => res.status(200).json(landlord))
-            .catch((err) => res.status(500).json(err))
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
     });
 
 
     return router;
-};
+}
+;

@@ -23,8 +23,10 @@ module.exports = (db, col) => {
             .then(() => createListingUseCase.createListing(db, listingCol, payload))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
+                console.log(err);
                 switch (err.message) {
                     case "bad_request":
+                    case "property_not_unique":
                         res.status(400).send();
                         break;
                     case "unverified_phone":
@@ -40,14 +42,14 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveListingUseCase.getListings(db, collection)
+        retrieveListingUseCase.getListings(db, listingCol)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.getListings(db, collection, {_id: ObjectId(uuid)})
+        retrieveListingUseCase.getListings(db, listingCol, {_id: ObjectId(uuid)})
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
@@ -55,21 +57,28 @@ module.exports = (db, col) => {
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createListingUseCase.validatePayload(req.data)
-            .then(() => {
-                retrieveListingUseCase.modifyListing(db, collection, req.body, uuid)
-                    .then(() => res.status(200).send())
-                    .catch((err) => res.status(500).json(err))
+            .then(() => retrieveListingUseCase.modifyListing(db, listingCol, req.body, uuid))
+            .then(() => res.status(200).send())
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
             })
-            .catch((err) => res.status(400).json(err))
 
     });
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.deleteListing(db, collection, uuid)
+        retrieveListingUseCase.deleteListing(db, listingCol, uuid)
             .then((property) => res.status(200).json(property))
             .catch((err) => res.status(500).json(err))
     });
 
     return router;
-};
+}
+;

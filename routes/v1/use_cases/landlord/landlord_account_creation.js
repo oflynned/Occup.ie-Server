@@ -3,7 +3,10 @@ let record = require("../common/record");
 
 module.exports = {
     validatePayload: function (data) {
-        return landlord.validate(data)
+        return new Promise((res, rej) => {
+            let results = landlord.validate(data);
+            results["error"] === null ? res() : rej(new Error("bad_request"));
+        })
     },
 
     getLandlordParams: function (obj, newObj) {

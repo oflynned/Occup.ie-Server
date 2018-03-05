@@ -40,12 +40,18 @@ module.exports = (db, env) => {
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         retrieveUserUseCase.doesUserExist(db, collection, {_id: ObjectId(uuid)})
-            .then(() => {
-                retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)})
-                    .then((users) => res.status(200).json(users[0]))
-                    .catch((err) => res.status(500).json(err))
+            .then(() => retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)}))
+            .then((users) => res.status(200).json(users[0]))
+            .catch((err) => {
+                switch (err.message) {
+                    case "non_existent_user":
+                        res.status(404).json(err);
+                        break;
+                    default:
+                        res.status(500).json(err);
+                        break;
+                }
             })
-            .catch((err) => res.status(404).json(err))
     });
 
     router.put('/:uuid', (req, res) => {
