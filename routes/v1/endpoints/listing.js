@@ -23,7 +23,6 @@ module.exports = (db, col) => {
             .then(() => createListingUseCase.createListing(db, listingCol, payload))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
-                console.log(err);
                 switch (err.message) {
                     case "bad_request":
                     case "property_not_unique":
@@ -49,9 +48,19 @@ module.exports = (db, col) => {
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.getListings(db, listingCol, {_id: ObjectId(uuid)})
+        retrieveListingUseCase.doesListingExist(db, listingCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveListingUseCase.getListings(db, listingCol, {_id: ObjectId(uuid)}))
             .then((properties) => res.status(200).json(properties))
-            .catch((err) => res.status(500).json(err))
+            .catch((err) => {
+                switch (err.message) {
+                    case "non_existent_listing":
+                        res.status(404).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
     });
 
     router.put('/:uuid', (req, res) => {

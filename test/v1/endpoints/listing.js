@@ -153,18 +153,24 @@ describe("api listing management", () => {
 
     it('should return 200 on a get request given the listing id of a property that exists', (done) => {
         listingRetrievalUseCase.getListings(db, listingCol)
-            .then((listings) => listings[0]["landlord_uuid"])
+            .then((listings) => listings[0]["_id"])
             .then((uuid) => helper.getResource(`/api/v1/listing/${uuid}`))
             .then((res) => {
                 assert.equal(res.status, 200);
-                // assert.equal(res.body.length, 1);
+                assert.equal(res.body.length, 1);
                 done()
             })
             .catch((err) => done(err))
     });
 
     it('should return 404 on a get request given the listing id of a property that does not exist', (done) => {
-        done()
+        const nonExistentUuid = ObjectId();
+        helper.getResource(`/api/v1/listing/${nonExistentUuid}`)
+            .then(() => done("Incorrectly asserting that a non-existent property exists by a uuid"))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done();
+            })
     });
 
     it('should return 200 on a landlord deleting a listing that exists successfully', (done) => {

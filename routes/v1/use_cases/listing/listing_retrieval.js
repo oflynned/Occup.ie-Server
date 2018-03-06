@@ -1,30 +1,23 @@
-let ObjectId = require('mongodb').ObjectID;
+let record = require("../common/record");
 
 module.exports = {
-    getListings: function (db, collection, filter = {}) {
+    doesListingExist: function (db, collection, filter) {
         return new Promise((res, rej) => {
-            db.get(collection)
-                .find(filter)
-                .then((properties) => res(properties))
+            record.getRecords(db, collection, filter)
+                .then((records) => records.length > 0 ? res() : rej(new Error("non_existent_listing")))
                 .catch((err) => rej(err))
         })
     },
 
-    modifyListing: function (db, collection, id, data) {
-        return new Promise((res, rej) => {
-            db.get(collection)
-                .update({_id: ObjectId(id)}, {"$set": data})
-                .then(() => res(data))
-                .catch((err) => rej(err));
-        })
+    getListings: function (db, collection, filter = {}) {
+        return record.getRecords(db, collection, filter)
+    },
+
+    modifyListing: function (db, collection, data, id) {
+        return record.modifyRecord(db, collection, data, id)
     },
 
     deleteListing: function (db, collection, id) {
-        return new Promise((res, rej) => {
-            db.get(collection)
-                .remove({_id: ObjectId(id)})
-                .then((record) => res(record))
-                .catch((err) => rej(err))
-        })
+        return record.deleteRecord(db, collection, id)
     }
 };

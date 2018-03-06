@@ -45,7 +45,6 @@ module.exports = (db, col) => {
             .then(() => retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)}))
             .then((landlords) => res.status(200).json(landlords[0]))
             .catch((err) => {
-                console.log(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
