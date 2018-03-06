@@ -21,15 +21,15 @@ const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/li
 const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
 
-function dropDb() {
-    return Promise.all([db.get(listingCol).drop(), db.get(landlordCol).drop()])
-}
-
 function seedDb() {
     return createLandlord()
         .then((landlord) => landlord["_id"])
         .then((uuid) => createListingObject(uuid))
         .then((listing) => listingCreationUseCase.createListing(db, listingCol, listing))
+}
+
+function dropDb() {
+    return Promise.all([db.get(listingCol).drop(), db.get(landlordCol).drop()])
 }
 
 function createLandlord() {
@@ -38,10 +38,6 @@ function createLandlord() {
 }
 
 function createListingObject(landlordUuid) {
-    const today = new Date();
-    let expiry = new Date();
-    expiry.setDate(today.getDate() + 21);
-
     return Promise.resolve(
         listingModel.generate(
             "rent",
