@@ -65,13 +65,17 @@ module.exports = (db, col) => {
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        createListingUseCase.validatePayload(req.data)
+        createListingUseCase.validatePayload(req.body)
+            .then(() => retrieveListingUseCase.doesListingExist(db, listingCol, uuid))
             .then(() => retrieveListingUseCase.modifyListing(db, listingCol, req.body, uuid))
             .then(() => res.status(200).send())
             .catch((err) => {
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "non_existent_listing":
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).send();

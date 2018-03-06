@@ -27,7 +27,6 @@ module.exports = {
                 .catch((err) => rej(err));
         })
     },
-
     deleteRecord: function (db, collection, id) {
         return new Promise((res, rej) => {
             db.get(collection)
