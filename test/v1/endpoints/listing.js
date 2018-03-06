@@ -174,10 +174,33 @@ describe("api listing management", () => {
     });
 
     it('should return 200 on a landlord deleting a listing that exists successfully', (done) => {
-        done()
+        listingRetrievalUseCase.getListings(db, listingCol)
+            .then((listings) => listings[0]["_id"])
+            .then((uuid) => helper.deleteResource(`/api/v1/listing/${uuid}`))
+            .then((res) => assert.equal(res.status, 200))
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(((listings) => {
+                assert.equal(listings.length, 0);
+                done();
+            }))
+            .catch((err) => done(err))
     });
 
     it('should return 404 on a landlord deleting a listing that does not exist', (done) => {
-        done()
+        let nonExistingUuid = ObjectId();
+        let originalCount = 0;
+
+        listingRetrievalUseCase.getListings(db, listingCol)
+            .then((listings) => originalCount = listings.length)
+            .then(() => helper.deleteResource(`/api/v1/listing/${nonExistingUuid}`))
+            .then(() => done("Incorrectly asserting that a non-existent uuid for a listing was deleted"))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                listingRetrievalUseCase.getListings(db, listingCol)
+                    .then(((listings) => {
+                        assert.equal(listings.length, originalCount);
+                        done();
+                    }));
+            })
     });
 });

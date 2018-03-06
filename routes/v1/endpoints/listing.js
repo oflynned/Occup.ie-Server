@@ -83,9 +83,19 @@ module.exports = (db, col) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.deleteListing(db, listingCol, uuid)
+        retrieveListingUseCase.doesListingExist(db, listingCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveListingUseCase.deleteListing(db, listingCol, uuid))
             .then((property) => res.status(200).json(property))
-            .catch((err) => res.status(500).json(err))
+            .catch((err) => {
+                switch (err.message) {
+                    case "non_existent_listing":
+                        res.status(404).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
     });
 
     return router;
