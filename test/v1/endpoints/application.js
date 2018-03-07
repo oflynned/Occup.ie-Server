@@ -8,14 +8,19 @@ const config = require('../../../config/db');
 const db = require('monk')(config.mongoUrl);
 const env = require("../../../config/collections").test;
 
-const landlordCol = env.landlords;
 const userCol = env.users;
 const listingCol = env.listings;
+const landlordCol = env.landlords;
+const applicationCol = env.applications;
 
 const helper = require("./helper");
-const landlordModel = require("../../../routes/v1/models/landlord");
 const userModel = require("../../../routes/v1/models/user");
 const listingModel = require("../../../routes/v1/models/listing");
+const landlordModel = require("../../../routes/v1/models/landlord");
+const applicationModel = require("../../../routes/v1/models/application");
+
+const applicationCreationUseCase = require("../../../routes/v1/use_cases/application/application_creation");
+const applicationRetrievalUseCase = require("../../../routes/v1/use_cases/application/application_retrieval");
 
 const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/listing_creation");
 const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/listing_retrieval");
@@ -26,18 +31,20 @@ const userRetrievalUseCase = require("../../../routes/v1/use_cases/user/user_acc
 const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
 
-function dropDb() {
-    return db.get(listingCol).drop()
-        .then(() => db.get(userCol).drop())
-        .then(() => db.get(landlordCol).drop())
-}
-
 function seedDb() {
     return createLandlord()
-        .then((landlord) => landlord["_id"])
         .then((uuid) => createListingObject(uuid))
         .then((listing) => listingCreationUseCase.createListing(db, listingCol, listing))
         .then(() => createUsers())
+}
+
+function dropDb() {
+    return Promise.all([
+        db.get(listingCol).drop(),
+        db.get(userCol).drop(),
+        db.get(landlordCol).drop(),
+        db.get(applicationCol).drop()
+    ])
 }
 
 function getDobFromAge(age) {
@@ -46,20 +53,32 @@ function getDobFromAge(age) {
 }
 
 function createUsers() {
-    const user1 = userModel.generate("Edmond", "Ó Floinn", getDobFromAge(20), "male", "professional");
-    const user2 = userModel.generate("Student", "User", getDobFromAge(30), "female", "student");
-    const user3 = userModel.generate("Non-Binary", "User", getDobFromAge(40), "other", "professional");
+    const user1 = userModel.generate("Fitting", "Candidate", getDobFromAge(23), "male", "professional");
+    const user2 = userModel.generate("Wrong", "Profession", getDobFromAge(23), "male", "student");
+    const user3 = userModel.generate("Too", "Young", getDobFromAge(18), "male", "professional");
+    const user4 = userModel.generate("Too", "Old", getDobFromAge(30), "male", "professional");
+    const user5 = userModel.generate("Wrong", "Gender", getDobFromAge(23), "female", "professional");
 
     return Promise.all([
         userCreationUseCase.createAccount(db, userCol, user1),
         userCreationUseCase.createAccount(db, userCol, user2),
-        userCreationUseCase.createAccount(db, userCol, user3)
+        userCreationUseCase.createAccount(db, userCol, user3),
+        userCreationUseCase.createAccount(db, userCol, user4),
+        userCreationUseCase.createAccount(db, userCol, user5)
     ])
 }
 
 function createLandlord() {
-    const landlord = landlordModel.generate("Emma", "Sheeran", "emma.sheeran@test.com", "0");
+    const landlord = landlordModel.generate("Landlord", "Account", "landlord.account@test.com", "0");
+    let uuid;
+
     return landlordCreationUseCase.createAccount(db, landlordCol, landlord)
+        .then((landlord) => uuid = landlord["_id"])
+        .then(() => Promise.all([
+            landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid),
+            landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid)
+        ]))
+        .then(() => uuid)
 }
 
 function createListingObject(landlordUuid) {
@@ -97,10 +116,40 @@ describe("api application management", () => {
     });
 
     it('should return 201 to a new user who makes an application for a fitting listing', (done) => {
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((res) => assert.equal(res.status, 201))
+            .then(() => applicationRetrievalUseCase.getApplications(db, applicationCol))
+            .then((applications) => {
+                assert.equal(applications.length, 1);
+                done()
+            })
+            .catch((err) => done(err));
+    });
+
+    it('should return 403 to a new user (too young) who makes an application for a non-fitting listing', (done) => {
         done()
     });
 
-    it('should return 403 to a new user who makes an application for a non-fitting listing', (done) => {
+    it('should return 403 to a new user (too old) who makes an application for a non-fitting listing', (done) => {
+        done()
+    });
+
+    it('should return 403 to a new user (wrong profession) who makes an application for a non-fitting listing', (done) => {
+        done()
+    });
+
+    it('should return 403 to a new user (wrong gender) who makes an application for a non-fitting listing', (done) => {
         done()
     });
 

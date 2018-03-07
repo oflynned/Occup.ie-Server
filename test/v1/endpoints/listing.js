@@ -1,7 +1,6 @@
 const assert = require("assert");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const expect = chai.expect;
 const ObjectId = require("mongodb").ObjectId;
 
 const config = require('../../../config/db');
