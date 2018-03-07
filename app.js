@@ -17,17 +17,16 @@ module.exports = (env) => {
 
     app.use(express.static(path.join(__dirname, 'public')));
 
-    let index = require('./routes/v1/endpoints/index');
-    app.use('/', index);
-
     const config = require('./config/db');
     let db = require('monk')(config.mongoUrl);
 
+    let index = require('./routes/v1/endpoints/index')(db, env);
     let user = require('./routes/v1/endpoints/user')(db, env);
     let listing = require('./routes/v1/endpoints/listing')(db, env);
     let landlord = require('./routes/v1/endpoints/landlord')(db, env);
     let application = require('./routes/v1/endpoints/application')(db, env);
 
+    app.use('/', index);
     app.use('/api/v1/user', user);
     app.use('/api/v1/listing', listing);
     app.use('/api/v1/landlord', landlord);
