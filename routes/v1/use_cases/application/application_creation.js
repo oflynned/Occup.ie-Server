@@ -15,27 +15,6 @@ module.exports = {
         })
     },
 
-    validateApplicationIsFitting: function (db, collection, data) {
-        return new Promise((res, rej) => {
-            let query = {
-                user_id: data["user_id"],
-                landlord_id: data["landlord_id"],
-                listing_id: data["listing_id"]
-            };
-
-            record.getRecords(db, collection, query)
-                .then((listings) => {
-                    if (listings.length === 0)
-                        rej(new Error("non_existent_application"))
-
-                })
-        })
-    },
-
-    validateListingIsOpen: function () {
-        // TODO
-    },
-
     generateApplicationObject: function (db, collection, payload) {
         return {
             user_id: payload["user_id"],
