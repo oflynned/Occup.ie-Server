@@ -1,10 +1,10 @@
-function validateFacebookToken(req, token) {
-    return new Promise((rej, res) => {
-        // TODO call facebook api to validate token
-        res(true);
-    });
-}
-
 module.exports = {
-    validateFacebookToken: validateFacebookToken
+    validateFacebookToken: function (req, token) {
+        // TODO call facebook api to validate token
+        return Promise.resolve(true);
+    },
+
+    validateGoogleToken: function (req, token) {
+        return Promise.resolve(true);
+    }
 };
