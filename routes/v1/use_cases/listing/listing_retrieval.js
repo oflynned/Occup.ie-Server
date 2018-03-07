@@ -69,13 +69,16 @@ module.exports = {
                         inRange(userDob, maxDob, minDob) &&
                         listingSex.includes(userSex) && listingProfession.includes(userProfession);
 
-                    isSuitable ? res() : rej(new Error(("unfitting_candidate")))
+                    isSuitable ? res() : rej(new Error("unfitting_candidate"))
                 })
         })
     },
 
-    validateListingIsOpen: function () {
-        // TODO
+    validateListingIsOpen: function (db, collection, filter) {
+        return new Promise((res, rej) => {
+           record.getRecords(db, collection, filter)
+               .then((records) => records[0]["listing"]["status"] === "open" ? res() : rej("non_applicable_listing"))
+        });
     },
 
     getListings: function (db, collection, filter = {}) {
