@@ -30,7 +30,9 @@ module.exports = {
 
     validatePayload: function (data) {
         return new Promise((res, rej) => {
-            let results = application.validate(data);
+            let dataValidation = data;
+            delete dataValidation["_id"];
+            let results = application.validate(dataValidation);
             results["error"] === null ? res() : rej(new Error("bad_request"));
         })
     }
