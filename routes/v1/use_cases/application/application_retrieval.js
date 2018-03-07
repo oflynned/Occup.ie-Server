@@ -1,8 +1,7 @@
 let ObjectId = require('mongodb').ObjectID;
-const collection = require("../../../../config/collections").applications;
 
 module.exports = {
-    getApplications: function (db, filter = {}) {
+    getApplications: function (db, collection, filter = {}) {
         return new Promise((res, rej) => {
             db.get(collection)
                 .find(filter)
@@ -11,18 +10,16 @@ module.exports = {
         })
     },
 
-    modifyApplication: function (db, id, data) {
+    modifyApplication: function (db, collection, data, id) {
         return new Promise((res, rej) => {
             db.get(collection)
                 .update({_id: ObjectId(id)}, {"$set": data})
-                .then(() => {
-                    res(data)
-                })
+                .then(() => res(data))
                 .catch((err) => rej(err));
         })
     },
 
-    deleteApplication: function (db, id) {
+    deleteApplication: function (db, collection, id) {
         return new Promise((res, rej) => {
             db.get(collection)
                 .remove({_id: ObjectId(id)})

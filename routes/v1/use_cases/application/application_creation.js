@@ -1,33 +1,58 @@
-let ObjectId = require('mongodb').ObjectID;
-const collection = require("../../../../config/collections").applications;
+let application = require("../../models/application");
+let record = require("../common/record");
 
 module.exports = {
-    getApplications: function (db, filter = {}) {
+    validateApplicationIsUnique: function (db, collection, data) {
         return new Promise((res, rej) => {
-            db.get(collection)
-                .find(filter)
-                .then((records) => res(records))
-                .catch((err) => rej(err))
+            let query = {
+                user_id: data["user_id"],
+                landlord_id: data["landlord_id"],
+                listing_id: data["listing_id"]
+            };
+
+            record.getRecords(db, collection, query)
+                .then((listings) => listings.length === 0 ? res() : rej(new Error("non_unique_application")))
         })
     },
 
-    modifyApplication: function (db, id, data) {
+    validateApplicationIsFitting: function (db, collection, data) {
         return new Promise((res, rej) => {
-            db.get(collection)
-                .update({_id: ObjectId(id)}, {"$set": data})
-                .then(() => {
-                    res(data)
+            let query = {
+                user_id: data["user_id"],
+                landlord_id: data["landlord_id"],
+                listing_id: data["listing_id"]
+            };
+
+            record.getRecords(db, collection, query)
+                .then((listings) => {
+                    if (listings.length === 0)
+                        rej(new Error("non_existent_application"))
+
                 })
-                .catch((err) => rej(err));
         })
     },
 
-    deleteApplication: function (db, id) {
+    validateListingIsOpen: function () {
+        // TODO
+    },
+
+    generateApplicationObject: function (db, collection, payload) {
+        return {
+            user_id: payload["user_id"],
+            landlord_id: payload["landlord_id"],
+            listing_id: payload["listing_id"],
+            status: "pending"
+        };
+    },
+
+    createApplication: function (db, collection, data) {
+        return record.createRecord(db, collection, data)
+    },
+
+    validatePayload: function (data) {
         return new Promise((res, rej) => {
-            db.get(collection)
-                .remove({_id: ObjectId(id)})
-                .then((record) => res(record))
-                .catch((err) => rej(err))
+            let results = application.validate(data);
+            results["error"] === null ? res() : rej(new Error("bad_request"));
         })
     }
 };
