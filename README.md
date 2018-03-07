@@ -1,5 +1,7 @@
 # Backend
 
+[![CircleCI](https://circleci.com/gh/oflynned/RentApp-Server/tree/master.svg?style=shield)](https://circleci.com/gh/oflynned/RentApp-Server/tree/master)
+
 Node.js backend service for better renting in Ireland because fuck Daft :smiley:
 
 Install MongoDB and set it running in the background.
