@@ -21,11 +21,13 @@ module.exports = (db, col) => {
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(application["listing_id"])}))
             .then(() => retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {_id: ObjectId(application["landlord_id"])}))
             .then(() => retrieveUserUseCase.doesUserExist(db, userCol, {_id: ObjectId(application["user_id"])}))
+            .then(() => retrieveListingUseCase.validateListingIsOpen(db, listingsCol, {_id: application["listing_id"]}))
             .then(() => retrieveListingUseCase.validateListingIsFitting(db, userCol, listingsCol, application))
             .then(() => createApplicationUseCase.validateApplicationIsUnique(db, applicationCol, application))
             .then(() => createApplicationUseCase.createApplication(db, applicationCol, application))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
+                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -38,6 +40,8 @@ module.exports = (db, col) => {
                     case "non_existent_user":
                         res.status(404).send();
                         break;
+                    case "non_applicable_listing":
+                    case "non_unique_application":
                     default:
                         res.status(500).send();
                         break;
@@ -49,6 +53,7 @@ module.exports = (db, col) => {
         retrieveApplicationUseCase.getApplications(db)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => {
+                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -65,6 +70,7 @@ module.exports = (db, col) => {
         retrieveApplicationUseCase.getApplications(db, applicationCol, {_id: ObjectId(uuid)})
             .then((properties) => res.status(200).json(properties))
             .catch((err) => {
+                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -82,6 +88,7 @@ module.exports = (db, col) => {
             .then(() => retrieveApplicationUseCase.modifyListing(db, applicationCol, req.body, uuid))
             .then(() => res.status(200).send())
             .catch((err) => {
+                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -98,6 +105,7 @@ module.exports = (db, col) => {
         retrieveApplicationUseCase.deleteApplication(db, applicationCol, uuid)
             .then((property) => res.status(200).json(property))
             .catch((err) => {
+                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
