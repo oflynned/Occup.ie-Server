@@ -25,9 +25,8 @@ module.exports = (db, col) => {
             .then(() => retrieveListingUseCase.validateListingIsFitting(db, userCol, listingsCol, application))
             .then(() => createApplicationUseCase.validateApplicationIsUnique(db, applicationCol, application))
             .then(() => createApplicationUseCase.createApplication(db, applicationCol, application))
-            .then((data) => res.status(201).json(data))
+            .then((application) => res.status(201).json(application))
             .catch((err) => {
-                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -50,10 +49,10 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveApplicationUseCase.getApplications(db)
-            .then((properties) => res.status(200).json(properties))
+        retrieveApplicationUseCase.validateQuery(req.query)
+            .then((query) => retrieveApplicationUseCase.getApplications(db, applicationCol, query))
+            .then((applications) => res.status(200).json(applications))
             .catch((err) => {
-                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -67,13 +66,16 @@ module.exports = (db, col) => {
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveApplicationUseCase.getApplications(db, applicationCol, {_id: ObjectId(uuid)})
+        retrieveApplicationUseCase.doesApplicationExist(db, applicationCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveApplicationUseCase.getApplications(db, applicationCol, {_id: ObjectId(uuid)}))
             .then((properties) => res.status(200).json(properties))
             .catch((err) => {
-                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "non_existent_application":
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).send();
@@ -84,14 +86,17 @@ module.exports = (db, col) => {
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        createApplicationUseCase.validatePayload(req.data)
-            .then(() => retrieveApplicationUseCase.modifyListing(db, applicationCol, req.body, uuid))
-            .then(() => res.status(200).send())
+        createApplicationUseCase.validatePayload(req.body)
+            .then(() => retrieveApplicationUseCase.doesApplicationExist(db, applicationCol, uuid))
+            .then(() => retrieveApplicationUseCase.modifyApplication(db, applicationCol, req.body, uuid))
+            .then((application) => res.status(200).json(application))
             .catch((err) => {
-                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "non_existent_application":
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).send();
@@ -102,13 +107,16 @@ module.exports = (db, col) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveApplicationUseCase.deleteApplication(db, applicationCol, uuid)
+        retrieveApplicationUseCase.doesApplicationExist(db, applicationCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveApplicationUseCase.deleteApplication(db, applicationCol, uuid))
             .then((property) => res.status(200).json(property))
             .catch((err) => {
-                console.error(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "non_existent_application":
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).send();
