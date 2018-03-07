@@ -18,6 +18,7 @@ const listingModel = require("../../../routes/v1/models/listing");
 const landlordModel = require("../../../routes/v1/models/landlord");
 const applicationModel = require("../../../routes/v1/models/application");
 
+const applicationCreationUseCase = require("../../../routes/v1/use_cases/application/application_creation");
 const applicationRetrievalUseCase = require("../../../routes/v1/use_cases/application/application_retrieval");
 const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/listing_creation");
 const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/listing_retrieval");
@@ -53,13 +54,15 @@ function createUsers() {
     const user3 = userModel.generate("Too", "Young", getDobFromAge(18), "male", "professional");
     const user4 = userModel.generate("Too", "Old", getDobFromAge(30), "male", "professional");
     const user5 = userModel.generate("Wrong", "Gender", getDobFromAge(23), "female", "professional");
+    const user6 = userModel.generate("Other", "Candidate", getDobFromAge(23), "male", "professional");
 
     return Promise.all([
         userCreationUseCase.createAccount(db, userCol, user1),
         userCreationUseCase.createAccount(db, userCol, user2),
         userCreationUseCase.createAccount(db, userCol, user3),
         userCreationUseCase.createAccount(db, userCol, user4),
-        userCreationUseCase.createAccount(db, userCol, user5)
+        userCreationUseCase.createAccount(db, userCol, user5),
+        userCreationUseCase.createAccount(db, userCol, user6)
     ])
 }
 
@@ -288,7 +291,6 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => helper.postResource(`/api/v1/application`, application))
-            .then((res) => assert.equal(res.status, 201))
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => helper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly allowed a user to apply twice to a listing")))
@@ -322,5 +324,202 @@ describe("api application management", () => {
                 assert.equal(err.response.status, 500);
                 done()
             });
+    });
+
+    it('should return 200 on querying for applications by user id', (done) => {
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then(() => helper.getResource(`/api/v1/application?user_id=${user["_id"]}`))
+            .then((res) => {
+                assert.equal(res.status, 200);
+                assert.equal(res.body.length, 1);
+                done()
+            })
+            .catch((err) => done(err))
+    });
+
+    it('should return 200 on querying by application id', (done) => {
+        let firstUser = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => firstUser = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(firstUser["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then((application) => helper.getResource(`/api/v1/application/${application["_id"]}`))
+            .then((res) => {
+                assert.equal(res.status, 200);
+                assert.equal(res.body.length, 1);
+                done()
+            })
+            .catch((err) => done(err))
+    });
+
+    it('should return 404 on querying by non-existent application id', (done) => {
+        helper.getResource(`/api/v1/application/${ObjectId()}`)
+            .then(() => done(new Error("Incorrectly returned non-existent application id query")))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done()
+            })
+    });
+
+    it('should return 200 and one record on querying for applications by user id where there are other applicants', (done) => {
+        let firstUser = {};
+        let secondUser = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => firstUser = _user[0])
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then((_user) => secondUser = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(firstUser["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then(() => applicationModel.generate(secondUser["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then(() => helper.getResource(`/api/v1/application?user_id=${firstUser["_id"]}`))
+            .then((res) => {
+                assert.equal(res.status, 200);
+                assert.equal(res.body.length, 1);
+                done()
+            })
+            .catch((err) => done(err))
+    });
+
+    it('should return 400 on querying for applications with non-existent parameters', (done) => {
+        helper.getResource(`/api/v1/application?bad=param`)
+            .then(() => done(new Error("Incorrectly accepted query with bad params on applications")))
+            .catch((err) => {
+                assert.equal(err.response.status, 400);
+                done()
+            })
+    });
+
+    it('should return 200 on updating an application', (done) => {
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then((application) => {
+                application["status"] = "accepted";
+                return application
+            })
+            .then((application) => helper.putResource(`/api/v1/application/${application["_id"]}`, application))
+            .then((res) => {
+                assert.equal(res.status, 200);
+                assert.equal([res.body].length, 1);
+                done()
+            })
+            .catch((err) => done(err))
+    });
+
+    it('should return 400 on updating an application with bad data', (done) => {
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then((application) => {
+                application["bad"] = "param";
+                return application
+            })
+            .then((application) => helper.putResource(`/api/v1/application/${application["_id"]}`, application))
+            .then(() => done(new Error("Incorrectly validated object not following schema")))
+            .catch((err) => {
+                assert.equal(err.response.status, 400);
+                done()
+            })
+    });
+
+    it('should return 404 on updating a non-existent application', (done) => {
+        let user = {};
+        let listing = {};
+        let landlord = {};
+        
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then((application) => {
+                application["status"] = "accepted";
+                return application
+            })
+            .then((application) => helper.putResource(`/api/v1/application/${ObjectId()}`, application))
+            .then(() => done("Incorrectly updated a non-existent application resource"))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done();
+            })
+    });
+
+    it('should return 200 on deleting an existing application', (done) => {
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
+            .then((application) => helper.deleteResource(`/api/v1/application/${application["_id"]}`))
+            .then((res) => assert.equal(res.status, 200))
+            .then(() => applicationRetrievalUseCase.getApplications(db, applicationCol))
+            .then((applications) => {
+                assert.equal(applications.length, 0);
+                done();
+            })
+            .catch((err) => done(err))
+    });
+
+    it('should return 404 on deleting a non-existent application', (done) => {
+        helper.deleteResource(`/api/v1/application/${ObjectId()}`)
+            .then(() => done("Incorrectly deleted a non-existent application resource"))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done();
+            })
     });
 });
