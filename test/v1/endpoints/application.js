@@ -91,7 +91,7 @@ function createListingObject(landlordUuid) {
             "rent",
             landlordUuid,
             listingModel.generateAddress("22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
-            listingModel.generateDetails("apartment", "Awesome apartment", "No caveats :)", 12, 20, 25, "male", "professional"),
+            listingModel.generateDetails("apartment", "Awesome apartment", "Caveats :)", 12, 20, 25, ["male"], ["professional"]),
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "twin"],
             listingModel.generateFacilities(true, true, false, false, true, false),
@@ -132,29 +132,143 @@ describe("api application management", () => {
             .then(() => applicationRetrievalUseCase.getApplications(db, applicationCol))
             .then((applications) => {
                 assert.equal(applications.length, 1);
+                assert.equal(applications[0]["user_id"], user["_id"]);
+                assert.equal(applications[0]["listing_id"], listing["_id"]);
+                assert.equal(applications[0]["landlord_id"], landlord["_id"]);
                 done()
             })
             .catch((err) => done(err));
     });
 
     it('should return 403 to a new user (too young) who makes an application for a non-fitting listing', (done) => {
-        done()
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Too", surname: "Young"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user below minimum age restrictions")))
+            .catch((err) => {
+                assert.equal(err.response.status, 403);
+                done()
+            });
     });
 
     it('should return 403 to a new user (too old) who makes an application for a non-fitting listing', (done) => {
-        done()
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Too", surname: "Old"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user above maximum age restrictions")))
+            .catch((err) => {
+                assert.equal(err.response.status, 403);
+                done()
+            });
     });
 
     it('should return 403 to a new user (wrong profession) who makes an application for a non-fitting listing', (done) => {
-        done()
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Profession"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user with non-accepted profession")))
+            .catch((err) => {
+                assert.equal(err.response.status, 403);
+                done()
+            });
     });
 
     it('should return 403 to a new user (wrong gender) who makes an application for a non-fitting listing', (done) => {
-        done()
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user with non-accepted sex")))
+            .catch((err) => {
+                assert.equal(err.response.status, 403);
+                done()
+            });
     });
 
     it('should return 404 to a new user who makes an application for a non-existent listing', (done) => {
-        done()
+        let user = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], ObjectId()))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user with non-existing listing")))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done()
+            });
+    });
+
+    it('should return 404 to a non-existent user who makes an application for a listing', (done) => {
+        let listing = {};
+        let landlord = {};
+
+        landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"})
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(ObjectId(), landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user with non-existing listing")))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done()
+            });
+    });
+
+    it('should return 404 to a user who makes an application for a listing with a non-existent landlord', (done) => {
+        let user = {};
+        let listing = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
+            .then((_user) => user = _user[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], ObjectId(), listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly created application for user with non-existing listing")))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
+                done()
+            });
     });
 
     it('should return 500 to user who is a previous applicant who makes an application for a listing', (done) => {
