@@ -46,7 +46,7 @@ function createListingObject(landlordUuid) {
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "twin"],
             listingModel.generateFacilities(true, true, false, false, true, false),
-            listingModel.generateListing("free", false, true, "B1")
+            listingModel.generateListing("entry", false, true, "B1")
         )
     );
 }

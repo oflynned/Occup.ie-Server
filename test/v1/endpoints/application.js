@@ -95,7 +95,7 @@ function createListingObject(landlordUuid) {
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "twin"],
             listingModel.generateFacilities(true, true, false, false, true, false),
-            listingModel.generateListing("free", false, true, "B1")
+            listingModel.generateListing("entry", false, true, "B1")
         )
     );
 }
@@ -272,10 +272,51 @@ describe("api application management", () => {
     });
 
     it('should return 500 to user who is a previous applicant who makes an application for a listing', (done) => {
-        done()
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => listing = _listing[0])
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((res) => assert.equal(res.status, 201))
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly allowed a user to apply twice to a listing")))
+            .catch((err) => {
+                assert.equal(err.response.status, 500);
+                done()
+            });
     });
 
     it('should return 500 to new user who makes an application for a fitting non-applicable listing', (done) => {
-        done()
+        let user = {};
+        let listing = {};
+        let landlord = {};
+
+        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+            .then((_user) => user = _user[0])
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
+            .then((_landlord) => landlord = _landlord[0])
+            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then((_listing) => {
+                listing = _listing[0];
+                let uuid = listing["_id"];
+                let modifiedListing = listing;
+                modifiedListing["listing"]["status"] = "closed";
+                return listingRetrievalUseCase.modifyListing(db, listingCol, modifiedListing, ObjectId(uuid))
+            })
+            .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
+            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then(() => done(new Error("Incorrectly allowed a fitting user to apply to a non-applicable listing")))
+            .catch((err) => {
+                assert.equal(err.response.status, 500);
+                done()
+            });
     });
 });
