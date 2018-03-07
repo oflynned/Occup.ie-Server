@@ -18,8 +18,8 @@ const schema = Joi.object().keys({
         lease_length_months: Joi.number().required(),
         min_target_age: Joi.number().min(18).required(),
         max_target_age: Joi.number().min(18).required(),
-        target_sex: Joi.string().valid("male", "female", "other", "couple").required(),
-        target_profession: Joi.string().valid("student", "professional").required()
+        target_sex: Joi.array().items(Joi.string().valid("male", "female", "other", "couple")).required(),
+        target_profession: Joi.array().items(Joi.string().valid("student", "professional")).required()
     },
 
     bedrooms: Joi.array().items(Joi.string().valid("single", "double", "twin")).required(),
