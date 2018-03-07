@@ -1,7 +1,6 @@
 const assert = require("assert");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const expect = chai.expect;
 const ObjectId = require("mongodb").ObjectId;
 
 const config = require('../../../config/db');
@@ -19,15 +18,11 @@ const listingModel = require("../../../routes/v1/models/listing");
 const landlordModel = require("../../../routes/v1/models/landlord");
 const applicationModel = require("../../../routes/v1/models/application");
 
-const applicationCreationUseCase = require("../../../routes/v1/use_cases/application/application_creation");
 const applicationRetrievalUseCase = require("../../../routes/v1/use_cases/application/application_retrieval");
-
 const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/listing_creation");
 const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/listing_retrieval");
-
 const userCreationUseCase = require("../../../routes/v1/use_cases/user/user_account_creation");
 const userRetrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
-
 const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
 
@@ -138,6 +133,15 @@ describe("api application management", () => {
                 done()
             })
             .catch((err) => done(err));
+    });
+
+    it('should return 400 to a user who makes an application with missing parameters', (done) => {
+        helper.postResource(`/api/v1/application`, {"user_id": ObjectId(), "landlord_id": ObjectId()})
+            .then(() => done(new Error("Incorrectly created application with missing params")))
+            .catch((err) => {
+                assert.equal(err.response.status, 400);
+                done()
+            });
     });
 
     it('should return 403 to a new user (too young) who makes an application for a non-fitting listing', (done) => {
