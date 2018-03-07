@@ -26,10 +26,12 @@ module.exports = (env) => {
     let user = require('./routes/v1/endpoints/user')(db, env);
     let listing = require('./routes/v1/endpoints/listing')(db, env);
     let landlord = require('./routes/v1/endpoints/landlord')(db, env);
+    let application = require('./routes/v1/endpoints/application')(db, env);
 
     app.use('/api/v1/user', user);
     app.use('/api/v1/listing', listing);
     app.use('/api/v1/landlord', landlord);
+    app.use('/api/v1/application', application);
 
     return app;
 };
