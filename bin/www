@@ -8,7 +8,7 @@ require('dotenv').config();
 
 let env = process.env.ENVIRONMENT;
 let collections = require("../config/collections");
-let app = require('../app')(env === "PRODUCTION" ? collections.production: collections.development);
+let app = require('../app')(env === "production" ? collections.production: collections.development);
 let debug = require('debug')('rent:server');
 let http = require('http');
 
