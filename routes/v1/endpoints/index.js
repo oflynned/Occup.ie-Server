@@ -1,9 +1,14 @@
 let express = require('express');
 let router = express.Router();
 
-router.get('/ping', (req, res) => {
-    res.send("pong");
-});
+module.exports = (db, env) => {
+    router.get('/ping', (req, res) => {
+        res.send("pong");
+    });
 
-module.exports = router;
+    router.get('/seed', (req, res) => {
+        res.status(200).send()
+    });
 
+    return router;
+};
