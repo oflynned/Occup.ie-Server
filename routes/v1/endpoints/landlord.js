@@ -62,14 +62,16 @@ module.exports = (db, col) => {
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createLandlordUseCase.validatePayload(req.body)
-            .then(() => retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)}))
-            .then((landlords) => createLandlordUseCase.getLandlordParams(landlords[0], req.body))
-            .then((landlord) => retrieveLandlordUseCase.modifyLandlord(db, collection, landlord, uuid))
+            .then(() => retrieveLandlordUseCase.doesLandlordExist(db, collection, {_id: ObjectId(uuid)}))
+            .then(() => retrieveLandlordUseCase.modifyLandlord(db, collection, req.body, uuid))
             .then((landlord) => res.status(200).json(landlord))
             .catch((err) => {
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "non_existent_landlord":
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).send();
@@ -86,6 +88,9 @@ module.exports = (db, col) => {
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "non_existent_landlord":
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).send();

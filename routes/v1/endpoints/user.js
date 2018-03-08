@@ -76,9 +76,19 @@ module.exports = (db, env) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveUserUseCase.deleteUser(db, collection, uuid)
+        retrieveUserUseCase.doesUserExist(db, collection, {_id: ObjectId(uuid)})
+            .then(() => retrieveUserUseCase.deleteUser(db, collection, uuid))
             .then((user) => res.status(200).send(user))
-            .catch((err) => res.status(500).send(err))
+            .catch((err) => {
+                switch (err.message) {
+                    case "non_existent_user":
+                        res.status(404).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
     });
 
     return router;
