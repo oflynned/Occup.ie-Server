@@ -9,17 +9,6 @@ module.exports = {
         })
     },
 
-    getLandlordParams: function (obj, newObj) {
-        obj["forename"] = newObj["forename"] === undefined ? obj["forename"] : newObj["forename"];
-        obj["surname"] = newObj["surname"] === undefined ? obj["surname"] : newObj["surname"];
-        obj["profile_picture"] = newObj["profile_picture"] === undefined ? obj["profile_picture"] : newObj["profile_picture"];
-
-        // TODO allow updating of phone number, but validation has to revert back to false
-
-        landlord.validate(obj);
-        return obj;
-    },
-
     generateLandlordObject: function (payload) {
         return {
             forename: payload["forename"],

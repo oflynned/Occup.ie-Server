@@ -6,7 +6,6 @@ module.exports = {
         return new Promise((res, rej) => {
             record.getRecords(db, collection, filter)
                 .then((records) => records.length > 0 ? res() : rej(new Error("non_existent_landlord")))
-                .catch((err) => rej(err))
         })
     },
 
