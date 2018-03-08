@@ -158,7 +158,16 @@ describe("api user account management", () => {
             })
             .then((users) => {
                 assert.equal(users.length, 2);
-                assert.equal(!(deletedRecord in users), true);
+                assert.equal(!(users.includes(deletedRecord)), true);
+                done()
+            })
+    });
+
+    it('should return status 404 if deleting non-existent resource', (done) => {
+        helper.deleteResource(`/api/v1/user/${ObjectId()}`)
+            .then(() => done(new Error("Falsely deleted non-existing user resource")))
+            .catch((err) => {
+                assert.equal(err.response.status, 404);
                 done()
             })
     });
