@@ -1,6 +1,6 @@
 # Backend
 
-[![CircleCI](https://circleci.com/gh/oflynned/RentApp-Server/tree/master.svg?style=shield)](https://circleci.com/gh/oflynned/RentApp-Server/tree/master) [![Known Vulnerabilities](https://snyk.io/test/github/oflynned/RentApp-Server/badge.svg)](https://snyk.io/test/github/oflynned/RentApp-Server)
+[![CircleCI](https://circleci.com/gh/oflynned/RentApp-Server/tree/master.svg?style=shield)](https://circleci.com/gh/oflynned/RentApp-Server/tree/master) 
 
 Node.js backend service for better renting in Ireland because fuck Daft :smiley:
 
