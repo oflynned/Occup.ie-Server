@@ -30,6 +30,7 @@ module.exports = {
     },
 
     modifyApplication: function (db, collection, data, id) {
+        data["last_updated"] = new Date();
         return record.modifyRecord(db, collection, data, id)
     },
 

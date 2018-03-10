@@ -4,6 +4,7 @@ const schema = Joi.object().keys({
     user_id: Joi.string().required(),
     landlord_id: Joi.string().required(),
     listing_id: Joi.string().required(),
+    last_updated: Joi.date().required(),
     status: Joi.string().required().valid("pending", "accepted", "rejected", "ceased")
 });
 
@@ -27,6 +28,7 @@ module.exports = {
             user_id: userId,
             landlord_id: landlordId,
             listing_id: listingId,
+            last_updated: new Date(),
             status: "pending"
         }
     }
