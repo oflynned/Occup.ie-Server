@@ -54,15 +54,14 @@ function getRandomTruth() {
 }
 
 function generateLetter() {
-    const chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
-    return chars.substr(Math.floor(Math.random() * chars.split("").length), 1);
+    return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".substr(getRandom(26), 1);
 }
 
 function generateGibberish(length) {
     let output = "";
     for (let i = 0; i < length; i++)
-        output += generateLetter()
-    return output
+        output += i % 5 === 0 ? " " : generateLetter()
+    return output.toLowerCase()
 }
 
 function getPhoneNumber() {
@@ -120,7 +119,7 @@ function seedListings(env, db, size) {
                 let uuid = landlords[getRandom(landlords.length)]["_id"];
                 let ageLimits = getAgeLimits();
                 let address = listingModel.generateAddress(i, `Street #${i}`, `Area ${i}`, `Dublin`, `Dublin`, getEircode());
-                let details = listingModel.generateDetails("apartment", "Description content", "No caveats", 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let details = listingModel.generateDetails("apartment", generateGibberish(32), generateGibberish(16), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
                 let facilities = listingModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
                 let listing = listingModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = listingModel.generate("rent", uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);

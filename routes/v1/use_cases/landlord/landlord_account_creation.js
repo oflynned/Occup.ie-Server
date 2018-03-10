@@ -13,6 +13,7 @@ module.exports = {
         return {
             forename: payload["forename"],
             surname: payload["surname"],
+            dob: payload["dob"],
             email: payload["email"],
             phone_number: payload["phone_number"],
             phone_verified: payload["phone_verified"],
