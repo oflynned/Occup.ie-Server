@@ -1,6 +1,7 @@
 const userModel = require("../../../../routes/v1/models/user");
 const listingModel = require("../../../../routes/v1/models/listing");
 const landlordModel = require("../../../../routes/v1/models/landlord");
+const applicationModel = require("../../../../routes/v1/models/application");
 
 const userCreationUseCase = require("../../../../routes/v1/use_cases/user/user_account_creation");
 const userRetrievalUseCase = require("../../../../routes/v1/use_cases/user/user_account_retrieval");
@@ -11,50 +12,87 @@ const listingRetrievalUseCase = require("../../../../routes/v1/use_cases/listing
 const landlordCreationUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
 
+const applicationCreationUseCase = require("../../../../routes/v1/use_cases/application/application_creation");
+const applicationRetrievalUseCase = require("../../../../routes/v1/use_cases/application/application_retrieval");
+
+function getRandom(limit) {
+    return Math.floor(Math.random() * limit);
+}
+
 function getSex() {
     const sexes = ["male", "female", "other"];
-    return sexes[Math.floor(Math.random() * sexes.length)];
+    return sexes[getRandom(sexes.length)];
 }
 
 function getProfession() {
     const professions = ["student", "professional"];
-    return professions[Math.floor(Math.random() * professions.length)];
+    return professions[getRandom(professions.length)];
 }
 
 function getDob() {
     const minAge = 18;
     let now = new Date();
-    let birthYear = now.getFullYear() - Math.floor(Math.random() * 30) - minAge;
+    let birthYear = now.getFullYear() - getRandom(30) - minAge;
     return new Date(birthYear, now.getMonth(), now.getDay(), 0, 0, 0);
+}
+
+function getAgeLimits() {
+    let minAge = getRandom(40) + 18;
+    let maxAge = minAge + getRandom(40);
+    return [minAge, maxAge]
 }
 
 function generateUuid(iterations) {
     let output = "";
-    let i = 0;
-    while (i < iterations) {
-        output += Math.floor(Math.random() * 9);
-        i++;
-    }
+    for (let i = 0; i < iterations; i++)
+        output += getRandom(9) + 1;
+    return output
+}
 
+function getRandomTruth() {
+    return Math.random() >= 0.5
+}
+
+function generateLetter() {
+    const chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
+    return chars.substr(Math.floor(Math.random() * chars.split("").length), 1);
+}
+
+function generateGibberish(length) {
+    let output = "";
+    for (let i = 0; i < length; i++)
+        output += generateLetter()
     return output
 }
 
 function getPhoneNumber() {
     const prefix = "+353";
     const providerCodes = ["83", "85", "87", "89"];
-    let providerCode = providerCodes[Math.floor(Math.random() * providerCodes.length)];
+    let providerCode = providerCodes[getRandom(providerCodes.length)];
 
     return [prefix, providerCode, generateUuid(3), generateUuid(4)].join(" ");
 }
 
+function getEircode() {
+    return generateLetter() + generateUuid(1) + generateUuid(1) + " " +
+        generateLetter() + generateUuid(1) + generateLetter() + generateUuid(1)
+}
+
+function getRandomBer() {
+    const ber = ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D1", "D2", "E1", "E2", "F", "G"];
+    return ber[getRandom(ber.length)]
+}
+
+function getRandomPlan() {
+    const plans = ["entry", "medium", "deluxe"];
+    return plans[getRandom(plans.length)]
+}
+
 function seedUsers(db, col, size) {
     let jobs = [];
-    let i = 0;
-
-    while (i < size) {
+    for (let i = 0; i < size; i++) {
         let user = userModel.generate(`user_${i}_forename`, `user_${i}_surname`, getDob(), getSex(), getProfession());
         jobs.push(userCreationUseCase.createAccount(db, col, user));
-        i++;
     }
 
     return Promise.all(jobs);
@@ -62,46 +100,58 @@ function seedUsers(db, col, size) {
 
 function seedLandlords(db, col, size) {
     let jobs = [];
-    let i = 0;
-
-    while (i < size) {
+    for (let i = 0; i < size; i++) {
         let landlord = landlordModel.generate(`landlord_${i}_forename`, `landlord_${i}_surname`, getDob(), getPhoneNumber());
         jobs.push(landlordCreationUseCase.createAccount(db, col, landlord));
-        i++;
     }
 
     return Promise.all(jobs);
 }
 
 function seedListings(env, db, size) {
-    /*
-    return userRetrievalUseCase.getUsers(db, env.users)
-        .then((count) => {
-            if (count < size) throw new Error("insufficient_users")
-        })
-        .then(() => landlordRetrievalUseCase.getLandlords(db, env.landlords))
-        .then((count) => {
-            if (count < size) throw new Error("insufficient_landlords")
-        })
-        .then(() => {
-
-        })*/
-
+    let landlords = [];
     let jobs = [];
     let i = 0;
-    let landlords = [];
-    let users = [];
 
     return landlordRetrievalUseCase.getLandlords(db, env.landlords)
         .then((_landlords) => landlords = _landlords)
         .then(() => {
-            while (i < size) {
-                let landlordUuid = landlords[Math.floor(Math.random() * landlords.length)]["_id"];
-                jobs.push(listingCreationUseCase.generate)
-                i++;
+            for (let i = 0; i < size; i++) {
+                let uuid = landlords[getRandom(landlords.length)]["_id"];
+                let ageLimits = getAgeLimits();
+                let address = listingModel.generateAddress(i, `Street #${i}`, `Area ${i}`, `Dublin`, `Dublin`, getEircode());
+                let details = listingModel.generateDetails("apartment", "Description content", "No caveats", 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let facilities = listingModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
+                let listing = listingModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let job = listingModel.generate("rent", uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
+
+                jobs.push(listingCreationUseCase.createListing(db, env.listings, job));
             }
         })
         .then(() => Promise.all(jobs));
+}
+
+function seedApplications(env, db, size) {
+    let jobs = [];
+    let users = [];
+    let listings = [];
+
+    return userRetrievalUseCase.getUsers(db, env.users)
+        .then((_users) => users = _users)
+        .then(() => listingRetrievalUseCase.getListings(db, env.listings))
+        .then((_listings) => listings = _listings)
+        .then(() => {
+            for (let i = 0; i < size; i++) {
+                let user = users[getRandom(users.length)];
+                let listing = listings[getRandom(listings.length)];
+
+                if (listingRetrievalUseCase.isListingFitting(user, listing)) {
+                    let application = applicationModel.generate(user["_id"], listing["landlord_uuid"], listing["_id"]);
+                    jobs.push(applicationCreationUseCase.createApplication(db, env.applications, application))
+                }
+            }
+        })
+        .then(() => Promise.all(jobs))
 }
 
 module.exports = {
@@ -115,11 +165,8 @@ module.exports = {
                 .then((landlords) => count += landlords.length),
             listingRetrievalUseCase.getListings(db, env.listings)
                 .then((listings) => count += listings.length)
-        ]).then(() => Promise.all([
-            db.get(env.users).drop(),
-            db.get(env.landlords).drop(),
-            db.get(env.listings).drop()
-        ]).then(() => count))
+        ]).then(() => Promise.all([db.get(env.users).drop(), db.get(env.landlords).drop(), db.get(env.listings).drop()])
+            .then(() => Promise.resolve(count)))
     },
 
     seed: function (env, db, seedType, seedSize) {
@@ -134,6 +181,9 @@ module.exports = {
     },
 
     seedAll: function (env, db, seedSize) {
-
+        seedLandlords(db, env.landlords, seedSize)
+            .then(() => seedListings(env, db, seedSize * 5))
+            .then(() => seedUsers(db, env.users, seedSize * 10))
+            .then(() => seedApplications(env, db, seedSize * 5))
     }
 };
