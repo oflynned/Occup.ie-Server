@@ -9,7 +9,7 @@ const db = require('monk')(config.mongoUrl);
 const env = require("../../../config/collections").test;
 const collection = env.users;
 
-const helper = require("./helper");
+const requestHelper = require("./request_helper");
 const model = require("../../../routes/v1/models/user");
 const creationUseCase = require("../../../routes/v1/use_cases/user/user_account_creation");
 const retrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
@@ -51,7 +51,7 @@ describe("api user account management", () => {
         dropDb()
             .then(() => retrievalUseCase.getUsers(db, collection))
             .then((users) => assert.equal(users.length, 0))
-            .then(() => helper.postResource(`/api/v1/user`, newUser))
+            .then(() => requestHelper.postResource(`/api/v1/user`, newUser))
             .then((res) => {
                 assert.equal(res.status, 201);
                 done();
@@ -63,7 +63,7 @@ describe("api user account management", () => {
         const newUser = model.generate("New", "User", "1994-01-01", "other", "professional");
         delete newUser["forename"];
 
-        helper.postResource(`/api/v1/user`, newUser)
+        requestHelper.postResource(`/api/v1/user`, newUser)
             .then(() => done(new Error("Failed validation for incorrect parameters on user creation")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -73,7 +73,7 @@ describe("api user account management", () => {
 
     it('should return 403 forbidden for users signing up under age 18 on creating a new user', (done) => {
         const newUser = model.generate("Underage", "User", "2017-01-01", "male", "student");
-        helper.postResource(`/api/v1/user`, newUser)
+        requestHelper.postResource(`/api/v1/user`, newUser)
             .then(() => done("Failed validation for incorrect parameters on user creation"))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -82,7 +82,7 @@ describe("api user account management", () => {
     });
 
     it("should return a list and status 200 if requesting existing users", (done) => {
-        helper.getResource("/api/v1/user")
+        requestHelper.getResource("/api/v1/user")
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 3);
@@ -95,7 +95,7 @@ describe("api user account management", () => {
         retrievalUseCase.getUsers(db, collection, {forename: "Emma"})
             .then((record) => record[0]["_id"])
             .then((uuid) => `/api/v1/user/${uuid}`)
-            .then((endpoint) => helper.getResource(endpoint))
+            .then((endpoint) => requestHelper.getResource(endpoint))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal([res.body].length, 1);
@@ -106,7 +106,7 @@ describe("api user account management", () => {
 
     it("should return status 404 if requesting a non-existing user by uuid", (done) => {
         const nonExistentUuid = ObjectId();
-        helper.getResource(`/api/v1/user/${nonExistentUuid}`)
+        requestHelper.getResource(`/api/v1/user/${nonExistentUuid}`)
             .then(() => done("Failure by accepting validation of non-existent resource!"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -129,7 +129,7 @@ describe("api user account management", () => {
                 uuid = record["_id"];
                 updatedRecord = record;
             })
-            .then(() => helper.putResource(`/api/v1/user/${uuid}`, updatedRecord))
+            .then(() => requestHelper.putResource(`/api/v1/user/${uuid}`, updatedRecord))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.forename, "ammE");
@@ -151,7 +151,7 @@ describe("api user account management", () => {
                 deletedRecord = records[0];
                 return deletedRecord["_id"]
             })
-            .then((uuid) => helper.deleteResource(`/api/v1/user/${uuid}`))
+            .then((uuid) => requestHelper.deleteResource(`/api/v1/user/${uuid}`))
             .then((res) => {
                 assert.equal(res.status, 200);
                 return retrievalUseCase.getUsers(db, collection)
@@ -164,7 +164,7 @@ describe("api user account management", () => {
     });
 
     it('should return status 404 if deleting non-existent resource', (done) => {
-        helper.deleteResource(`/api/v1/user/${ObjectId()}`)
+        requestHelper.deleteResource(`/api/v1/user/${ObjectId()}`)
             .then(() => done(new Error("Falsely deleted non-existing user resource")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);

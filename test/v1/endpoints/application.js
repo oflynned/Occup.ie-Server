@@ -12,7 +12,7 @@ const listingCol = env.listings;
 const landlordCol = env.landlords;
 const applicationCol = env.applications;
 
-const helper = require("./helper");
+const requestHelper = require("./request_helper");
 const userModel = require("../../../routes/v1/models/user");
 const listingModel = require("../../../routes/v1/models/listing");
 const landlordModel = require("../../../routes/v1/models/landlord");
@@ -125,7 +125,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then((res) => assert.equal(res.status, 201))
             .then(() => applicationRetrievalUseCase.getApplications(db, applicationCol))
             .then((applications) => {
@@ -139,7 +139,7 @@ describe("api application management", () => {
     });
 
     it('should return 400 to a user who makes an application with missing parameters', (done) => {
-        helper.postResource(`/api/v1/application`, {"user_id": ObjectId(), "landlord_id": ObjectId()})
+        requestHelper.postResource(`/api/v1/application`, {"user_id": ObjectId(), "landlord_id": ObjectId()})
             .then(() => done(new Error("Incorrectly created application with missing params")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -159,7 +159,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user below minimum age restrictions")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -179,7 +179,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user above maximum age restrictions")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -199,7 +199,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user with non-accepted profession")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -219,7 +219,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user with non-accepted sex")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -236,7 +236,7 @@ describe("api application management", () => {
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], ObjectId()))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user with non-existing listing")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -253,7 +253,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(ObjectId(), landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user with non-existing listing")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -270,7 +270,7 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], ObjectId(), listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly created application for user with non-existing listing")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -290,9 +290,9 @@ describe("api application management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly allowed a user to apply twice to a listing")))
             .catch((err) => {
                 assert.equal(err.response.status, 500);
@@ -318,7 +318,7 @@ describe("api application management", () => {
                 return listingRetrievalUseCase.modifyListing(db, listingCol, modifiedListing, ObjectId(uuid))
             })
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
-            .then((application) => helper.postResource(`/api/v1/application`, application))
+            .then((application) => requestHelper.postResource(`/api/v1/application`, application))
             .then(() => done(new Error("Incorrectly allowed a fitting user to apply to a non-applicable listing")))
             .catch((err) => {
                 assert.equal(err.response.status, 500);
@@ -339,7 +339,7 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then(() => helper.getResource(`/api/v1/application?user_id=${user["_id"]}`))
+            .then(() => requestHelper.getResource(`/api/v1/application?user_id=${user["_id"]}`))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
@@ -361,7 +361,7 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(firstUser["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then((application) => helper.getResource(`/api/v1/application/${application["_id"]}`))
+            .then((application) => requestHelper.getResource(`/api/v1/application/${application["_id"]}`))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
@@ -371,7 +371,7 @@ describe("api application management", () => {
     });
 
     it('should return 404 on querying by non-existent application id', (done) => {
-        helper.getResource(`/api/v1/application/${ObjectId()}`)
+        requestHelper.getResource(`/api/v1/application/${ObjectId()}`)
             .then(() => done(new Error("Incorrectly returned non-existent application id query")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -397,7 +397,7 @@ describe("api application management", () => {
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
             .then(() => applicationModel.generate(secondUser["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then(() => helper.getResource(`/api/v1/application?user_id=${firstUser["_id"]}`))
+            .then(() => requestHelper.getResource(`/api/v1/application?user_id=${firstUser["_id"]}`))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
@@ -407,7 +407,7 @@ describe("api application management", () => {
     });
 
     it('should return 400 on querying for applications with non-existent parameters', (done) => {
-        helper.getResource(`/api/v1/application?bad=param`)
+        requestHelper.getResource(`/api/v1/application?bad=param`)
             .then(() => done(new Error("Incorrectly accepted query with bad params on applications")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -432,7 +432,7 @@ describe("api application management", () => {
                 application["status"] = "accepted";
                 return application
             })
-            .then((application) => helper.putResource(`/api/v1/application/${application["_id"]}`, application))
+            .then((application) => requestHelper.putResource(`/api/v1/application/${application["_id"]}`, application))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal([res.body].length, 1);
@@ -458,7 +458,7 @@ describe("api application management", () => {
                 application["bad"] = "param";
                 return application
             })
-            .then((application) => helper.putResource(`/api/v1/application/${application["_id"]}`, application))
+            .then((application) => requestHelper.putResource(`/api/v1/application/${application["_id"]}`, application))
             .then(() => done(new Error("Incorrectly validated object not following schema")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -483,7 +483,7 @@ describe("api application management", () => {
                 application["status"] = "accepted";
                 return application
             })
-            .then((application) => helper.putResource(`/api/v1/application/${ObjectId()}`, application))
+            .then((application) => requestHelper.putResource(`/api/v1/application/${ObjectId()}`, application))
             .then(() => done("Incorrectly updated a non-existent application resource"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -504,7 +504,7 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then((application) => helper.deleteResource(`/api/v1/application/${application["_id"]}`))
+            .then((application) => requestHelper.deleteResource(`/api/v1/application/${application["_id"]}`))
             .then((res) => assert.equal(res.status, 200))
             .then(() => applicationRetrievalUseCase.getApplications(db, applicationCol))
             .then((applications) => {
@@ -515,7 +515,7 @@ describe("api application management", () => {
     });
 
     it('should return 404 on deleting a non-existent application', (done) => {
-        helper.deleteResource(`/api/v1/application/${ObjectId()}`)
+        requestHelper.deleteResource(`/api/v1/application/${ObjectId()}`)
             .then(() => done("Incorrectly deleted a non-existent application resource"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
