@@ -16,7 +16,8 @@ describe("landlord account creation tests", () => {
     afterEach(() => dropDb());
 
     it("should follow landlord schema for generate account", (done) => {
-        let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
+        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
+        let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         model.validate(landlord);
         useCase.createAccount(db, collection, landlord)
             .then((record) => {
@@ -29,15 +30,17 @@ describe("landlord account creation tests", () => {
     });
 
     it("should throw an error on missing params", (done) => {
-        let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
+        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
+        let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         delete landlord["forename"];
         model.validate(landlord)
             .then(() => done(new Error("landlord schema incorrectly validated")))
-            .catch((err) => done())
+            .catch(() => done())
     });
 
     it("should discard junk params", (done) => {
-        let landlord = model.generate("John", "Smith", "john.smith@test.com", "+353 86 123 4567");
+        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
+        let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         landlord["parameter"] = "junk";
 
         model.validate(landlord);
