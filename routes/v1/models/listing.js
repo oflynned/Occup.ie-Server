@@ -113,7 +113,11 @@ module.exports = {
             details: details,
             bathrooms: bathrooms,
             bedrooms: bedrooms,
-            images: ["http://f1.thejournal.ie/media/2013/08/james-larkin-2-337x500.jpg"],
+            images: [
+                "https://b.dmlimg.com/MDQ0NmY4MzAwY2VhYmFhZGRmY2JmNDk4MDA3MzEyODlxZGRX6azbb_50YdhwqtRuaHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvOC9mLzhmNzE2ODA4ZWUxZDk5MThmMDkyZmIwYmZiYjcwMWM3LmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg",
+                "https://b.dmlimg.com/MGFmZjg4ZjljYzdkMTJmNTlhMDgwZWI5MzE1ZGRlMGE3YL-cDCXeuZOsUmkVLsqZaHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvNC85LzQ5NGFkZDczN2RmZjgyMjJjMWY0NTE2YzM5MWRlYWYxLmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg",
+                "https://b.dmlimg.com/ZDIwNDFlZmY1NTBhYWJmYTQyZTY4NDM5MDQ3Mjk5ODXq1FI8tYeKcXln3fdrwwt9aHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvYi9hL2JhOGRjOTYzZTA5YTY5ZmIxYWQ4MjBiYWRkMWIwNzQ0LmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg"
+            ],
             facilities: facilities,
             listing: listing
         }
