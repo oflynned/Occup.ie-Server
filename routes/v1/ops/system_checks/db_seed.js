@@ -164,8 +164,12 @@ module.exports = {
                 .then((landlords) => count += landlords.length),
             listingRetrievalUseCase.getListings(db, env.listings)
                 .then((listings) => count += listings.length)
-        ]).then(() => Promise.all([db.get(env.users).drop(), db.get(env.landlords).drop(), db.get(env.listings).drop()])
-            .then(() => Promise.resolve(count)))
+        ]).then(() => Promise.all([
+            db.get(env.users).drop(),
+            db.get(env.landlords).drop(),
+            db.get(env.listings).drop(),
+            db.get(env.applications).drop()
+        ]).then(() => Promise.resolve(count)))
     },
 
     seed: function (env, db, seedType, seedSize) {
@@ -183,6 +187,6 @@ module.exports = {
         seedLandlords(db, env.landlords, seedSize)
             .then(() => seedListings(env, db, seedSize * 5))
             .then(() => seedUsers(db, env.users, seedSize * 10))
-            .then(() => seedApplications(env, db, seedSize * 5))
+            .then(() => seedApplications(env, db, seedSize * 10))
     }
 };

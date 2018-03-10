@@ -1,4 +1,4 @@
-let s3;
+let s3 = require("../../common/s3");
 
 module.export = {
     backupDb: function (env, db) {
