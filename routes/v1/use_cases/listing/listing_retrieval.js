@@ -30,6 +30,24 @@ function inRange(d, start, end) {
     );
 }
 
+function isListingFitting(user, listing) {
+    let minDob = getDobFromAge(listing["details"]["min_target_age"]);
+    let maxDob = getDobFromAge(listing["details"]["max_target_age"]);
+
+    let userDob = new Date(user["dob"]).toDateString();
+    let listingSex = listing["details"]["target_sex"];
+    let userSex = user["sex"];
+
+    let listingProfession = listing["details"]["target_profession"];
+    let userProfession = user["profession"];
+
+    // 1993, 1995, 1998
+    // max, user, min
+
+    return inRange(userDob, maxDob, minDob) &&
+        listingSex.includes(userSex) && listingProfession.includes(userProfession);
+}
+
 module.exports = {
     doesListingExist: function (db, collection, filter) {
         return new Promise((res, rej) => {
@@ -39,6 +57,8 @@ module.exports = {
         })
     },
 
+    isListingFitting: isListingFitting,
+
     validateListingIsFitting: function (db, userCol, listingCol, application) {
         return new Promise((res, rej) => {
             let user = {};
@@ -46,38 +66,22 @@ module.exports = {
             record.getRecords(db, userCol, application["user_id"])
                 .then((_user) => {
                     if (_user.length === 0) rej(new Error("non_existent_user"));
-                    user = _user
+                    user = _user[0]
                 })
                 .then(() => record.getRecords(db, listingCol, application["listing_id"]))
-                .then((listing) => {
-                    if (listing.length === 0) rej(new Error("non_existent_listing"));
+                .then((listings) => {
+                    if (listings.length === 0) rej(new Error("non_existent_listing"));
 
-                    let minDob = getDobFromAge(listing[0]["details"]["min_target_age"]);
-                    let maxDob = getDobFromAge(listing[0]["details"]["max_target_age"]);
-
-                    let userDob = new Date(user[0]["dob"]).toDateString();
-                    let listingSex = listing[0]["details"]["target_sex"];
-                    let userSex = user[0]["sex"];
-
-                    let listingProfession = listing[0]["details"]["target_profession"];
-                    let userProfession = user[0]["profession"];
-
-                    // 1993, 1995, 1998
-                    // max, user, min
-
-                    let isSuitable =
-                        inRange(userDob, maxDob, minDob) &&
-                        listingSex.includes(userSex) && listingProfession.includes(userProfession);
-
-                    isSuitable ? res() : rej(new Error("unfitting_candidate"))
+                    let listing = listings[0];
+                    isListingFitting(user, listing) ? res() : rej(new Error("unfitting_candidate"))
                 })
         })
     },
 
     validateListingIsOpen: function (db, collection, filter) {
         return new Promise((res, rej) => {
-           record.getRecords(db, collection, filter)
-               .then((records) => records[0]["listing"]["status"] === "open" ? res() : rej("non_applicable_listing"))
+            record.getRecords(db, collection, filter)
+                .then((records) => records[0]["listing"]["status"] === "open" ? res() : rej("non_applicable_listing"))
         });
     },
 
