@@ -8,7 +8,7 @@ const schema = Joi.object().keys({
     facebook_token: Joi.string().required(),
     identity_verified: Joi.boolean(),
     profile_picture: Joi.string().required(),
-    dob: Joi.string().required(),
+    dob: Joi.date().required(),
     sex: Joi.string().valid("male", "female", "other").required(),
     profession: Joi.valid("student", "professional").required()
 });

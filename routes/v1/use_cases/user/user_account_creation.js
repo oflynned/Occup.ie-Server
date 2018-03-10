@@ -2,8 +2,8 @@ let user = require("../../models/user");
 let record = require("../common/record");
 
 function getUserAge(birthday) {
-    let date = birthday.split("-");
-    let ageDiffMillis = Date.now() - new Date(date[0], date[1], date[2]).getTime();
+    let date = new Date(birthday);
+    let ageDiffMillis = Date.now() - date.getTime();
     let ageDate = new Date(ageDiffMillis);
     return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
