@@ -3,6 +3,7 @@ const Joi = require("joi");
 const schema = Joi.object().keys({
     forename: Joi.string().required(),
     surname: Joi.string().required(),
+    dob: Joi.date().required(),
     email: Joi.string().email().required(),
     phone_number: Joi.string().required(),
     phone_verified: Joi.boolean(),
@@ -14,11 +15,12 @@ module.exports = {
     validate: function (o) {
         return Joi.validate(o, schema, {allowUnknown: true})
     },
-    generate: function (forename, surname, email, phoneNumber) {
+    generate: function (forename, surname, dob, phoneNumber) {
         return {
             forename: forename,
             surname: surname,
-            email: email,
+            dob: dob,
+            email: `${forename}.${surname}@test.com`,
             phone_number: phoneNumber,
             phone_verified: false,
             identity_verified: false,
