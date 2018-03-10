@@ -419,6 +419,7 @@ describe("api application management", () => {
         let user = {};
         let listing = {};
         let landlord = {};
+        let application = {};
 
         userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
             .then((_user) => user = _user[0])
@@ -428,14 +429,16 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then((application) => {
-                application["status"] = "accepted";
-                return application
+            .then((_application) => {
+                application = _application;
+                _application["status"] = "accepted";
+                return _application
             })
             .then((application) => requestHelper.putResource(`/api/v1/application/${application["_id"]}`, application))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal([res.body].length, 1);
+                assert.notEqual(res.body.last_updated, application["last_updated"]);
                 done()
             })
             .catch((err) => done(err))
