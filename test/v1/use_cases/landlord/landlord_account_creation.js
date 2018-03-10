@@ -6,6 +6,7 @@ const collection = require("../../../../config/collections").development.landlor
 
 let model = require("../../../../routes/v1/models/landlord");
 let useCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
+const birthday = new Date(1960, 1, 1, 0, 0, 0);
 
 function dropDb() {
     db.get(collection).drop();
@@ -16,7 +17,6 @@ describe("landlord account creation tests", () => {
     afterEach(() => dropDb());
 
     it("should follow landlord schema for generate account", (done) => {
-        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         model.validate(landlord);
         useCase.createAccount(db, collection, landlord)
@@ -30,7 +30,6 @@ describe("landlord account creation tests", () => {
     });
 
     it("should throw an error on missing params", (done) => {
-        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         delete landlord["forename"];
         model.validate(landlord)
@@ -39,7 +38,6 @@ describe("landlord account creation tests", () => {
     });
 
     it("should discard junk params", (done) => {
-        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         landlord["parameter"] = "junk";
 

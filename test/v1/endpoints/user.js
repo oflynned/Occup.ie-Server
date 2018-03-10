@@ -14,14 +14,16 @@ const model = require("../../../routes/v1/models/user");
 const creationUseCase = require("../../../routes/v1/use_cases/user/user_account_creation");
 const retrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
 
+const birthday = new Date(1994, 1, 1, 0, 0, 0);
+
 function dropDb() {
     return db.get(collection).drop()
 }
 
 function seedDb() {
-    const user1 = model.generate("John", "Smith", "1994-01-01", "other", "student");
-    const user2 = model.generate("Emma", "Sheeran", "1994-01-01", "female", "student");
-    const user3 = model.generate("Edmond", "Ó Floinn", "1994-01-01", "male", "professional");
+    const user1 = model.generate("John", "Smith", birthday, "other", "student");
+    const user2 = model.generate("Emma", "Sheeran", birthday, "female", "student");
+    const user3 = model.generate("Edmond", "Ó Floinn", birthday, "male", "professional");
 
     return Promise.all([
         creationUseCase.createAccount(db, collection, user1),
@@ -46,7 +48,7 @@ describe("api user account management", () => {
     });
 
     it('should return status 201 and new resource if creating a new user', (done) => {
-        const newUser = model.generate("New", "User", "1994-01-01", "other", "professional");
+        const newUser = model.generate("New", "User", birthday, "other", "professional");
 
         dropDb()
             .then(() => retrievalUseCase.getUsers(db, collection))
@@ -60,7 +62,7 @@ describe("api user account management", () => {
     });
 
     it('should return 400 for missing parameters on creating a new user', (done) => {
-        const newUser = model.generate("New", "User", "1994-01-01", "other", "professional");
+        const newUser = model.generate("New", "User", birthday, "other", "professional");
         delete newUser["forename"];
 
         requestHelper.postResource(`/api/v1/user`, newUser)

@@ -14,12 +14,13 @@ const creationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_
 const retrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
 const requestHelper = require("./request_helper");
 
+const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
+
 function dropDb() {
     return db.get(collection).drop()
 }
 
 function seedDb() {
-    const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
     const landlord1 = model.generate("John", "Smith", birthday, "john.smith@test.com", "0");
     const landlord2 = model.generate("Emma", "Sheeran", birthday, "emma.sheeran@test.com", "1");
     const landlord3 = model.generate("Edmond", "Ó Floinn", birthday, "edmond.ofloinn@test.com", "2");
@@ -47,7 +48,6 @@ describe("api landlord account management", () => {
     });
 
     it('should return status 201 and new resource if creating a new landlord', (done) => {
-        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
         let newLandlord = model.generate("New", "Landlord", birthday, "new.user@test.com", "4");
 
         dropDb()
@@ -62,7 +62,6 @@ describe("api landlord account management", () => {
     });
 
     it('should return 400 for missing parameters on creating a new landlord', (done) => {
-        const birthday = new Date(1960, 1, 1, 0, 0, 0).toDateString();
         let newLandlord = model.generate("New", "Landlord", birthday, "new.user@test.com", "4");
         delete newLandlord["forename"];
 

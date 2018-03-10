@@ -45,7 +45,7 @@ function dropDb() {
 
 function getDobFromAge(age) {
     let now = new Date();
-    return new Date(now.getFullYear() - age, now.getMonth(), now.getDay(), 0, 0, 0, 0).toDateString();
+    return new Date(now.getFullYear() - age, now.getMonth(), now.getDay(), 0, 0, 0, 0);
 }
 
 function createUsers() {
