@@ -45,7 +45,7 @@ module.exports = (db, env) => {
             .catch((err) => {
                 switch (err.message) {
                     case "non_existent_user":
-                        res.status(404).json(err);
+                        res.status(404).send();
                         break;
                     default:
                         res.status(500).json(err);
@@ -62,13 +62,15 @@ module.exports = (db, env) => {
             .then((user) => retrieveUserUseCase.modifyUser(db, collection, user, uuid))
             .then((user) => res.status(200).json(user))
             .catch((err) => {
-                console.log(err);
                 switch (err.message) {
                     case "bad_request":
-                        res.status(400).json(err);
+                        res.status(400).send();
+                        break;
+                    case "non_existent_user":
+                        res.status(404).send();
                         break;
                     default:
-                        res.status(500).json(err);
+                        res.status(500).send();
                         break;
                 }
             })
@@ -92,5 +94,4 @@ module.exports = (db, env) => {
     });
 
     return router;
-}
-;
+};
