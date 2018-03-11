@@ -27,6 +27,7 @@ module.exports = (db, col) => {
             .then(() => createApplicationUseCase.createApplication(db, applicationCol, application))
             .then((application) => res.status(201).json(application))
             .catch((err) => {
+                console.log(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();

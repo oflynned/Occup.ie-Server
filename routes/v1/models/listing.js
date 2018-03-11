@@ -35,6 +35,7 @@ const schema = Joi.object().keys({
         garden: Joi.boolean().required()
     },
     listing: {
+        rent: Joi.number().required(),
         created: Joi.date().required(),
         expires: Joi.date().required(),
         plan: Joi.string().valid("entry", "medium", "deluxe").required(),
@@ -94,7 +95,10 @@ module.exports = {
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
 
+        let rent = Math.floor(Math.random() * 2500);
+
         return {
+            rent: rent,
             created: creation,
             expires: expiry,
             plan: plan,

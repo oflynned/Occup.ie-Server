@@ -2,7 +2,7 @@ let record = require("../common/record");
 
 function getDobFromAge(age) {
     let now = new Date();
-    return new Date((now.getFullYear() - age) + "-" + (now.getMonth()) + "-" + now.getDay()).toDateString();
+    return new Date(now.getFullYear() - age, now.getMonth(), now.getDay());
 }
 
 function convert(d) {
@@ -34,7 +34,7 @@ function isListingFitting(user, listing) {
     let minDob = getDobFromAge(listing["details"]["min_target_age"]);
     let maxDob = getDobFromAge(listing["details"]["max_target_age"]);
 
-    let userDob = new Date(user["dob"]).toDateString();
+    let userDob = new Date(user["dob"]);
     let listingSex = listing["details"]["target_sex"];
     let userSex = user["sex"];
 
