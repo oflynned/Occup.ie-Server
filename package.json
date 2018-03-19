@@ -1,6 +1,6 @@
 {
-  "name": "rent",
-  "version": "0.0.0",
+  "name": "occup.ie",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
