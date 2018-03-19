@@ -121,9 +121,9 @@ function seedListings(env, db, size) {
                 let uuid = landlords[getRandom(landlords.length)]["_id"];
                 let ageLimits = getAgeLimits();
                 let address = listingModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
-                let details = listingModel.generateDetails("apartment", generateGibberish(60), generateGibberish(15), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let details = listingModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
                 let facilities = listingModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = listingModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let listing = listingModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = listingModel.generate("rent", uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
 
                 jobs.push(listingCreationUseCase.createListing(db, env.listings, job));

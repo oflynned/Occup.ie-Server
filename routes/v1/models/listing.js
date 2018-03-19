@@ -14,10 +14,9 @@ const schema = Joi.object().keys({
     details: {
         dwelling: Joi.string().valid("studio", "apartment", "house").required(),
         description: Joi.string().required(),
-        stay_caveats: Joi.string(),
         lease_length_months: Joi.number().required(),
         min_target_age: Joi.number().min(18).required(),
-        max_target_age: Joi.number().min(18).required(),
+        max_target_age: Joi.number().min(Joi.ref('min_target_age')).required(),
         target_sex: Joi.array().items(Joi.string().valid("male", "female", "other", "couple")).required(),
         target_profession: Joi.array().items(Joi.string().valid("student", "professional")).required()
     },
@@ -27,15 +26,16 @@ const schema = Joi.object().keys({
     images: Joi.array().items(Joi.string().required()),
 
     facilities: {
-        washing_machine: Joi.boolean().required(),
         dryer: Joi.boolean().required(),
-        parking: Joi.boolean().required(),
-        wifi: Joi.boolean().required(),
+        washing_machine: Joi.boolean().required(),
         central_heating: Joi.boolean().required(),
+        parking: Joi.boolean().required(),
+        pets: Joi.boolean().required(),
+        wifi: Joi.boolean().required(),
         garden: Joi.boolean().required()
     },
     listing: {
-        rent: Joi.number().required(),
+        rent: Joi.number().min(1).required(),
         created: Joi.date().required(),
         expires: Joi.date().required(),
         plan: Joi.string().valid("entry", "medium", "deluxe").required(),
@@ -66,11 +66,10 @@ module.exports = {
         }
     },
 
-    generateDetails: function (dwelling, description, stayCaveats, leaseLengthMonths, minAge, maxAge, targetSex, targetProfession) {
+    generateDetails: function (dwelling, description, leaseLengthMonths, minAge, maxAge, targetSex, targetProfession) {
         return {
             dwelling: dwelling,
             description: description,
-            stayCaveats: stayCaveats,
             lease_length_months: leaseLengthMonths,
             min_target_age: minAge,
             max_target_age: maxAge,
@@ -79,8 +78,9 @@ module.exports = {
         }
     },
 
-    generateFacilities: function (hasWashingMachine, hasDryer, hasParking, hasWifi, hasCentralHeating, hasGarden) {
+    generateFacilities: function (arePetsAllowed, hasWashingMachine, hasDryer, hasParking, hasWifi, hasCentralHeating, hasGarden) {
         return {
+            pets: arePetsAllowed,
             washing_machine: hasWashingMachine,
             dryer: hasDryer,
             parking: hasParking,
@@ -90,12 +90,10 @@ module.exports = {
         }
     },
 
-    generateListing: function (plan, isOwnerOccupied, isFurnished, ber) {
+    generateListing: function (rent, plan, isOwnerOccupied, isFurnished, ber) {
         const creation = new Date();
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
-
-        let rent = Math.floor(Math.random() * 2500);
 
         return {
             rent: rent,
