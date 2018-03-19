@@ -6,7 +6,7 @@ const collection = require("../../../../config/collections").development.landlor
 
 let model = require("../../../../routes/v1/models/landlord");
 let useCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
-const birthday = new Date(1960, 1, 1, 0, 0, 0);
+const birthday = new Date(1960, 1, 1);
 
 function dropDb() {
     db.get(collection).drop();
@@ -18,30 +18,32 @@ describe("landlord account creation tests", () => {
 
     it("should follow landlord schema for generate account", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
-        model.validate(landlord);
-        useCase.createAccount(db, collection, landlord)
+        let payload = useCase.generateLandlordObject(landlord);
+
+        useCase.validatePayload(payload)
+            .then(() => useCase.createAccount(db, collection, payload))
             .then((record) => {
-                assert.equal(record, landlord);
+                assert.equal(record, payload);
                 assert.equal(record["phone_verified"], false);
                 assert.equal(record["identity_verified"], false);
                 done();
             })
-            .catch((err) => done(err));
+            .catch((err) => done(err.message));
     });
 
-    it("should throw an error on missing params", (done) => {
+    it("should throw an error on account missing params", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
-        delete landlord["forename"];
-        model.validate(landlord)
-            .then(() => done(new Error("landlord schema incorrectly validated")))
-            .catch(() => done())
+        let payload = useCase.generateLandlordObject(landlord);
+        delete payload["forename"];
+
+        useCase.validatePayload(payload)
+            .then(() => done(new Error("incorrectly validated a wrong payload")))
+            .catch(() => done());
     });
 
-    it("should discard junk params", (done) => {
+    it("should discard junk params provided to landlord account creation", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         landlord["parameter"] = "junk";
-
-        model.validate(landlord);
         let record = useCase.generateLandlordObject(landlord);
 
         assert.notEqual(record, landlord);
