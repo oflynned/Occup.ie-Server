@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let dbSeed = require("../ops/system_checks/db_seed");
+let path = require('path');
 
 function checkParams(seedType, seedSize) {
     return new Promise((res, rej) => {
@@ -12,6 +13,10 @@ function checkParams(seedType, seedSize) {
 }
 
 module.exports = (db, env) => {
+    router.get('/', (req, res) => {
+        res.sendFile(path.join(__dirname, '../../../views/index.html'));
+    });
+
     router.get('/ping', (req, res) => {
         res.send("pong");
     });
