@@ -49,7 +49,8 @@ const schema = Joi.object().keys({
             "D1", "D2",
             "E1", "E2",
             "F",
-            "G"
+            "G",
+            "Exempt"
         )
     }
 });
@@ -96,7 +97,7 @@ module.exports = {
         expiry.setDate(creation.getDate() + 21);
 
         return {
-            rent: rent,
+            rent: parseInt(rent),
             created: creation,
             expires: expiry,
             plan: plan,

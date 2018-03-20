@@ -1,7 +1,7 @@
 let assert = require("assert");
 let model = require("../../../routes/v1/models/listing");
 
-describe("user model tests", () => {
+describe("listing model tests", () => {
     it("should validate object with correct params", (done) => {
         let type = "rent";
         let landlordUuid = "uuid";
@@ -70,7 +70,7 @@ describe("user model tests", () => {
         done();
     });
 
-    ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D1", "D2", "E1", "E2", "F", "G"].forEach((ber) => {
+    ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D1", "D2", "E1", "E2", "F", "G", "Exempt"].forEach((ber) => {
         it(`should validate object with correct ${ber} BER rating`, (done) => {
             let type = "rent";
             let landlordUuid = "uuid";
@@ -254,23 +254,7 @@ describe("user model tests", () => {
         done();
     });
 
-    it('should not validate object with rent being 0 or less', (done) => {
-        let type = "rent";
-        let landlordUuid = "uuid";
-        let address = model.generateAddress("22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
-        let details = model.generateDetails("apartment", "description", 12, 20, 18, ["male"], ["professional"]);
-        let bedrooms = ["single"];
-        let bathrooms = ["separate"];
-        let facilities = model.generateFacilities(false, true, true, true, true, true, true);
-        let listing = model.generateListing(0, "entry", true, true, "A1");
-
-        let object = model.generate(type, landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
-        let result = model.validate(object)["error"] !== null;
-        assert.equal(result, true);
-        done();
-    });
-
-    it('should not validate object with rent being 0 or less', (done) => {
+    it('should not validate object with rent being less than 0', (done) => {
         let type = "rent";
         let landlordUuid = "uuid";
         let address = model.generateAddress("22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
@@ -286,7 +270,34 @@ describe("user model tests", () => {
         done();
     });
 
-    it('should validate object with rent being greater than 0', (done) => {
+    it('should not validate object with rent being 0', (done) => {
+        let type = "rent";
+        let landlordUuid = "uuid";
+        let address = model.generateAddress("22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
+        let details = model.generateDetails("apartment", "description", 12, 20, 18, ["male"], ["professional"]);
+        let bedrooms = ["single"];
+        let bathrooms = ["separate"];
+        let facilities = model.generateFacilities(false, true, true, true, true, true, true);
+        let listing = model.generateListing(0, "entry", true, true, "A1");
+
+        let object = model.generate(type, landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
+        let result = model.validate(object)["error"] !== null;
+        assert.equal(result, true);
+        done();
+    });
+
+    it('should not validate object with rent having a decimal point', (done) => {
+        let type = "rent";
+        let landlordUuid = "uuid";
+        let address = model.generateAddress("22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
+        let details = model.generateDetails("apartment", "description", 12, 20, 18, ["male"], ["professional"]);
+        let bedrooms = ["single"];
+        let bathrooms = ["separate"];
+        let facilities = model.generateFacilities(false, true, true, true, true, true, true);
+        let listing = model.generateListing(1.23, "entry", true, true, "A1");
+        let object = model.generate(type, landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
+
+        assert.equal(object["listing"]["rent"], 1);
         done();
     });
 });
