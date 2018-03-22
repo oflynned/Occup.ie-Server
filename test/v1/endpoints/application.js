@@ -14,14 +14,17 @@ const applicationCol = env.applications;
 
 const requestHelper = require("./request_helper");
 const userModel = require("../../../routes/v1/models/user");
-const listingModel = require("../../../routes/v1/models/listing");
+const rentalModel = require("../../../routes/v1/models/rental");
+const houseShareModel = require("../../../routes/v1/models/house_share");
 const landlordModel = require("../../../routes/v1/models/landlord");
 const applicationModel = require("../../../routes/v1/models/application");
 
 const applicationCreationUseCase = require("../../../routes/v1/use_cases/application/application_creation");
 const applicationRetrievalUseCase = require("../../../routes/v1/use_cases/application/application_retrieval");
-const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/listing_creation");
-const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/listing_retrieval");
+const houseShareCreationUseCase = require("../../../routes/v1/use_cases/listing/house_share_creation");
+const houseShareRetrievalUseCase = require("../../../routes/v1/use_cases/listing/house_share_retrieval");
+const rentalCreationUseCase = require("../../../routes/v1/use_cases/listing/rental_creation");
+const rentalRetrievalUseCase = require("../../../routes/v1/use_cases/listing/rental_retrieval");
 const userCreationUseCase = require("../../../routes/v1/use_cases/user/user_account_creation");
 const userRetrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
 const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
@@ -30,7 +33,7 @@ const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/
 function seedDb() {
     return createLandlord()
         .then((uuid) => createListingObject(uuid))
-        .then((listing) => listingCreationUseCase.createListing(db, listingCol, listing))
+        .then((listing) => houseShareCreationUseCase.createListing(db, listingCol, listing))
         .then(() => createUsers())
 }
 
@@ -85,15 +88,14 @@ function createListingObject(landlordUuid) {
     expiry.setDate(today.getDate() + 21);
 
     return Promise.resolve(
-        listingModel.generate(
-            "rent",
+        houseShareModel.generate(
             landlordUuid,
-            listingModel.generateAddress("22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
-            listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
+            houseShareModel.generateAddress("22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
+            houseShareModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
             ["shared", "ensuite", "ensuite"],
-            ["single", "double", "twin"],
-            listingModel.generateFacilities(false, true, true, false, false, true, false),
-            listingModel.generateListing(Math.floor(Math.random() * 2500), "entry", false, true, "B1")
+            ["single", "double", "shared"],
+            houseShareModel.generateFacilities(false, true, true, false, false, true, false),
+            houseShareModel.generateListing(Math.floor(Math.random() * 2500), "entry", false, true, "B1")
         )
     );
 }
@@ -122,7 +124,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -156,7 +158,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -176,7 +178,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -196,7 +198,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -216,7 +218,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -250,7 +252,7 @@ describe("api application management", () => {
 
         landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"})
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(ObjectId(), landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -267,7 +269,7 @@ describe("api application management", () => {
 
         userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
             .then((_user) => user = _user[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], ObjectId(), listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -287,7 +289,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -309,13 +311,13 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => {
                 listing = _listing[0];
                 let uuid = listing["_id"];
                 let modifiedListing = listing;
                 modifiedListing["listing"]["status"] = "closed";
-                return listingRetrievalUseCase.modifyListing(db, listingCol, modifiedListing, ObjectId(uuid))
+                return houseShareRetrievalUseCase.modifyListing(db, listingCol, modifiedListing, ObjectId(uuid))
             })
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => requestHelper.postResource(`/api/v1/application`, application))
@@ -335,7 +337,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
@@ -357,7 +359,7 @@ describe("api application management", () => {
             .then((_user) => firstUser = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(firstUser["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
@@ -391,7 +393,7 @@ describe("api application management", () => {
             .then((_user) => secondUser = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(firstUser["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
@@ -425,7 +427,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
@@ -453,7 +455,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
@@ -478,7 +480,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
@@ -503,7 +505,7 @@ describe("api application management", () => {
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
-            .then(() => listingRetrievalUseCase.getListings(db, listingCol))
+            .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))

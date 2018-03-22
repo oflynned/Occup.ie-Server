@@ -12,10 +12,10 @@ const listingCol = env.listings;
 
 const requestHelper = require("./request_helper");
 const landlordModel = require("../../../routes/v1/models/landlord");
-const listingModel = require("../../../routes/v1/models/house_share");
+const listingModel = require("../../../routes/v1/models/rental");
 
-const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/listing_creation");
-const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/listing_retrieval");
+const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/house_share_creation");
+const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/house_share_retrieval");
 
 const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
@@ -39,19 +39,18 @@ function createLandlord() {
 function createListingObject(landlordUuid) {
     return Promise.resolve(
         listingModel.generate(
-            "rent",
             landlordUuid,
             listingModel.generateAddress("22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
-            listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
+            listingModel.generateDetails("apartment", "Awesome apartment", 12, ["individual"]),
             ["shared", "ensuite", "ensuite"],
-            ["single", "double", "twin"],
+            ["single", "double", "shared"],
             listingModel.generateFacilities(false, true, true, false, false, true, false),
             listingModel.generateListing(1000, "entry", false, true, "B1")
         )
     );
 }
 
-describe("api listing management", () => {
+describe("api rental management", () => {
     beforeEach((done) => {
         dropDb()
             .then(() => seedDb())
@@ -74,7 +73,7 @@ describe("api listing management", () => {
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
             .then((uuid) => createListingObject(uuid))
-            .then((listing) => requestHelper.postResource(`/api/v1/listing`, listing))
+            .then((listing) => requestHelper.postResource(`/api/v1/rental`, listing))
             .then((res) => assert.equal(res.status, 201))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((listings) => {
@@ -94,7 +93,7 @@ describe("api listing management", () => {
                 let listing = createListingObject(uuid);
                 delete listing["address"];
             })
-            .then((listing) => requestHelper.postResource(`/api/v1/listing`, listing))
+            .then((listing) => requestHelper.postResource(`/api/v1/rental`, listing))
             .then(() => done(new Error("Incorrectly accepted landlord listing creation with missing parameters")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -107,7 +106,7 @@ describe("api listing management", () => {
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
             .then((uuid) => createListingObject(uuid))
-            .then((listing) => requestHelper.postResource(`/api/v1/listing`, listing))
+            .then((listing) => requestHelper.postResource(`/api/v1/rental`, listing))
             .then(() => done(new Error("Incorrectly accepted landlord listing creation without verified phone number")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -120,7 +119,7 @@ describe("api listing management", () => {
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
             .then((uuid) => createListingObject(uuid))
-            .then((listing) => requestHelper.postResource(`/api/v1/listing`, listing))
+            .then((listing) => requestHelper.postResource(`/api/v1/rental`, listing))
             .then(() => done(new Error("Incorrectly accepted landlord list creation without verified government id")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -131,7 +130,7 @@ describe("api listing management", () => {
     it('should return 403 on creating a listing if the landlord uuid does not exist', (done) => {
         const nonExistentUuid = ObjectId();
         Promise.resolve(createListingObject(nonExistentUuid))
-            .then((listing) => requestHelper.postResource(`/api/v1/listing`, listing))
+            .then((listing) => requestHelper.postResource(`/api/v1/rental`, listing))
             .then(() => done(new Error("Incorrectly accepted new listing given non-existent landlord uuid")))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -142,7 +141,7 @@ describe("api listing management", () => {
     it('should return 200 on a get request given the listing id of a property that exists', (done) => {
         listingRetrievalUseCase.getListings(db, listingCol)
             .then((listings) => listings[0]["_id"])
-            .then((uuid) => requestHelper.getResource(`/api/v1/listing/${uuid}`))
+            .then((uuid) => requestHelper.getResource(`/api/v1/rental/${uuid}`))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
@@ -153,7 +152,7 @@ describe("api listing management", () => {
 
     it('should return 404 on a get request given the listing id of a property that does not exist', (done) => {
         const nonExistentUuid = ObjectId();
-        requestHelper.getResource(`/api/v1/listing/${nonExistentUuid}`)
+        requestHelper.getResource(`/api/v1/rental/${nonExistentUuid}`)
             .then(() => done("Incorrectly asserting that a non-existent property exists by a uuid"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -167,7 +166,7 @@ describe("api listing management", () => {
                 listings[0]["listing"]["ber"] = "A3";
                 return listings[0]
             })
-            .then((listing) => requestHelper.putResource(`/api/v1/listing/${listing["_id"]}`, listing))
+            .then((listing) => requestHelper.putResource(`/api/v1/rental/${listing["_id"]}`, listing))
             .then((res) => assert.equal(res.status, 200))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then(((listings) => {
@@ -185,9 +184,8 @@ describe("api listing management", () => {
                 delete listing["listing"]["plan"];
                 return listing;
             })
-            .then((listing) => requestHelper.putResource(`/api/v1/listing/${listing["_id"]}`, listing))
+            .then((listing) => requestHelper.putResource(`/api/v1/rental/${listing["_id"]}`, listing))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
-            .then((listings) => console.log(listings))
             .then(() => done(new Error("Incorrectly accepting put request for existent listing with bad params")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -198,7 +196,7 @@ describe("api listing management", () => {
     it('should return 404 on updating a non-existing listing resource', (done) => {
         const nonExistentUuid = ObjectId();
         createListingObject(nonExistentUuid)
-            .then((listing) => requestHelper.putResource(`/api/v1/listing/${nonExistentUuid}`, listing))
+            .then((listing) => requestHelper.putResource(`/api/v1/rental/${nonExistentUuid}`, listing))
             .then(() => done(new Error("Incorrectly accepting put request for non existent listing uuid")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -212,7 +210,7 @@ describe("api listing management", () => {
                 assert.equal(listings.length, 1);
                 return listings[0]["_id"]
             })
-            .then((uuid) => requestHelper.deleteResource(`/api/v1/listing/${uuid}`))
+            .then((uuid) => requestHelper.deleteResource(`/api/v1/rental/${uuid}`))
             .then((res) => assert.equal(res.status, 200))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then(((listings) => {
@@ -228,7 +226,7 @@ describe("api listing management", () => {
 
         listingRetrievalUseCase.getListings(db, listingCol)
             .then((listings) => originalCount = listings.length)
-            .then(() => requestHelper.deleteResource(`/api/v1/listing/${nonExistingUuid}`))
+            .then(() => requestHelper.deleteResource(`/api/v1/rental/${nonExistingUuid}`))
             .then(() => done("Incorrectly asserting that a non-existent uuid for a listing was deleted"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
