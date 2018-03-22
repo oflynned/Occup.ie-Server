@@ -1,13 +1,13 @@
 const userModel = require("../../../../routes/v1/models/user");
-const listingModel = require("../../../../routes/v1/models/listing");
+const listingModel = require("../../models/house_share");
 const landlordModel = require("../../../../routes/v1/models/landlord");
 const applicationModel = require("../../../../routes/v1/models/application");
 
 const userCreationUseCase = require("../../../../routes/v1/use_cases/user/user_account_creation");
 const userRetrievalUseCase = require("../../../../routes/v1/use_cases/user/user_account_retrieval");
 
-const listingCreationUseCase = require("../../../../routes/v1/use_cases/listing/listing_creation");
-const listingRetrievalUseCase = require("../../../../routes/v1/use_cases/listing/listing_retrieval");
+const listingCreationUseCase = require("../../use_cases/listing/house_share_creation");
+const listingRetrievalUseCase = require("../../use_cases/listing/house_share_retrieval");
 
 const landlordCreationUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_retrieval");

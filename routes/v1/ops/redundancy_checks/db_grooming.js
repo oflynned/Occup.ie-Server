@@ -27,6 +27,8 @@ function groomDb() {
                         listing: {expires: {"$lt": date}}
                     }));
                 break;
+            case "payments":
+                break;
         }
     }
 
