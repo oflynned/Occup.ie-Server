@@ -8,7 +8,8 @@ const schema = Joi.object().keys({
     phone_number: Joi.string().required(),
     phone_verified: Joi.boolean(),
     identity_verified: Joi.boolean(),
-    profile_picture: Joi.string().required()
+    profile_picture: Joi.string().required(),
+    creation_time: Joi.date().required()
 });
 
 module.exports = {
@@ -24,7 +25,8 @@ module.exports = {
             phone_number: phoneNumber,
             phone_verified: false,
             identity_verified: false,
-            profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg"
+            profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg",
+            creation_time: new Date()
         };
     }
 };

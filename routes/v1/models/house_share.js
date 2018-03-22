@@ -1,8 +1,12 @@
 const Joi = require("joi");
 
 const schema = Joi.object().keys({
-    type: Joi.string().valid("rent", "house_share").required(),
+    type: Joi.string().valid("house_share").required(),
     landlord_uuid: Joi.string().required(),
+    bedrooms: Joi.array().items(Joi.string().valid("single", "double", "shared")).min(1).required(),
+    bathrooms: Joi.array().items(Joi.string().valid("ensuite", "shared").min(1).required()),
+    images: Joi.array().items(Joi.string().required()).min(4).unique(),
+
     address: {
         house_number: Joi.string().required(),
         street: Joi.string().required(),
@@ -11,19 +15,16 @@ const schema = Joi.object().keys({
         county: Joi.string().required(),
         eircode: Joi.string().required()
     },
+
     details: {
-        dwelling: Joi.string().valid("studio", "apartment", "house").required(),
+        dwelling: Joi.string().valid("apartment", "house").required(),
         description: Joi.string().required(),
         lease_length_months: Joi.number().required(),
         min_target_age: Joi.number().min(18).required(),
         max_target_age: Joi.number().min(Joi.ref('min_target_age')).required(),
-        target_sex: Joi.array().items(Joi.string().valid("male", "female", "other", "couple")).required(),
-        target_profession: Joi.array().items(Joi.string().valid("student", "professional")).required()
+        target_tenant: Joi.array().items(Joi.string().valid("male", "female", "other", "couple")).min(1).unique().required(),
+        target_profession: Joi.array().items(Joi.string().valid("student", "professional")).min(1).unique().required()
     },
-
-    bedrooms: Joi.array().items(Joi.string().valid("single", "double", "twin")).required(),
-    bathrooms: Joi.array().items(Joi.string().valid("ensuite", "shared").required()),
-    images: Joi.array().items(Joi.string().required()),
 
     facilities: {
         dryer: Joi.boolean().required(),
@@ -34,6 +35,7 @@ const schema = Joi.object().keys({
         wifi: Joi.boolean().required(),
         garden: Joi.boolean().required()
     },
+
     listing: {
         rent: Joi.number().min(1).required(),
         created: Joi.date().required(),
@@ -48,10 +50,9 @@ const schema = Joi.object().keys({
             "C1", "C2", "C3",
             "D1", "D2",
             "E1", "E2",
-            "F",
-            "G",
+            "F", "G",
             "Exempt"
-        )
+        ).required()
     }
 });
 
@@ -67,14 +68,14 @@ module.exports = {
         }
     },
 
-    generateDetails: function (dwelling, description, leaseLengthMonths, minAge, maxAge, targetSex, targetProfession) {
+    generateDetails: function (dwelling, description, leaseLengthMonths, minAge, maxAge, targetTenant, targetProfession) {
         return {
             dwelling: dwelling,
             description: description,
             lease_length_months: leaseLengthMonths,
             min_target_age: minAge,
             max_target_age: maxAge,
-            target_sex: targetSex,
+            target_tenant: targetTenant,
             target_profession: targetProfession,
         }
     },
@@ -108,19 +109,20 @@ module.exports = {
         }
     },
 
-    generate: function (type, landlordUuid, address, details, bathrooms, bedrooms, facilities, listing) {
+    generate: function (landlordUuid, address, details, bathrooms, bedrooms, facilities, listing) {
         return {
-            type: type,
+            type: "house_share",
             landlord_uuid: String(landlordUuid),
-            address: address,
-            details: details,
             bathrooms: bathrooms,
             bedrooms: bedrooms,
             images: [
                 "https://b.dmlimg.com/MDQ0NmY4MzAwY2VhYmFhZGRmY2JmNDk4MDA3MzEyODlxZGRX6azbb_50YdhwqtRuaHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvOC9mLzhmNzE2ODA4ZWUxZDk5MThmMDkyZmIwYmZiYjcwMWM3LmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg",
                 "https://b.dmlimg.com/MGFmZjg4ZjljYzdkMTJmNTlhMDgwZWI5MzE1ZGRlMGE3YL-cDCXeuZOsUmkVLsqZaHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvNC85LzQ5NGFkZDczN2RmZjgyMjJjMWY0NTE2YzM5MWRlYWYxLmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg",
-                "https://b.dmlimg.com/ZDIwNDFlZmY1NTBhYWJmYTQyZTY4NDM5MDQ3Mjk5ODXq1FI8tYeKcXln3fdrwwt9aHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvYi9hL2JhOGRjOTYzZTA5YTY5ZmIxYWQ4MjBiYWRkMWIwNzQ0LmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg"
+                "https://b.dmlimg.com/ZDIwNDFlZmY1NTBhYWJmYTQyZTY4NDM5MDQ3Mjk5ODXq1FI8tYeKcXln3fdrwwt9aHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvYi9hL2JhOGRjOTYzZTA5YTY5ZmIxYWQ4MjBiYWRkMWIwNzQ0LmpwZ3x8fHx8fDYwMHg0NTB8fHx8.jpg",
+                "https://b.dmlimg.com/ODQ4MjI0Yjg5N2Q2MWIzOTgyODQzYTU5MzMzMzZlYTmxZrPBn3u2X0C_8a3Nff6TaHR0cDovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL21lZGlhbWFzdGVyLXMzZXUvOS9lLzllN2ZmZWIyYTE1ODZiYmRhNjg1MTcyNTZhMzc2ODM4LmpwZ3x8fHx8fDM0MHgyNTV8fHx8.jpg"
             ],
+            address: address,
+            details: details,
             facilities: facilities,
             listing: listing
         }

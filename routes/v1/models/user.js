@@ -10,7 +10,8 @@ const schema = Joi.object().keys({
     profile_picture: Joi.string().required(),
     dob: Joi.date().required(),
     sex: Joi.string().valid("male", "female", "other").required(),
-    profession: Joi.valid("student", "professional").required()
+    profession: Joi.valid("student", "professional").required(),
+    creation_time: Joi.date().required()
 });
 
 module.exports = {
@@ -25,7 +26,8 @@ module.exports = {
             profile_picture: "http://f1.thejournal.ie/media/2013/08/james-larkin-2-337x500.jpg",
             dob: dob,
             sex: sex,
-            profession: profession
+            profession: profession,
+            creation_time: new Date()
         };
     },
 
