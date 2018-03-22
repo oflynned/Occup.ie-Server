@@ -12,6 +12,8 @@ let app = require('../app')(env === "production" ? collections.production: colle
 let debug = require('debug')('rent:server');
 let http = require('http');
 
+app.set('env', env === "production" ? "production": "development");
+
 /**
  * Get port from environment and store in Express.
  */

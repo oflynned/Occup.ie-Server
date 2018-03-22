@@ -1,5 +1,5 @@
 let assert = require("assert");
-let model = require("../../../routes/v1/models/listing");
+let model = require("../../../routes/v1/models/house_share");
 
 describe("listing model tests", () => {
     it("should validate object with correct params", (done) => {

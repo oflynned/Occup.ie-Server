@@ -22,14 +22,16 @@ module.exports = (env) => {
 
     let index = require('./routes/v1/endpoints/index')(db, env);
     let user = require('./routes/v1/endpoints/user')(db, env);
-    let listing = require('./routes/v1/endpoints/listing')(db, env);
+    let rental = require('./routes/v1/endpoints/rental')(db, env);
     let landlord = require('./routes/v1/endpoints/landlord')(db, env);
+    let houseShare = require('./routes/v1/endpoints/house_share')(db, env);
     let application = require('./routes/v1/endpoints/application')(db, env);
 
     app.use('/', index);
     app.use('/api/v1/user', user);
-    app.use('/api/v1/listing', listing);
+    app.use('/api/v1/rental', rental);
     app.use('/api/v1/landlord', landlord);
+    app.use('/api/v1/house-share', houseShare);
     app.use('/api/v1/application', application);
 
     return app;

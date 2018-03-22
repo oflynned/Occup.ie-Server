@@ -12,7 +12,7 @@ const listingCol = env.listings;
 
 const requestHelper = require("./request_helper");
 const landlordModel = require("../../../routes/v1/models/landlord");
-const listingModel = require("../../../routes/v1/models/listing");
+const listingModel = require("../../../routes/v1/models/house_share");
 
 const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/listing_creation");
 const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/listing_retrieval");
