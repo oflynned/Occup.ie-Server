@@ -35,7 +35,7 @@ function isListingFitting(user, listing) {
     let maxDob = getDobFromAge(listing["details"]["max_target_age"]);
 
     let userDob = new Date(user["dob"]);
-    let listingSex = listing["details"]["target_sex"];
+    let listingSex = listing["details"]["target_tenant"];
     let userSex = user["sex"];
 
     let listingProfession = listing["details"]["target_profession"];

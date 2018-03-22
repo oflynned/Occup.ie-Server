@@ -1,10 +1,10 @@
-let listingModel = require('../../models/house_share');
+let model = require('../../models/house_share');
 let record = require("../common/record");
 
 module.exports = {
     validatePayload: function (data) {
         return new Promise((res, rej) => {
-            let result = listingModel.validate(data);
+            let result = model.validate(data);
             result["error"] === null ? res() : rej(new Error("bad_request"))
         })
     },

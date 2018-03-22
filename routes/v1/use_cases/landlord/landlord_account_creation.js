@@ -18,7 +18,8 @@ module.exports = {
             phone_number: payload["phone_number"],
             phone_verified: payload["phone_verified"],
             identity_verified: payload["identity_verified"],
-            profile_picture: payload["profile_picture"]
+            profile_picture: payload["profile_picture"],
+            creation_time: payload["creation_time"]
         };
     },
 
