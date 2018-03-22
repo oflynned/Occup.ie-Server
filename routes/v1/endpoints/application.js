@@ -5,7 +5,7 @@ let ObjectId = require('mongodb').ObjectID;
 let createApplicationUseCase = require('../use_cases/application/application_creation');
 let retrieveApplicationUseCase = require('../use_cases/application/application_retrieval');
 let retrieveLandlordUseCase = require('../use_cases/landlord/landlord_account_retrieval');
-let retrieveListingUseCase = require('../use_cases/listing/listing_retrieval');
+let retrieveListingUseCase = require('../use_cases/listing/house_share_retrieval');
 let retrieveUserUseCase = require('../use_cases/user/user_account_retrieval');
 
 module.exports = (db, col) => {

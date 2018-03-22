@@ -2,25 +2,24 @@ let express = require('express');
 let router = express.Router();
 let ObjectId = require('mongodb').ObjectID;
 
-let createListingUseCase = require('../use_cases/listing/house_share_creation');
-let retrieveListingUseCase = require('../use_cases/listing/house_share_retrieval');
-
-let createLandlordUseCase = require('../use_cases/landlord/landlord_account_creation');
+let createListingUseCase = require('../use_cases/listing/rental_creation');
+let retrieveListingUseCase = require('../use_cases/listing/rental_retrieval');
 let retrieveLandlordUseCase = require('../use_cases/landlord/landlord_account_retrieval');
 
 module.exports = (db, col) => {
     const landlordCol = col["landlords"];
-    const listingCol = col["listings"];
+    const listingsCol = col["listings"];
 
     router.post('/', (req, res) => {
         let payload = req.body;
+
 
         createListingUseCase.validatePayload(payload)
             .then(() => retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, payload["landlord_uuid"]))
             .then(() => retrieveLandlordUseCase.isLandlordIdentityVerified(db, landlordCol, payload["landlord_uuid"]))
             .then(() => retrieveLandlordUseCase.isLandlordPhoneVerified(db, landlordCol, payload["landlord_uuid"]))
-            .then(() => createListingUseCase.validatePropertyIsUnique(db, listingCol, payload["address"]))
-            .then(() => createListingUseCase.createListing(db, listingCol, payload))
+            .then(() => createListingUseCase.validatePropertyIsUnique(db, listingsCol, payload["address"]))
+            .then(() => createListingUseCase.createListing(db, listingsCol, payload))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
                 switch (err.message) {
@@ -41,15 +40,15 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveListingUseCase.getListings(db, listingCol)
+        retrieveListingUseCase.getListings(db, listingsCol)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.doesListingExist(db, listingCol, {_id: ObjectId(uuid)})
-            .then(() => retrieveListingUseCase.getListings(db, listingCol, {_id: ObjectId(uuid)}))
+        retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}))
             .then((properties) => res.status(200).json(properties))
             .catch((err) => {
                 switch (err.message) {
@@ -66,8 +65,8 @@ module.exports = (db, col) => {
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createListingUseCase.validatePayload(req.body)
-            .then(() => retrieveListingUseCase.doesListingExist(db, listingCol, uuid))
-            .then(() => retrieveListingUseCase.modifyListing(db, listingCol, req.body, uuid))
+            .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
+            .then(() => retrieveListingUseCase.modifyListing(db, listingsCol, req.body, uuid))
             .then(() => res.status(200).send())
             .catch((err) => {
                 switch (err.message) {
@@ -87,8 +86,8 @@ module.exports = (db, col) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveListingUseCase.doesListingExist(db, listingCol, {_id: ObjectId(uuid)})
-            .then(() => retrieveListingUseCase.deleteListing(db, listingCol, uuid))
+        retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveListingUseCase.deleteListing(db, listingsCol, uuid))
             .then((property) => res.status(200).json(property))
             .catch((err) => {
                 switch (err.message) {
