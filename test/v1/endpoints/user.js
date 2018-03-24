@@ -1,7 +1,6 @@
 const assert = require("assert");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const expect = chai.expect;
 const ObjectId = require("mongodb").ObjectId;
 
 const config = require('../../../config/db');
@@ -60,7 +59,7 @@ describe("api user account management", () => {
 
     it('should return 400 for missing parameters on creating a new user', (done) => {
         const newUser = model.generate("New", "User", birthday, "other", "professional");
-        delete newUser["forename"];
+        delete newUser["details"]["forename"];
 
         requestHelper.postResource(`/api/v1/user`, newUser)
             .then(() => done(new Error("Failed validation for incorrect parameters on user creation")))
@@ -91,8 +90,8 @@ describe("api user account management", () => {
     });
 
     it("should return an existing user and status 200 if requesting an existing user uuid", (done) => {
-        retrievalUseCase.getUsers(db, collection, {forename: "Emma"})
-            .then((record) => record[0]["_id"])
+        retrievalUseCase.getUsers(db, collection, {"details.forename": "Emma"})
+            .then((records) => records[0]["_id"])
             .then((uuid) => `/api/v1/user/${uuid}`)
             .then((endpoint) => requestHelper.getResource(endpoint))
             .then((res) => {
@@ -117,11 +116,11 @@ describe("api user account management", () => {
         let uuid = -1;
         let updatedRecord = {};
 
-        retrievalUseCase.getUsers(db, collection, {forename: "Emma"})
+        retrievalUseCase.getUsers(db, collection, {"details.forename": "Emma"})
             .then((recordList) => recordList[0])
             .then((record) => {
-                assert.equal(record.forename, "Emma");
-                record["forename"] = "ammE";
+                assert.equal(record.details.forename, "Emma");
+                record["details"]["forename"] = "ammE";
                 return record
             })
             .then((record) => {
@@ -131,7 +130,7 @@ describe("api user account management", () => {
             .then(() => requestHelper.putResource(`/api/v1/user/${uuid}`, updatedRecord))
             .then((res) => {
                 assert.equal(res.status, 200);
-                assert.equal(res.body.forename, "ammE");
+                assert.equal(res.body.details.forename, "ammE");
                 done();
             })
             .catch((err) => done(err))
@@ -140,7 +139,7 @@ describe("api user account management", () => {
     it('should return status 200 if deleting resource and assert old record is gone', (done) => {
         let deletedRecord = {};
 
-        retrievalUseCase.getUsers(db, collection, {forename: "Emma"})
+        retrievalUseCase.getUsers(db, collection, {"details.forename": "Emma"})
             .then((records) => {
                 deletedRecord = records[0];
                 return deletedRecord["_id"]

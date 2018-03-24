@@ -120,7 +120,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -154,7 +154,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Too", surname: "Young"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Too", "details.surname": "Young"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -174,7 +174,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Too", surname: "Old"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Too", "details.surname": "Old"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -194,7 +194,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Profession"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Wrong", "details.surname": "Profession"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -214,7 +214,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Wrong", "details.surname": "Gender"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -233,7 +233,7 @@ describe("api application management", () => {
         let user = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Wrong", "details.surname": "Gender"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -267,7 +267,7 @@ describe("api application management", () => {
         let user = {};
         let listing = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Wrong", surname: "Gender"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Wrong", "details.surname": "Gender"})
             .then((_user) => user = _user[0])
             .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
@@ -285,7 +285,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -307,7 +307,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -333,7 +333,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -355,7 +355,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => firstUser = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -387,9 +387,9 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => firstUser = _user[0])
-            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Other", "details.surname": "Candidate"}))
             .then((_user) => secondUser = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
@@ -423,9 +423,9 @@ describe("api application management", () => {
         let landlord = {};
         let application = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
-            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Other", "details.surname": "Candidate"}))
             .then((_landlord) => landlord = _landlord[0])
             .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
@@ -451,9 +451,9 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
-            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Other", "details.surname": "Candidate"}))
             .then((_landlord) => landlord = _landlord[0])
             .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
@@ -475,10 +475,10 @@ describe("api application management", () => {
         let user = {};
         let listing = {};
         let landlord = {};
-        
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
-            .then(() => userRetrievalUseCase.getUsers(db, userCol, {forename: "Other", surname: "Candidate"}))
+            .then(() => userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Other", "details.surname": "Candidate"}))
             .then((_landlord) => landlord = _landlord[0])
             .then(() => houseShareRetrievalUseCase.getListings(db, listingCol))
             .then((_listing) => listing = _listing[0])
@@ -501,7 +501,7 @@ describe("api application management", () => {
         let listing = {};
         let landlord = {};
 
-        userRetrievalUseCase.getUsers(db, userCol, {forename: "Fitting", surname: "Candidate"})
+        userRetrievalUseCase.getUsers(db, userCol, {"details.forename": "Fitting", "details.surname": "Candidate"})
             .then((_user) => user = _user[0])
             .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Landlord"}))
             .then((_landlord) => landlord = _landlord[0])
