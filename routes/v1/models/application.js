@@ -16,6 +16,10 @@ const querySchema = Joi.object().keys({
 });
 
 module.exports = {
+    validatePayload: function (o) {
+        return Joi.validate(o, schema, {allowUnknown: true});
+    },
+
     validate: function (o) {
         return Joi.validate(o, schema);
     },
