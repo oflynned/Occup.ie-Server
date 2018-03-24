@@ -44,7 +44,7 @@ describe("user model tests", () => {
 
     it('should fail object validation with missing params', (done) => {
         let user = model.generate("John", "Smith", birthday, "male", "student");
-        delete user["forename"];
+        delete user["details"]["forename"];
         let outcome = model.validate(user)["error"] !== null;
         assert.equal(outcome, true);
         done();

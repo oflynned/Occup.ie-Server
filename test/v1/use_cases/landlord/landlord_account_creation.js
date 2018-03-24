@@ -18,12 +18,10 @@ describe("landlord account creation tests", () => {
 
     it("should follow landlord schema for generate account", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
-        let payload = useCase.generateLandlordObject(landlord);
-
-        useCase.validatePayload(payload)
-            .then(() => useCase.createAccount(db, collection, payload))
+        useCase.validatePayload(landlord)
+            .then(() => useCase.createAccount(db, collection, landlord))
             .then((record) => {
-                assert.equal(record, payload);
+                assert.equal(record, landlord);
                 assert.equal(record["phone_verified"], false);
                 assert.equal(record["identity_verified"], false);
                 done();
@@ -33,10 +31,9 @@ describe("landlord account creation tests", () => {
 
     it("should throw an error on account missing params", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
-        let payload = useCase.generateLandlordObject(landlord);
-        delete payload["forename"];
+        delete landlord["forename"];
 
-        useCase.validatePayload(payload)
+        useCase.validatePayload(landlord)
             .then(() => done(new Error("incorrectly validated a wrong payload")))
             .catch(() => done());
     });
@@ -44,13 +41,13 @@ describe("landlord account creation tests", () => {
     it("should discard junk params provided to landlord account creation", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
         landlord["parameter"] = "junk";
-        let record = useCase.generateLandlordObject(landlord);
 
-        assert.notEqual(record, landlord);
-        assert.equal("parameter" in landlord, true);
+        let result = model.validateModel(landlord);
+        assert.equal(result["error"] !== null, true);
 
         delete landlord["parameter"];
-        assert.deepEqual(record, landlord);
+        result = model.validateModel(landlord);
+        assert.equal(result["error"] === null, true);
 
         done();
     });
