@@ -63,7 +63,7 @@ describe("api landlord account management", () => {
 
     it('should return 400 for missing parameters on creating a new landlord', (done) => {
         let newLandlord = model.generate("New", "Landlord", birthday, "new.user@test.com", "4");
-        delete newLandlord["forename"];
+        delete newLandlord["details"]["forename"];
 
         requestHelper.postResource(`/api/v1/landlord`, newLandlord)
             .then(() => done(new Error("Failed validation for incorrect parameters on landlord creation")))
@@ -84,7 +84,7 @@ describe("api landlord account management", () => {
     });
 
     it("should return an existing landlord and status 200 if requesting an existing landlord uuid", (done) => {
-        retrievalUseCase.getLandlords(db, collection, {forename: "Emma"})
+        retrievalUseCase.getLandlords(db, collection, {"details.forename": "Emma"})
             .then((record) => record[0]["_id"])
             .then((uuid) => `/api/v1/landlord/${uuid}`)
             .then((endpoint) => requestHelper.getResource(endpoint))
@@ -110,11 +110,11 @@ describe("api landlord account management", () => {
         let uuid = -1;
         let updatedRecord = {};
 
-        retrievalUseCase.getLandlords(db, collection, {forename: "Emma"})
+        retrievalUseCase.getLandlords(db, collection, {"details.forename": "Emma"})
             .then((recordList) => recordList[0])
             .then((record) => {
-                assert.equal(record.forename, "Emma");
-                record["forename"] = "ammE";
+                assert.equal(record.details.forename, "Emma");
+                record["details"]["forename"] = "ammE";
                 return record
             })
             .then((record) => {
@@ -124,7 +124,7 @@ describe("api landlord account management", () => {
             .then(() => requestHelper.putResource(`/api/v1/landlord/${uuid}`, updatedRecord))
             .then((res) => {
                 assert.equal(res.status, 200);
-                assert.equal(res.body.forename, "ammE");
+                assert.equal(res.body.details.forename, "ammE");
                 done();
             })
             .catch((err) => done(err))
@@ -133,7 +133,7 @@ describe("api landlord account management", () => {
     it('should return status 200 if deleting resource and assert old record is gone', (done) => {
         let deletedRecord = {};
 
-        retrievalUseCase.getLandlords(db, collection, {forename: "Emma"})
+        retrievalUseCase.getLandlords(db, collection, {"details.forename": "Emma"})
             .then((records) => {
                 deletedRecord = records[0];
                 return deletedRecord["_id"]

@@ -68,7 +68,7 @@ describe("api rental management", () => {
     it('should return 201 on creating a listing if the landlord is verified', (done) => {
         dropDb()
             .then(() => createLandlord())
-            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"}))
+            .then(() => landlordRetrievalUseCase.getLandlords(db, landlordCol, {"details.forename": "Emma"}))
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
@@ -86,7 +86,7 @@ describe("api rental management", () => {
     });
 
     it('should return 400 on creating a listing if there are missing parameters', (done) => {
-        landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"})
+        landlordRetrievalUseCase.getLandlords(db, landlordCol, {"details.forename": "Emma"})
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
             .then((uuid) => {
@@ -102,7 +102,7 @@ describe("api rental management", () => {
     });
 
     it('should return 403 on creating a listing if the landlord is not phone verified', (done) => {
-        landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"})
+        landlordRetrievalUseCase.getLandlords(db, landlordCol, {"details.forename": "Emma"})
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordIdentity(db, landlordCol, uuid))
             .then((uuid) => createListingObject(uuid))
@@ -115,7 +115,7 @@ describe("api rental management", () => {
     });
 
     it('should return 403 on creating a listing if the landlord is not government id verified', (done) => {
-        landlordRetrievalUseCase.getLandlords(db, landlordCol, {forename: "Emma"})
+        landlordRetrievalUseCase.getLandlords(db, landlordCol, {"details.forename": "Emma"})
             .then((landlords) => landlords[0]["_id"])
             .then((uuid) => landlordRetrievalUseCase.verifyLandlordPhone(db, landlordCol, uuid))
             .then((uuid) => createListingObject(uuid))
