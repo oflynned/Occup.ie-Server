@@ -10,6 +10,7 @@ const schema = Joi.object().keys({
     identity_verified: Joi.boolean(),
     profile_picture: Joi.string().required(),
     creation_time: Joi.date().required(),
+    google_id: Joi.string().required(),
     google_token: Joi.string().required(),
     firebase_token: Joi.string().required(),
     tos_version_accepted: Joi.number().required(),
@@ -17,6 +18,9 @@ const schema = Joi.object().keys({
 });
 
 module.exports = {
+    validateModel: function (o) {
+        return Joi.validate(o, schema)
+    },
     validate: function (o) {
         return Joi.validate(o, schema, {allowUnknown: true})
     },
@@ -31,6 +35,7 @@ module.exports = {
             identity_verified: false,
             profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg",
             creation_time: new Date(),
+            google_id: "google_id",
             google_token: "google_token",
             firebase_token: "firebase_token",
             tos_version_accepted: 1,
