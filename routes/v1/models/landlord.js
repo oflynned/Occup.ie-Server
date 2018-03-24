@@ -9,7 +9,11 @@ const schema = Joi.object().keys({
     phone_verified: Joi.boolean(),
     identity_verified: Joi.boolean(),
     profile_picture: Joi.string().required(),
-    creation_time: Joi.date().required()
+    creation_time: Joi.date().required(),
+    google_token: Joi.string().required(),
+    firebase_token: Joi.string().required(),
+    tos_version_accepted: Joi.number().required(),
+    privacy_version_accepted: Joi.number().required()
 });
 
 module.exports = {
@@ -26,7 +30,11 @@ module.exports = {
             phone_verified: false,
             identity_verified: false,
             profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg",
-            creation_time: new Date()
+            creation_time: new Date(),
+            google_token: "google_token",
+            firebase_token: "firebase_token",
+            tos_version_accepted: 1,
+            privacy_version_accepted: 1
         };
     }
 };
