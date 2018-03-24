@@ -22,16 +22,19 @@ describe("landlord account creation tests", () => {
             .then(() => useCase.createAccount(db, collection, landlord))
             .then((record) => {
                 assert.equal(record, landlord);
-                assert.equal(record["phone_verified"], false);
-                assert.equal(record["identity_verified"], false);
+                assert.equal(record["meta"]["phone_verified"], false);
+                assert.equal(record["meta"]["identity_verified"], false);
                 done();
             })
-            .catch((err) => done(err.message));
+            .catch((err) => {
+                console.log(err);
+                done(err.message)
+            });
     });
 
     it("should throw an error on account missing params", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
-        delete landlord["forename"];
+        delete landlord["details"]["forename"];
 
         useCase.validatePayload(landlord)
             .then(() => done(new Error("incorrectly validated a wrong payload")))
