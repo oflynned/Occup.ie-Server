@@ -209,8 +209,10 @@ module.exports = {
                 return seedLandlords(db, env.landlords, seedSize);
             case "user":
                 return seedUsers(db, env.users, seedSize);
+            case "house-share":
+                return seedHouseShares(env, db, seedSize);
             case "rental":
-                return seedListings(env, db, seedSize);
+                return seedRentals(env, db, seedSize);
         }
     },
 
