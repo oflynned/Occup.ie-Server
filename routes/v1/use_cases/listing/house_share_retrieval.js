@@ -34,12 +34,12 @@ function isListingFitting(user, listing) {
     let minDob = getDobFromAge(listing["details"]["min_target_age"]);
     let maxDob = getDobFromAge(listing["details"]["max_target_age"]);
 
-    let userDob = new Date(user["dob"]);
+    let userDob = new Date(user["details"]["dob"]);
     let listingSex = listing["details"]["target_tenant"];
-    let userSex = user["sex"];
+    let userSex = user["details"]["sex"];
 
     let listingProfession = listing["details"]["target_profession"];
-    let userProfession = user["profession"];
+    let userProfession = user["details"]["profession"];
 
     // 1993, 1995, 1998
     // max, user, min
