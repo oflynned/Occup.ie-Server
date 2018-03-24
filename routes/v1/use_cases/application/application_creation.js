@@ -15,15 +15,6 @@ module.exports = {
         })
     },
 
-    generateApplicationObject: function (db, collection, payload) {
-        return {
-            user_id: payload["user_id"],
-            landlord_id: payload["landlord_id"],
-            listing_id: payload["listing_id"],
-            status: "pending"
-        };
-    },
-
     createApplication: function (db, collection, data) {
         return record.createRecord(db, collection, data)
     },
