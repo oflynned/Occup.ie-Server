@@ -6,6 +6,16 @@
     "start": "node ./bin/www",
     "test": "mocha 'test/**/*.js' --exit"
   },
+  "nyc": {
+    "include": [
+      "routes/**/*.js"
+    ],
+    "exclude": [
+      "routes/v1/ops/**/*.js",
+      "routes/v1/endpoints/index.js",
+      "routes/v1/use_cases/common/**/*.js"
+    ]
+  },
   "dependencies": {
     "aws-sdk": "^2.204.0",
     "aws-sdk-apis": "^3.1.10",
@@ -30,13 +40,11 @@
     "nock": "^9.2.3",
     "nodemon": "^1.17.1",
     "npm": "^5.8.0",
+    "nyc": "^11.4.1",
     "s3rver": "^2.2.1",
     "serve-favicon": "~2.4.5",
     "serve-static": "^1.13.2",
     "should": "^13.2.1",
     "uuid": "^3.2.1"
-  },
-  "devDependencies": {
-    "nyc": "^11.4.1"
   }
 }
