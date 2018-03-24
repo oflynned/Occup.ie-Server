@@ -9,20 +9,6 @@ module.exports = {
         })
     },
 
-    generateLandlordObject: function (payload) {
-        return {
-            forename: payload["forename"],
-            surname: payload["surname"],
-            dob: payload["dob"],
-            email: payload["email"],
-            phone_number: payload["phone_number"],
-            phone_verified: payload["phone_verified"],
-            identity_verified: payload["identity_verified"],
-            profile_picture: payload["profile_picture"],
-            creation_time: payload["creation_time"]
-        };
-    },
-
     createAccount: function (db, collection, data) {
         return record.createRecord(db, collection, data)
     }
