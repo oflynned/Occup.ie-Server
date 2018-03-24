@@ -1,13 +1,17 @@
 const userModel = require("../../../../routes/v1/models/user");
-const listingModel = require("../../models/house_share");
+const houseShareModel = require("../../models/house_share");
+const rentalModel = require("../../models/rental");
 const landlordModel = require("../../../../routes/v1/models/landlord");
 const applicationModel = require("../../../../routes/v1/models/application");
 
 const userCreationUseCase = require("../../../../routes/v1/use_cases/user/user_account_creation");
 const userRetrievalUseCase = require("../../../../routes/v1/use_cases/user/user_account_retrieval");
 
-const listingCreationUseCase = require("../../use_cases/listing/house_share_creation");
-const listingRetrievalUseCase = require("../../use_cases/listing/house_share_retrieval");
+const houseShareCreationUseCase = require("../../use_cases/listing/house_share_creation");
+const houseShareRetrievalUseCase = require("../../use_cases/listing/house_share_retrieval");
+
+const rentalCreationUseCase = require("../../use_cases/listing/rental_creation");
+const rentalRetrievalUseCase = require("../../use_cases/listing/rental_retrieval");
 
 const landlordCreationUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
@@ -109,10 +113,9 @@ function seedLandlords(db, col, size) {
     return Promise.all(jobs);
 }
 
-function seedListings(env, db, size) {
+function seedHouseShares(env, db, size) {
     let landlords = [];
     let jobs = [];
-    let i = 0;
 
     return landlordRetrievalUseCase.getLandlords(db, env.landlords)
         .then((_landlords) => landlords = _landlords)
@@ -120,13 +123,35 @@ function seedListings(env, db, size) {
             for (let i = 0; i < size; i++) {
                 let uuid = landlords[getRandom(landlords.length)]["_id"];
                 let ageLimits = getAgeLimits();
-                let address = listingModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
-                let details = listingModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
-                let facilities = listingModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = listingModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
-                let job = listingModel.generate("rent", uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
+                let address = houseShareModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
+                let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
+                let listing = houseShareModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let job = houseShareModel.generate(uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
 
-                jobs.push(listingCreationUseCase.createListing(db, env.listings, job));
+                jobs.push(houseShareCreationUseCase.createListing(db, env.listings, job));
+            }
+        })
+        .then(() => Promise.all(jobs));
+}
+
+function seedRentals(env, db, size) {
+    let landlords = [];
+    let jobs = [];
+
+    return landlordRetrievalUseCase.getLandlords(db, env.landlords)
+        .then((_landlords) => landlords = _landlords)
+        .then(() => {
+            for (let i = 0; i < size; i++) {
+                let uuid = landlords[getRandom(landlords.length)]["_id"];
+                let ageLimits = getAgeLimits();
+                let address = rentalModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
+                let details = rentalModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
+                let listing = rentalModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let job = rentalModel.generate(uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
+
+                jobs.push(rentalCreationUseCase.createListing(db, env.listings, job));
             }
         })
         .then(() => Promise.all(jobs));
@@ -135,18 +160,22 @@ function seedListings(env, db, size) {
 function seedApplications(env, db, size) {
     let jobs = [];
     let users = [];
-    let listings = [];
+    let houseShares = [];
+    let rentals = [];
 
     return userRetrievalUseCase.getUsers(db, env.users)
         .then((_users) => users = _users)
-        .then(() => listingRetrievalUseCase.getListings(db, env.listings))
-        .then((_listings) => listings = _listings)
+        .then(() => houseShareRetrievalUseCase.getListings(db, env.listings))
+        .then((listings) => houseShares = listings)
+        .then(() => rentalRetrievalUseCase.getListings(db, env.listings))
+        .then((listings) => rentals = listings)
         .then(() => {
             for (let i = 0; i < size; i++) {
                 let user = users[getRandom(users.length)];
+                let listings = houseShares + rentals;
                 let listing = listings[getRandom(listings.length)];
 
-                if (listingRetrievalUseCase.isListingFitting(user, listing)) {
+                if (houseShareRetrievalUseCase.isListingFitting(user, listing)) {
                     let application = applicationModel.generate(user["_id"], listing["landlord_uuid"], listing["_id"]);
                     jobs.push(applicationCreationUseCase.createApplication(db, env.applications, application))
                 }
@@ -164,7 +193,7 @@ module.exports = {
                 .then((users) => count += users.length),
             landlordRetrievalUseCase.getLandlords(db, env.landlords)
                 .then((landlords) => count += landlords.length),
-            listingRetrievalUseCase.getListings(db, env.listings)
+            houseShareRetrievalUseCase.getListings(db, env.listings)
                 .then((listings) => count += listings.length)
         ]).then(() => Promise.all([
             db.get(env.users).drop(),
@@ -180,15 +209,16 @@ module.exports = {
                 return seedLandlords(db, env.landlords, seedSize);
             case "user":
                 return seedUsers(db, env.users, seedSize);
-            case "listing":
+            case "rental":
                 return seedListings(env, db, seedSize);
         }
     },
 
     seedAll: function (env, db, seedSize) {
         seedLandlords(db, env.landlords, seedSize)
-            .then(() => seedListings(env, db, seedSize * 5))
+            .then(() => seedRentals(env, db, seedSize * 5))
+            .then(() => seedHouseShares(env, db, seedSize * 5))
             .then(() => seedUsers(db, env.users, seedSize * 10))
-            .then(() => seedApplications(env, db, seedSize * 10))
+            .then(() => seedApplications(env, db, seedSize * 100))
     }
 };
