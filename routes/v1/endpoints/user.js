@@ -12,8 +12,7 @@ module.exports = (db, env) => {
         createUserUseCase.validatePayload(req.body)
             .then(() => createUserUseCase.validateUserAge(req.body))
             .then(() => createUserUseCase.validateUserIsUnique(db, collection, req.body))
-            .then(() => createUserUseCase.generateUserObject(req.body))
-            .then((data) => createUserUseCase.createAccount(db, collection, data))
+            .then(() => createUserUseCase.createAccount(db, collection, req.body))
             .then((data) => res.status(201).json(data))
             .catch((err) => {
                 switch (err.message) {
@@ -55,11 +54,11 @@ module.exports = (db, env) => {
     });
 
     router.put('/:uuid', (req, res) => {
-        let uuid = req.params["uuid"];
-        createUserUseCase.validatePayload(req.body)
-            .then(() => retrieveUserUseCase.getUsers(db, collection, {_id: ObjectId(uuid)}))
-            .then((users) => createUserUseCase.getUserParams(users[0], req.body))
-            .then((user) => retrieveUserUseCase.modifyUser(db, collection, user, uuid))
+        let uuid = ObjectId(req.params["uuid"]);
+        retrieveUserUseCase.getUsers(db, collection, uuid)
+            .then((users) => createUserUseCase.generateModifiedRecord(users[0], req.data))
+            .then((user) => createUserUseCase.validatePayload(user))
+            .then(() => retrieveUserUseCase.modifyUser(db, collection, req.body, uuid))
             .then((user) => res.status(200).json(user))
             .catch((err) => {
                 switch (err.message) {
