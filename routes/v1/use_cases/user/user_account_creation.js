@@ -11,7 +11,7 @@ function getUserAge(birthday) {
 module.exports = {
     validateUserAge: function (data) {
         return new Promise((res, rej) => {
-            getUserAge(data["dob"]) >= 18 ? res() : rej(new Error("underage_user"));
+            getUserAge(data["details"]["dob"]) >= 18 ? res() : rej(new Error("underage_user"));
         });
     },
 
@@ -19,13 +19,13 @@ module.exports = {
         return new Promise((res, rej) => {
             let results = user.validate(data);
             results["error"] === null ? res() : rej(new Error("bad_request"));
-        })
+        });
     },
 
     validateUserIsUnique: function (db, collection, data) {
         return new Promise((res, rej) => {
             db.get(collection)
-                .find({facebook_id: data["facebook_id"]})
+                .find({facebook_id: data["oauth"]["oauth_id"]})
                 .then((users) => {
                     if (users.length === 0)
                         res();
@@ -36,32 +36,15 @@ module.exports = {
         })
     },
 
-    generateUserObject: function (payload) {
-        return Promise.resolve({
-            email: payload["email"],
-            forename: payload["forename"],
-            surname: payload["surname"],
-            facebook_id: payload["facebook_id"],
-            facebook_token: payload["facebook_token"],
-            identity_verified: false,
-            profile_picture: payload["profile_picture"],
-            age: payload["age"],
-            sex: payload["sex"],
-            profession: payload["profession"]
-        });
-    },
+    generateModifiedRecord: function (data, payload) {
+        let user = data;
+        for (let property in payload) {
+            for (let key in payload[property]) {
+                let value = payload[property][key];
+                user[property][key] = value;
+            }
+        }
 
-    getUserParams: function getUserParams(user, updatedUser) {
-        user["forename"] = updatedUser["forename"] === undefined ? user["forename"] : updatedUser["forename"];
-        user["surname"] = updatedUser["surname"] === undefined ? user["surname"] : updatedUser["surname"];
-        user["profile_picture"] = updatedUser["profile_picture"] === undefined ? user["profile_picture"] : updatedUser["profile_picture"];
-        user["age"] = updatedUser["age"] === undefined ? user["age"] : updatedUser["age"];
-        user["sex"] = updatedUser["sex"] === undefined ? user["sex"] : updatedUser["sex"];
-        user["profession"] = updatedUser["profession"] === undefined ? user["profession"] : updatedUser["profession"];
-
-        // TODO allow updating of email, but validation has to revert back to false
-
-        this.validatePayload(user);
         return user;
     },
 
