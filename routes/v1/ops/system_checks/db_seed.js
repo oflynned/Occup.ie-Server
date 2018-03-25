@@ -35,6 +35,11 @@ function getProfession() {
     return professions[getRandom(professions.length)];
 }
 
+function getTargetTenant() {
+    const targets = ["individual", "couple"];
+    return targets[getRandom(targets.length)];
+}
+
 function getDob() {
     const minAge = 18;
     let now = new Date();
@@ -146,7 +151,7 @@ function seedRentals(env, db, size) {
                 let uuid = landlords[getRandom(landlords.length)]["_id"];
                 let ageLimits = getAgeLimits();
                 let address = rentalModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
-                let details = rentalModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let details = rentalModel.generateDetails("apartment", generateGibberish(60), 12, [getTargetTenant()]);
                 let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
                 let listing = rentalModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = rentalModel.generate(uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
