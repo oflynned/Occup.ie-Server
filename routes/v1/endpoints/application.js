@@ -28,6 +28,7 @@ module.exports = (db, col) => {
             .then((application) => res.status(201).json(application))
             .catch((err) => {
                 switch (err.message) {
+                    case "unknown_listing_type":
                     case "bad_request":
                         res.status(400).send();
                         break;

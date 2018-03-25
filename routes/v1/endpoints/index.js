@@ -5,7 +5,7 @@ let path = require('path');
 
 function checkParams(seedType, seedSize) {
     return new Promise((res, rej) => {
-        const seedTypes = ["landlord", "user", "listing"];
+        const seedTypes = ["landlord", "user", "rental", "house-share", "application"];
         if (!seedTypes.includes(seedType)) rej();
         if (seedSize < 1 || isNaN(seedSize)) rej();
         res();

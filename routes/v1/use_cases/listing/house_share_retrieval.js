@@ -31,6 +31,9 @@ function inRange(d, start, end) {
 }
 
 function isListingFitting(user, listing) {
+    if (listing["type"] === "rental")
+        return true;
+
     let minDob = getDobFromAge(listing["details"]["min_target_age"]);
     let maxDob = getDobFromAge(listing["details"]["max_target_age"]);
 
@@ -72,8 +75,19 @@ module.exports = {
                 .then((listings) => {
                     if (listings.length === 0) rej(new Error("non_existent_listing"));
 
+                    console.log("I'm being validated on the endpoint?");
                     let listing = listings[0];
-                    isListingFitting(user, listing) ? res() : rej(new Error("unfitting_candidate"))
+                    switch (listing["type"]) {
+                        case "rental":
+                            res();
+                            break;
+                        case "house_share":
+                            isListingFitting(user, listing) ? res() : rej(new Error("unfitting_candidate"));
+                            break;
+                        default:
+                            rej(new Error("unknown_listing_type"));
+                            break;
+                    }
                 })
         })
     },

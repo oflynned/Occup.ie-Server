@@ -177,7 +177,7 @@ function seedApplications(env, db, size) {
         .then(() => {
             for (let i = 0; i < size; i++) {
                 let user = users[getRandom(users.length)];
-                let listings = houseShares + rentals;
+                let listings = houseShares.concat(rentals);
                 let listing = listings[getRandom(listings.length)];
 
                 if (houseShareRetrievalUseCase.isListingFitting(user, listing)) {
@@ -214,6 +214,8 @@ module.exports = {
                 return seedLandlords(db, env.landlords, seedSize);
             case "user":
                 return seedUsers(db, env.users, seedSize);
+            case "application":
+                return seedApplications(env, db, seedSize);
             case "house-share":
                 return seedHouseShares(env, db, seedSize);
             case "rental":
