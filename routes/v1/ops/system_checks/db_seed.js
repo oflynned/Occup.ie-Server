@@ -130,7 +130,7 @@ function seedHouseShares(env, db, size) {
                 let ageLimits = getAgeLimits();
                 let address = houseShareModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
-                let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
+                let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
                 let listing = houseShareModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = houseShareModel.generate(uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
 
