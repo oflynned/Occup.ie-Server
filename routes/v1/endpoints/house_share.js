@@ -39,7 +39,7 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveListingUseCase.getListings(db, listingsCol)
+        retrieveListingUseCase.getListings(db, listingsCol, {type: "house_share"})
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
