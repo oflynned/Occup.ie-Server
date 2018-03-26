@@ -1,11 +1,28 @@
-function validateFacebookToken(id, token) {
-    return fetch(`graph.facebook.com/debug_token?input_token=${token}&access_token=${process.env.FACEBOOK_APP_SECRET}`)
-        .then((res) => {
-            console.log(res);
-            switch (res.status) {
+let fetch = require("node-fetch");
 
-            }
+function validateFacebookToken(id, token) {
+    const appId = process.env.FACEBOOK_APP_ID;
+    const secret = process.env.FACEBOOK_APP_SECRET;
+    return fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${appId}|${secret}`)
+        .then((res) => {
+            if (res.status !== 200)
+                throw new Error("oauth_provider_error");
+            return res.json();
         })
+        .then((data) => {
+            let resultUserIsValid = data["data"]["is_valid"];
+            let resultUserId = data["data"]["user_id"];
+            let resultAppId = data["data"]["app_id"];
+
+            if (!resultUserIsValid)
+                throw new Error("bad_oauth_token");
+
+            if (!resultUserId === id)
+                throw new Error("bad_oauth_id");
+
+            if (resultAppId !== appId)
+                throw new Error("bad_app_id");
+        });
 }
 
 function validateGoogleToken(id, token) {
@@ -20,9 +37,9 @@ module.exports = {
 
         switch (provider) {
             case "facebook":
-                return validateFacebookToken(id, token);
+                return Promise.resolve(validateFacebookToken(id, token));
             case "google":
-                return validateGoogleToken(id, token);
+                return Promise.resolve(validateGoogleToken(id, token));
             default:
                 return Promise.reject(new Error("bad_request"));
         }
