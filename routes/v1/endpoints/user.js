@@ -2,6 +2,7 @@ let ObjectId = require("mongodb").ObjectId;
 let express = require('express');
 let router = express.Router();
 
+let oauth = require("../common/oauth");
 let createUserUseCase = require("../use_cases/user/user_account_creation");
 let retrieveUserUseCase = require("../use_cases/user/user_account_retrieval");
 
@@ -11,18 +12,31 @@ module.exports = (db, env) => {
     router.post("/", (req, res) => {
         createUserUseCase.validatePayload(req.body)
             .then(() => createUserUseCase.validateUserAge(req.body))
+            .then(() => oauth.validateOAuthIdentity(req.body))
             .then(() => createUserUseCase.validateUserIsUnique(db, collection, req.body))
-            .then(() => createUserUseCase.createAccount(db, collection, req.body))
-            .then((data) => res.status(201).json(data))
+            .then((isUnique) => {
+                if (!isUnique) {
+                    res.status(200).json();
+                } else {
+                    return createUserUseCase.createAccount(db, collection, req.body)
+                        .then((data) => res.status(201).json(data))
+                }
+            })
             .catch((err) => {
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).json(err);
                         break;
-                    case "user_not_unique":
+                    case "bad_app_id":
+                    case "bad_oauth_id":
+                    case "bad_oauth_token":
+                        res.status(401).json(err);
+                        break;
                     case "underage_user":
+                    case "user_not_unique":
                         res.status(403).json(err);
                         break;
+                    case "oauth_provider_error":
                     default:
                         res.status(500).json(err);
                         break;
