@@ -48,7 +48,6 @@ describe("api user account management", () => {
 
     it('should return status 201 and new resource if creating a new user', (done) => {
         const newUser = model.generate("New", "User", birthday, "other", "professional");
-
         requestHelper.postResource(`/api/v1/user`, newUser)
             .then((res) => {
                 assert.equal(res.status, 201);
@@ -70,7 +69,9 @@ describe("api user account management", () => {
     });
 
     it('should return 403 forbidden for users signing up under age 18 on creating a new user', (done) => {
-        const newUser = model.generate("Underage", "User", "2017-01-01", "male", "student");
+        const birthday = new Date(2017, 1, 1);
+        const newUser = model.generate("Underage", "User", birthday, "male", "student");
+
         requestHelper.postResource(`/api/v1/user`, newUser)
             .then(() => done("Failed validation for incorrect parameters on user creation"))
             .catch((err) => {

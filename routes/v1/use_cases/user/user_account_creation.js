@@ -25,13 +25,8 @@ module.exports = {
     validateUserIsUnique: function (db, collection, data) {
         return new Promise((res, rej) => {
             db.get(collection)
-                .find({facebook_id: data["oauth"]["oauth_id"]})
-                .then((users) => {
-                    if (users.length === 0)
-                        res();
-                    else
-                        throw new Error("user_not_unique");
-                })
+                .find({"oauth.oauth_id": data["oauth"]["oauth_id"]})
+                .then((users) => res(users.length === 0))
                 .catch((err) => rej(err))
         })
     },
@@ -49,6 +44,7 @@ module.exports = {
     },
 
     createAccount: function (db, collection, data) {
+        delete data["oauth"]["oauth_token"];
         return record.createRecord(db, collection, data)
     }
 };

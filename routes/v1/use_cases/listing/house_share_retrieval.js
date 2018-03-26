@@ -75,7 +75,6 @@ module.exports = {
                 .then((listings) => {
                     if (listings.length === 0) rej(new Error("non_existent_listing"));
 
-                    console.log("I'm being validated on the endpoint?");
                     let listing = listings[0];
                     switch (listing["type"]) {
                         case "rental":
