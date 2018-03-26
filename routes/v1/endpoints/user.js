@@ -16,7 +16,9 @@ module.exports = (db, env) => {
             .then(() => createUserUseCase.validateUserIsUnique(db, collection, req.body))
             .then((isUnique) => {
                 if (!isUnique) {
-                    res.status(200).json();
+                    let filter = {"oauth.oauth_id": req.body["oauth"]["oauth_id"]};
+                    return retrieveUserUseCase.getUsers(db, collection, filter)
+                        .then((data) => res.status(200).json(data[0]));
                 } else {
                     return createUserUseCase.createAccount(db, collection, req.body)
                         .then((data) => res.status(201).json(data))
