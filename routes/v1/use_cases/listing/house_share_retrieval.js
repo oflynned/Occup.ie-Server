@@ -1,4 +1,5 @@
 let record = require("../common/record");
+let ObjectId = require("mongodb").ObjectId;
 
 function getDobFromAge(age) {
     let now = new Date();
@@ -57,6 +58,26 @@ module.exports = {
             record.getRecords(db, collection, filter)
                 .then((records) => records.length > 0 ? res() : rej(new Error("non_existent_listing")))
                 .catch((err) => rej(err))
+        })
+    },
+
+    //.then(() => retrieveListingUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
+
+    doesLandlordOwnListing: function (db, headers, landlordCol, listingsCol, uuid) {
+        return new Promise((res, rej) => {
+            let landlord = {};
+            let listing = {};
+
+            record.getRecords(db, listingsCol, {_id: uuid})
+                .then((listings) => listing = listings[0])
+                .then(record.getRecords(db, landlordCol, {_id: ObjectId(listing["landlord_uuid"])}))
+                .then((landlords) => landlord = landlords[0])
+                .then(() => {
+                    if (headers["oauth_id"] !== landlord["oauth"]["oauth_id"])
+                        rej(new Error("wrong_landlord_account"));
+
+                    res();
+                })
         })
     },
 
