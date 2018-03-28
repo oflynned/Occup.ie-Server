@@ -26,9 +26,11 @@ module.exports = (db, col) => {
                     case "property_not_unique":
                         res.status(400).send();
                         break;
+                    case "non_existent_landlord":
+                        res.status(401).send();
+                        break;
                     case "unverified_phone":
                     case "unverified_identity":
-                    case "non_existent_landlord":
                         res.status(403).send();
                         break;
                     default:
