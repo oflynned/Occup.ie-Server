@@ -4,6 +4,9 @@ const chaiHttp = require("chai-http");
 const expect = chai.expect;
 const ObjectId = require("mongodb").ObjectId;
 
+const sinon = require("sinon");
+let app, oauth;
+
 const config = require('../../../config/db');
 const db = require('monk')(config.mongoUrl);
 const env = require("../../../config/collections").test;
@@ -15,6 +18,11 @@ const retrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord
 const requestHelper = require("./request_helper");
 
 const birthday = new Date(1960, 1, 1);
+const headers = {
+    oauth_id: "google_id",
+    oauth_provider: "google",
+    Authorization: "Bearer google_token"
+};
 
 function dropDb() {
     return db.get(collection).drop()
@@ -37,6 +45,9 @@ describe("api landlord account management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
+                oauth = require('../../../common/oauth');
+                sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
+                app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
             })
@@ -44,7 +55,10 @@ describe("api landlord account management", () => {
     });
 
     afterEach((done) => {
-        dropDb().then(() => done()).catch((err) => done(err));
+        dropDb()
+            .then(() => oauth.markInvalidRequests.restore())
+            .then(() => done())
+            .catch((err) => done(err));
     });
 
     it('should return status 201 and new resource if creating a new landlord', (done) => {
@@ -53,7 +67,7 @@ describe("api landlord account management", () => {
         dropDb()
             .then(() => retrievalUseCase.getLandlords(db, collection))
             .then((landlords) => assert.equal(landlords.length, 0))
-            .then(() => requestHelper.postResource(`/api/v1/landlord`, newLandlord))
+            .then(() => requestHelper.postResource(app, headers, `/api/v1/landlord`, newLandlord))
             .then((res) => {
                 assert.equal(res.status, 201);
                 done();
@@ -65,7 +79,7 @@ describe("api landlord account management", () => {
         let newLandlord = model.generate("New", "Landlord", birthday, "new.user@test.com", "4");
         delete newLandlord["details"]["forename"];
 
-        requestHelper.postResource(`/api/v1/landlord`, newLandlord)
+        requestHelper.postResource(app, headers, `/api/v1/landlord`, newLandlord)
             .then(() => done(new Error("Failed validation for incorrect parameters on landlord creation")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -74,7 +88,7 @@ describe("api landlord account management", () => {
     });
 
     it("should return a list and status 200 if requesting existing landlords", (done) => {
-        requestHelper.getResource("/api/v1/landlord")
+        requestHelper.getResource(app, headers, "/api/v1/landlord")
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 3);
@@ -87,7 +101,7 @@ describe("api landlord account management", () => {
         retrievalUseCase.getLandlords(db, collection, {"details.forename": "Emma"})
             .then((record) => record[0]["_id"])
             .then((uuid) => `/api/v1/landlord/${uuid}`)
-            .then((endpoint) => requestHelper.getResource(endpoint))
+            .then((endpoint) => requestHelper.getResource(app, headers, endpoint))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal([res.body].length, 1);
@@ -98,7 +112,7 @@ describe("api landlord account management", () => {
 
     it("should return status 404 if requesting a non-existing landlord by uuid", (done) => {
         const nonExistentUuid = ObjectId();
-        requestHelper.getResource(`/api/v1/landlord/${nonExistentUuid}`)
+        requestHelper.getResource(app, headers, `/api/v1/landlord/${nonExistentUuid}`)
             .then(() => done("Failure by accepting validation of non-existent resource!"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -121,7 +135,7 @@ describe("api landlord account management", () => {
                 uuid = record["_id"];
                 updatedRecord = record;
             })
-            .then(() => requestHelper.putResource(`/api/v1/landlord/${uuid}`, updatedRecord))
+            .then(() => requestHelper.putResource(app, headers, `/api/v1/landlord/${uuid}`, updatedRecord))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.details.forename, "ammE");
@@ -138,7 +152,7 @@ describe("api landlord account management", () => {
                 deletedRecord = records[0];
                 return deletedRecord["_id"]
             })
-            .then((uuid) => requestHelper.deleteResource(`/api/v1/landlord/${uuid}`))
+            .then((uuid) => requestHelper.deleteResource(app, headers, `/api/v1/landlord/${uuid}`))
             .then((res) => assert.equal(res.status, 200))
             .then(() => retrievalUseCase.getLandlords(db, collection))
             .then((landlords) => {

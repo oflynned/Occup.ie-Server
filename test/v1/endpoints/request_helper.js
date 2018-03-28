@@ -1,42 +1,63 @@
-const chai = require("chai");
-const env = require("../../../config/collections").test;
-const app = require("../../../app")(env);
+let chai = require("chai");
 
-function postResource(endpoint, data) {
+function getMockRequest(app, headers) {
+    let req = chai.request(app);
+    for (let k in headers) {
+        req.set(k, headers[k]);
+    }
+
+    return req;
+}
+
+function postResource(app, headers, endpoint, data) {
     return new Promise((res, rej) => {
         chai.request(app)
             .post(endpoint)
-            .set('content-type', 'application/json')
+            .set("oauth_id", headers["oauth_id"])
+            .set("oauth_provider", headers["oauth_provider"])
+            .set("Authorization", headers["Authorization"])
+            .set('Content-Type', 'application/json')
             .send(data)
             .then((response) => res(response))
             .catch((err) => rej(err))
     })
 }
 
-function putResource(endpoint, data) {
+function putResource(app, headers, endpoint, data) {
     return new Promise((res, rej) => {
         chai.request(app)
             .put(endpoint)
-            .set('content-type', 'application/json')
+            .set("oauth_id", headers["oauth_id"])
+            .set("oauth_provider", headers["oauth_provider"])
+            .set("Authorization", headers["Authorization"])
+            .set('Content-Type', 'application/json')
             .send(data)
             .then((response) => res(response))
             .catch((err) => rej(err))
     })
 }
 
-function getResource(endpoint) {
+function getResource(app, headers, endpoint) {
     return new Promise((res, rej) => {
         chai.request(app)
             .get(endpoint)
+            .set("oauth_id", headers["oauth_id"])
+            .set("oauth_provider", headers["oauth_provider"])
+            .set("Authorization", headers["Authorization"])
+            .set('Content-Type', 'application/json')
             .then((response) => res(response))
             .catch((err) => rej(err))
     })
 }
 
-function deleteResource(endpoint) {
+function deleteResource(app, headers, endpoint) {
     return new Promise((res, rej) => {
         chai.request(app)
             .delete(endpoint)
+            .set("oauth_id", headers["oauth_id"])
+            .set("oauth_provider", headers["oauth_provider"])
+            .set("Authorization", headers["Authorization"])
+            .set('Content-Type', 'application/json')
             .then((response) => res(response))
             .catch((err) => rej(err))
     })
