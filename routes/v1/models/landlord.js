@@ -21,8 +21,7 @@ const schema = Joi.object().keys({
 
     oauth: Joi.object().keys({
         oauth_provider: Joi.string().required(),
-        oauth_id: Joi.string().required(),
-        oauth_token: Joi.string().required(),
+        oauth_id: Joi.string().required()
     }),
 });
 
@@ -56,7 +55,6 @@ module.exports = {
             oauth: {
                 oauth_provider: "google",
                 oauth_id: "google_id",
-                oauth_token: "google_token",
             }
         };
     }
