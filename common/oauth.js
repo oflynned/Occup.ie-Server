@@ -4,11 +4,8 @@ function validateFacebookToken(id, token) {
     const appId = process.env.FACEBOOK_APP_ID;
     const secret = process.env.FACEBOOK_APP_SECRET;
 
-    if (id === undefined || id === null)
-        throw new Error("bad_oauth_id");
-
-    if (token === undefined || token === null)
-        throw new Error("bad_oauth_token");
+    if (id === undefined || id === null || token === undefined || token === null)
+        throw new Error("bad_request");
 
     return fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${appId}|${secret}`)
         .then((res) => res.json())
