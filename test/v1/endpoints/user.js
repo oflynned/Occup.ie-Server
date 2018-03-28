@@ -3,6 +3,9 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const ObjectId = require("mongodb").ObjectId;
 
+const sinon = require("sinon");
+let app, oauth;
+
 const config = require('../../../config/db');
 const db = require('monk')(config.mongoUrl);
 const env = require("../../../config/collections").test;
@@ -14,6 +17,11 @@ const creationUseCase = require("../../../routes/v1/use_cases/user/user_account_
 const retrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
 
 const birthday = new Date(1994, 1, 1);
+const headers = {
+    oauth_id: "google_id",
+    oauth_token: "google_token",
+    oauth_provider: "google"
+};
 
 function dropDb() {
     return db.get(collection).drop()
@@ -36,6 +44,9 @@ describe("api user account management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
+                oauth = require('../../../common/oauth');
+                sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
+                app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
             })
@@ -43,7 +54,10 @@ describe("api user account management", () => {
     });
 
     afterEach((done) => {
-        dropDb().then(() => done()).catch((err) => done(err));
+        dropDb()
+            .then(() => oauth.markInvalidRequests.restore())
+            .then(() => done())
+            .catch((err) => done(err));
     });
 
     it('should return status 200 if creating a user that already exists', (done) => {
@@ -52,20 +66,19 @@ describe("api user account management", () => {
 
     it('should return status 201 and new resource if creating a new user', (done) => {
         const newUser = model.generate("New", "User", birthday, "other", "professional");
-        requestHelper.postResource(`/api/v1/user`, newUser)
+        requestHelper.postResource(app, headers, `/api/v1/user`, newUser)
             .then((res) => {
                 assert.equal(res.status, 201);
                 done();
             })
             .catch((err) => done(err));
-        done();
     });
 
     it('should return 400 for missing parameters on creating a new user', (done) => {
         const newUser = model.generate("New", "User", birthday, "other", "professional");
         delete newUser["details"]["forename"];
 
-        requestHelper.postResource(`/api/v1/user`, newUser)
+        requestHelper.postResource(app, headers, `/api/v1/user`, newUser)
             .then(() => done(new Error("Failed validation for incorrect parameters on user creation")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -89,7 +102,7 @@ describe("api user account management", () => {
         const birthday = new Date(2017, 1, 1);
         const newUser = model.generate("Underage", "User", birthday, "male", "student");
 
-        requestHelper.postResource(`/api/v1/user`, newUser)
+        requestHelper.postResource(app, headers, `/api/v1/user`, newUser)
             .then(() => done("Failed validation for incorrect parameters on user creation"))
             .catch((err) => {
                 assert.equal(err.response.status, 403);
@@ -98,7 +111,7 @@ describe("api user account management", () => {
     });
 
     it("should return a list and status 200 if requesting existing users", (done) => {
-        requestHelper.getResource("/api/v1/user")
+        requestHelper.getResource(app, headers, "/api/v1/user")
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 3);
@@ -111,7 +124,7 @@ describe("api user account management", () => {
         retrievalUseCase.getUsers(db, collection, {"details.forename": "Emma"})
             .then((records) => records[0]["_id"])
             .then((uuid) => `/api/v1/user/${uuid}`)
-            .then((endpoint) => requestHelper.getResource(endpoint))
+            .then((endpoint) => requestHelper.getResource(app, headers, endpoint))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal([res.body].length, 1);
@@ -122,7 +135,7 @@ describe("api user account management", () => {
 
     it("should return status 404 if requesting a non-existing user by uuid", (done) => {
         const nonExistentUuid = ObjectId();
-        requestHelper.getResource(`/api/v1/user/${nonExistentUuid}`)
+        requestHelper.getResource(app, headers, `/api/v1/user/${nonExistentUuid}`)
             .then(() => done("Failure by accepting validation of non-existent resource!"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
@@ -145,7 +158,7 @@ describe("api user account management", () => {
                 uuid = record["_id"];
                 updatedRecord = record;
             })
-            .then(() => requestHelper.putResource(`/api/v1/user/${uuid}`, updatedRecord))
+            .then(() => requestHelper.putResource(app, headers, `/api/v1/user/${uuid}`, updatedRecord))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.details.forename, "ammE");
@@ -162,7 +175,7 @@ describe("api user account management", () => {
                 deletedRecord = records[0];
                 return deletedRecord["_id"]
             })
-            .then((uuid) => requestHelper.deleteResource(`/api/v1/user/${uuid}`))
+            .then((uuid) => requestHelper.deleteResource(app, headers, `/api/v1/user/${uuid}`))
             .then((res) => {
                 assert.equal(res.status, 200);
                 return retrievalUseCase.getUsers(db, collection)
@@ -175,7 +188,7 @@ describe("api user account management", () => {
     });
 
     it('should return status 404 if deleting non-existent resource', (done) => {
-        requestHelper.deleteResource(`/api/v1/user/${ObjectId()}`)
+        requestHelper.deleteResource(app, headers, `/api/v1/user/${ObjectId()}`)
             .then(() => done(new Error("Falsely deleted non-existing user resource")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);

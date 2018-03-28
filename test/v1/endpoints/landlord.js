@@ -134,6 +134,7 @@ describe("api landlord account management", () => {
             .then((record) => {
                 uuid = record["_id"];
                 updatedRecord = record;
+                console.log(record);
             })
             .then(() => requestHelper.putResource(app, headers, `/api/v1/landlord/${uuid}`, updatedRecord))
             .then((res) => {
