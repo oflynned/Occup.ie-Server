@@ -51,14 +51,13 @@ describe("api user account management", () => {
     });
 
     it('should return status 201 and new resource if creating a new user', (done) => {
-        // TODO create facebook token authenticator stub
-        /*const newUser = model.generate("New", "User", birthday, "other", "professional");
+        const newUser = model.generate("New", "User", birthday, "other", "professional");
         requestHelper.postResource(`/api/v1/user`, newUser)
             .then((res) => {
                 assert.equal(res.status, 201);
                 done();
             })
-            .catch((err) => done(err))*/
+            .catch((err) => done(err));
         done();
     });
 
