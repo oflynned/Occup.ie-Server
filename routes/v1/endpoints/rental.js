@@ -67,12 +67,16 @@ module.exports = (db, col) => {
         let uuid = req.params["uuid"];
         createListingUseCase.validatePayload(req.body)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
+            .then(() => retrieveLandlordUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
             .then(() => retrieveListingUseCase.modifyListing(db, listingsCol, req.body, uuid))
             .then(() => res.status(200).send())
             .catch((err) => {
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "wrong_landlord_account":
+                        res.status(401).send();
                         break;
                     case "non_existent_listing":
                         res.status(404).send();
@@ -88,10 +92,14 @@ module.exports = (db, col) => {
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveLandlordUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
             .then(() => retrieveListingUseCase.deleteListing(db, listingsCol, uuid))
             .then((property) => res.status(200).json(property))
             .catch((err) => {
                 switch (err.message) {
+                    case "wrong_landlord_account":
+                        res.status(401).send();
+                        break;
                     case "non_existent_listing":
                         res.status(404).send();
                         break;

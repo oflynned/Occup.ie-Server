@@ -67,7 +67,7 @@ module.exports = (db, col) => {
         let uuid = req.params["uuid"];
         createListingUseCase.validatePayload(req.body)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
-            .then(() => retrieveListingUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
+            .then(() => retrieveLandlordUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
             .then(() => retrieveListingUseCase.modifyListing(db, listingsCol, req.body, uuid))
             .then(() => res.status(200).send())
             .catch((err) => {
@@ -76,7 +76,7 @@ module.exports = (db, col) => {
                         res.status(400).send();
                         break;
                     case "wrong_landlord_account":
-                        res.status(403).send();
+                        res.status(401).send();
                         break;
                     case "non_existent_listing":
                         res.status(404).send();
@@ -93,13 +93,13 @@ module.exports = (db, col) => {
         let uuid = ObjectId(req.params["uuid"]);
 
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: uuid})
-            .then(() => retrieveListingUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
+            .then(() => retrieveLandlordUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
             .then(() => retrieveListingUseCase.deleteListing(db, listingsCol, uuid))
             .then((property) => res.status(200).json(property))
             .catch((err) => {
                 switch (err.message) {
                     case "wrong_landlord_account":
-                        res.status(403).send();
+                        res.status(401).send();
                         break;
                     case "non_existent_listing":
                         res.status(404).send();
