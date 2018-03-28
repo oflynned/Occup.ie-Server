@@ -53,5 +53,23 @@ module.exports = {
                 return record.modifyRecord(db, collection, landlord, id)
             })
             .then(() => id)
+    },
+
+    doesLandlordOwnListing: function (db, headers, landlordCol, listingsCol, uuid) {
+        return new Promise((res, rej) => {
+            let landlord = {};
+            let listing = {};
+
+            record.getRecords(db, listingsCol, {_id: uuid})
+                .then((listings) => listing = listings[0])
+                .then(record.getRecords(db, landlordCol, {_id: ObjectId(listing["landlord_uuid"])}))
+                .then((landlords) => landlord = landlords[0])
+                .then(() => {
+                    if (headers["oauth_id"] !== landlord["oauth"]["oauth_id"])
+                        rej(new Error("wrong_landlord_account"));
+
+                    res();
+                })
+        })
     }
 };
