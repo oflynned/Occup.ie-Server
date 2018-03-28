@@ -20,8 +20,8 @@ const requestHelper = require("./request_helper");
 const birthday = new Date(1960, 1, 1);
 const headers = {
     oauth_id: "google_id",
-    oauth_provider: "google",
-    Authorization: "Bearer google_token"
+    oauth_token: "google_token",
+    oauth_provider: "google"
 };
 
 function dropDb() {
