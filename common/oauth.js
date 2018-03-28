@@ -28,8 +28,8 @@ function validateFacebookToken(id, token) {
         });
 }
 
-function validateGoogleToken(id, token, next) {
-    return next();
+function validateGoogleToken(id, token) {
+
 }
 
 function validateOAuthIdentity(req) {
