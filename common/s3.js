@@ -1,4 +1,4 @@
-const s3Config = require("../../../config/s3");
+const s3Config = require("../config/s3");
 let AWS = require("aws-sdk");
 
 module.exports = () => {
