@@ -39,15 +39,17 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveListingUseCase.getListings(db, listingsCol, {type: "house_share"})
+        let hiddenFields = req.headers["restricted"] ? {"address.house_number": false, "address.eircode": false} : {};
+        retrieveListingUseCase.getListings(db, listingsCol, {type: "house_share"}, hiddenFields)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
+        let hiddenFields = req.headers["restricted"] ? {"address.house_number": false, "address.eircode": false} : {};
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
-            .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}))
+            .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}), hiddenFields)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => {
                 switch (err.message) {
@@ -65,12 +67,16 @@ module.exports = (db, col) => {
         let uuid = req.params["uuid"];
         createListingUseCase.validatePayload(req.body)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
+            .then(() => retrieveListingUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
             .then(() => retrieveListingUseCase.modifyListing(db, listingsCol, req.body, uuid))
             .then(() => res.status(200).send())
             .catch((err) => {
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "wrong_landlord_account":
+                        res.status(403).send();
                         break;
                     case "non_existent_listing":
                         res.status(404).send();
@@ -84,12 +90,17 @@ module.exports = (db, col) => {
     });
 
     router.delete('/:uuid', (req, res) => {
-        let uuid = req.params["uuid"];
-        retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
+        let uuid = ObjectId(req.params["uuid"]);
+
+        retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: uuid})
+            .then(() => retrieveListingUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))
             .then(() => retrieveListingUseCase.deleteListing(db, listingsCol, uuid))
             .then((property) => res.status(200).json(property))
             .catch((err) => {
                 switch (err.message) {
+                    case "wrong_landlord_account":
+                        res.status(403).send();
+                        break;
                     case "non_existent_listing":
                         res.status(404).send();
                         break;

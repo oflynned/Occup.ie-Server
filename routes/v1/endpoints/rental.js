@@ -13,7 +13,6 @@ module.exports = (db, col) => {
     router.post('/', (req, res) => {
         let payload = req.body;
 
-
         createListingUseCase.validatePayload(payload)
             .then(() => retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, payload["landlord_uuid"]))
             .then(() => retrieveLandlordUseCase.isLandlordIdentityVerified(db, landlordCol, payload["landlord_uuid"]))
@@ -40,15 +39,17 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        retrieveListingUseCase.getListings(db, listingsCol, {type: "rental"})
+        let hiddenFields = req.headers["restricted"] ? {"address.house_number": false, "address.eircode": false} : {};
+        retrieveListingUseCase.getListings(db, listingsCol, {type: "rental"}, hiddenFields)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
+        let hiddenFields = req.headers["restricted"] ? {"address.house_number": false, "address.eircode": false} : {};
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
-            .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}))
+            .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}, hiddenFields))
             .then((properties) => res.status(200).json(properties))
             .catch((err) => {
                 switch (err.message) {
@@ -102,5 +103,4 @@ module.exports = (db, col) => {
     });
 
     return router;
-}
-;
+};
