@@ -1,11 +1,11 @@
 let assert = require("assert");
 
-const config = require('../../../../config/db');
+const config = require('../../../config/db');
 const db = require('monk')(config.mongoUrl);
-const collection = require("../../../../config/collections").development.landlords;
+const collection = require("../../../config/collections").development.landlords;
 
-let model = require("../../../../models/landlord");
-let useCase = require("../../../../models/use_cases/landlord/landlord_account_creation");
+let model = require("../../../models/landlord");
+let useCase = require("../../../models/use_cases/landlord/landlord_account_creation");
 const birthday = new Date(1960, 1, 1);
 
 function dropDb() {

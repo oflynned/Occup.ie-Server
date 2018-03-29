@@ -1,5 +1,5 @@
 let expect = require("expect");
-let model = require("../../../models/user");
+let model = require("../../models/user");
 const birthday = new Date(1960, 1, 1);
 
 describe("user model tests", () => {

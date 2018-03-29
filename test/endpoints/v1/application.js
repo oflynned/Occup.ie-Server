@@ -33,6 +33,8 @@ const userRetrievalUseCase = require("../../../models/use_cases/user/user_accoun
 const landlordCreationUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
 const landlordRetrievalUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
 
+const birthday = new Date(1994, 1, 1);
+
 const headers = {
     oauth_id: "google_id",
     oauth_token: "google_token",
@@ -79,7 +81,7 @@ function createUsers() {
 }
 
 function createLandlord() {
-    const landlord = landlordModel.generate("Landlord", "Account", "landlord.account@test.com", "0");
+    const landlord = landlordModel.generate("Landlord", "Account", birthday, "0");
     let uuid;
 
     return landlordCreationUseCase.createAccount(db, landlordCol, landlord)
@@ -359,12 +361,8 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then(() => {
-                let queryUserId = String(user["_id"]);
-                return requestHelper.getResource(app, headers, `/api/v1/application?user_id=${queryUserId}`)
-            })
+            .then(() => requestHelper.getResource(app, headers, `/api/v1/application?user_id=${user["_id"]}`))
             .then((res) => {
-                console.log(res.body);
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
                 done()
