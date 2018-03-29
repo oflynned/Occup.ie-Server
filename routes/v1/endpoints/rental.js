@@ -2,9 +2,9 @@ let express = require('express');
 let router = express.Router();
 let ObjectId = require('mongodb').ObjectID;
 
-let createListingUseCase = require('../use_cases/listing/rental_creation');
-let retrieveListingUseCase = require('../use_cases/listing/rental_retrieval');
-let retrieveLandlordUseCase = require('../use_cases/landlord/landlord_account_retrieval');
+let createListingUseCase = require('../../../models/use_cases/listing/rental_creation');
+let retrieveListingUseCase = require('../../../models/use_cases/listing/rental_retrieval');
+let retrieveLandlordUseCase = require('../../../models/use_cases/landlord/landlord_account_retrieval');
 
 module.exports = (db, col) => {
     const landlordCol = col["landlords"];

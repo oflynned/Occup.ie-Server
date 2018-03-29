@@ -2,8 +2,8 @@ let ObjectId = require("mongodb").ObjectId;
 let express = require('express');
 let router = express.Router();
 
-let createUserUseCase = require("../use_cases/user/user_account_creation");
-let retrieveUserUseCase = require("../use_cases/user/user_account_retrieval");
+let createUserUseCase = require("../../../models/use_cases/user/user_account_creation");
+let retrieveUserUseCase = require("../../../models/use_cases/user/user_account_retrieval");
 
 module.exports = (db, env) => {
     const collection = env["users"];
@@ -11,6 +11,7 @@ module.exports = (db, env) => {
     router.post("/", (req, res) => {
         createUserUseCase.validatePayload(req.body)
             .then(() => createUserUseCase.validateUserAge(req.body))
+            .then(() => createUserUseCase.validateUserIsUnique(db, collection, req.body))
             .then(() => {
                 let filter = {"oauth.oauth_id": req.body["oauth"]["oauth_id"]};
                 return retrieveUserUseCase.getUsers(db, collection, filter);

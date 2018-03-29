@@ -2,9 +2,9 @@ let express = require('express');
 let router = express.Router();
 let ObjectId = require('mongodb').ObjectID;
 
-let createListingUseCase = require('../use_cases/listing/house_share_creation');
-let retrieveListingUseCase = require('../use_cases/listing/house_share_retrieval');
-let retrieveLandlordUseCase = require('../use_cases/landlord/landlord_account_retrieval');
+let createListingUseCase = require('../../../models/use_cases/listing/house_share_creation');
+let retrieveListingUseCase = require('../../../models/use_cases/listing/house_share_retrieval');
+let retrieveLandlordUseCase = require('../../../models/use_cases/landlord/landlord_account_retrieval');
 
 module.exports = (db, col) => {
     const landlordCol = col["landlords"];
@@ -67,7 +67,6 @@ module.exports = (db, col) => {
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        console.log(req.headers);
         createListingUseCase.validatePayload(req.body)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
             .then(() => retrieveLandlordUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))

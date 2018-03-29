@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let dbSeed = require("../ops/system_checks/db_seed");
+let dbSeed = require("../../../config/ops/system_checks/db_seed");
 let path = require('path');
 
 function checkParams(seedType, seedSize) {
