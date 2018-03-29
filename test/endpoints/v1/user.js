@@ -89,15 +89,11 @@ describe("api user account management", () => {
             })
     });
 
-    it('should return status 401 if creating a user that with a bad app id', (done) => {
+    it('should return status 401 if creating a user that with a bad oauth id', (done) => {
         done();
     });
 
     it('should return status 401 if creating a user that with invalid token', (done) => {
-        done();
-    });
-
-    it('should return status 401 if creating a user that with a bad oauth id', (done) => {
         done();
     });
 
