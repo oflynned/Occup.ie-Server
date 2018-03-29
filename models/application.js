@@ -30,9 +30,9 @@ module.exports = {
 
     generate: function (userId, landlordId, listingId) {
         return {
-            user_id: userId,
-            landlord_id: landlordId,
-            listing_id: listingId,
+            user_id: String(userId),
+            landlord_id: String(landlordId),
+            listing_id: String(listingId),
             status: "pending",
             creation_time: new Date(),
             last_updated: new Date()

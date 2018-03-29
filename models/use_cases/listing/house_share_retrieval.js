@@ -98,8 +98,8 @@ module.exports = {
         });
     },
 
-    getListings: function (db, collection, filter = {}) {
-        return record.getRecords(db, collection, filter)
+    getListings: function (db, collection, filter = {}, suppressedFields = {}) {
+        return record.getRecords(db, collection, filter, suppressedFields)
     },
 
     modifyListing: function (db, collection, data, id) {
