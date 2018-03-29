@@ -1,9 +1,9 @@
 module.exports = {
-    get accessToken() {
-        return process.env.FB_ACCESS_TOKEN
+    get appId() {
+        return process.env.FACEBOOK_APP_ID
     },
 
-    get appId() {
-        return process.env.FB_APP_ID
+    get appSecret() {
+        return process.env.FACEBOOK_APP_SECRET
     }
 };

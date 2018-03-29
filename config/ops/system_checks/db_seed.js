@@ -1,23 +1,23 @@
-const userModel = require("../../../../routes/v1/models/user");
-const houseShareModel = require("../../models/house_share");
-const rentalModel = require("../../models/rental");
-const landlordModel = require("../../../../routes/v1/models/landlord");
-const applicationModel = require("../../../../routes/v1/models/application");
+const userModel = require("../../../models/user");
+const houseShareModel = require("../../../models/house_share");
+const rentalModel = require("../../../models/rental");
+const landlordModel = require("../../../models/landlord");
+const applicationModel = require("../../../models/application");
 
-const userCreationUseCase = require("../../../../routes/v1/use_cases/user/user_account_creation");
-const userRetrievalUseCase = require("../../../../routes/v1/use_cases/user/user_account_retrieval");
+const userCreationUseCase = require("../../../models/use_cases/user/user_account_creation");
+const userRetrievalUseCase = require("../../../models/use_cases/user/user_account_retrieval");
 
-const houseShareCreationUseCase = require("../../use_cases/listing/house_share_creation");
-const houseShareRetrievalUseCase = require("../../use_cases/listing/house_share_retrieval");
+const houseShareCreationUseCase = require("../../../models/use_cases/listing/house_share_creation");
+const houseShareRetrievalUseCase = require("../../../models/use_cases/listing/house_share_retrieval");
 
-const rentalCreationUseCase = require("../../use_cases/listing/rental_creation");
-const rentalRetrievalUseCase = require("../../use_cases/listing/rental_retrieval");
+const rentalCreationUseCase = require("../../../models/use_cases/listing/rental_creation");
+const rentalRetrievalUseCase = require("../../../models/use_cases/listing/rental_retrieval");
 
-const landlordCreationUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
-const landlordRetrievalUseCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
+const landlordCreationUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
+const landlordRetrievalUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
 
-const applicationCreationUseCase = require("../../../../routes/v1/use_cases/application/application_creation");
-const applicationRetrievalUseCase = require("../../../../routes/v1/use_cases/application/application_retrieval");
+const applicationCreationUseCase = require("../../../models/use_cases/application/application_creation");
+const applicationRetrievalUseCase = require("../../../models/use_cases/application/application_retrieval");
 
 // TODO limit to dev environment
 

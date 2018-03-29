@@ -1,8 +1,8 @@
-const config = require('../../../../config/db');
+const config = require('../../db');
 let db = require('monk')(config.mongoUrl);
 
 let env = process.env.ENVIRONMENT;
-let collections = require("../../../../config/collections");
+let collections = require("../../collections");
 let collection = env === "production" ? collections.production : collections.development;
 
 function groomDb() {

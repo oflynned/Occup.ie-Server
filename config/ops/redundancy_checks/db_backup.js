@@ -1,5 +1,5 @@
 const exec = require('child_process');
-const config = require('../../../../config/db');
+const config = require('../../db');
 
 function backupDb() {
     let timestamp = new Date();
