@@ -1,13 +1,11 @@
+const fb = require("../config/fb");
 let fetch = require("node-fetch");
 
 function validateFacebookToken(id, token) {
-    const appId = process.env.FACEBOOK_APP_ID;
-    const secret = process.env.FACEBOOK_APP_SECRET;
-
     if (id === undefined || id === null || token === undefined || token === null)
         throw new Error("bad_request");
 
-    return fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${appId}|${secret}`)
+    return fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${fb.appId}|${fb.appSecret}`)
         .then((res) => res.json())
         .then((data) => {
             let resultUserIsValid = data["data"]["is_valid"];
@@ -20,7 +18,7 @@ function validateFacebookToken(id, token) {
             if (resultUserId !== id)
                 throw new Error("bad_oauth_id");
 
-            if (resultAppId !== appId)
+            if (resultAppId !== fb.appId)
                 throw new Error("bad_app_id");
         })
         .catch(() => {

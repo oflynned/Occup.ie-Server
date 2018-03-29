@@ -102,6 +102,10 @@ function seedUsers(db, col, size) {
     let jobs = [];
     for (let i = 0; i < size; i++) {
         let user = userModel.generate(`user_${i}_forename`, `user_${i}_surname`, getDob(), getSex(), getProfession());
+        let result = userModel.validate(user);
+        if (result["error"] !== null)
+            throw new Error(result);
+
         jobs.push(userCreationUseCase.createAccount(db, col, user));
     }
 
@@ -112,6 +116,10 @@ function seedLandlords(db, col, size) {
     let jobs = [];
     for (let i = 0; i < size; i++) {
         let landlord = landlordModel.generate(`landlord_${i}_forename`, `landlord_${i}_surname`, getDob(), getPhoneNumber());
+        let result = landlordModel.validate(landlord);
+        if (result["error"] !== null)
+            throw new Error(result);
+
         jobs.push(landlordCreationUseCase.createAccount(db, col, landlord));
     }
 
@@ -134,6 +142,10 @@ function seedHouseShares(env, db, size) {
                 let listing = houseShareModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = houseShareModel.generate(uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
 
+                let result = houseShareModel.validate(job);
+                if (result["error"] !== null)
+                    throw new Error(result);
+
                 jobs.push(houseShareCreationUseCase.createListing(db, env.listings, job));
             }
         })
@@ -155,6 +167,10 @@ function seedRentals(env, db, size) {
                 let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
                 let listing = rentalModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = rentalModel.generate(uuid, address, details, generateUuid(1), generateUuid(1), facilities, listing);
+
+                let result = houseShareModel.validate(job);
+                if (result["error"] !== null)
+                    throw new Error(result);
 
                 jobs.push(rentalCreationUseCase.createListing(db, env.listings, job));
             }
@@ -182,6 +198,11 @@ function seedApplications(env, db, size) {
 
                 if (houseShareRetrievalUseCase.isListingFitting(user, listing)) {
                     let application = applicationModel.generate(user["_id"], listing["landlord_uuid"], listing["_id"]);
+
+                    let result = applicationModel.validate(application);
+                    if (result["error"] !== null)
+                        throw new Error(result);
+
                     jobs.push(applicationCreationUseCase.createApplication(db, env.applications, application))
                 }
             }
