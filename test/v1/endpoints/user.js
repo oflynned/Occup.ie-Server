@@ -12,15 +12,15 @@ const env = require("../../../config/collections").test;
 const collection = env.users;
 
 const requestHelper = require("./request_helper");
-const model = require("../../../routes/v1/models/user");
-const creationUseCase = require("../../../routes/v1/use_cases/user/user_account_creation");
-const retrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
+const model = require("../../../models/user");
+const creationUseCase = require("../../../models/use_cases/user/user_account_creation");
+const retrievalUseCase = require("../../../models/use_cases/user/user_account_retrieval");
 
 const birthday = new Date(1994, 1, 1);
 const headers = {
-    oauth_id: "google_id",
-    oauth_token: "google_token",
-    oauth_provider: "google"
+    oauth_id: "facebook_id",
+    oauth_token: "facebook_token",
+    oauth_provider: "facebook"
 };
 
 function dropDb() {
@@ -45,7 +45,7 @@ describe("api user account management", () => {
             .then(() => seedDb())
             .then(() => {
                 oauth = require('../../../common/oauth');
-                sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
+                sinon.stub(oauth, 'denyInvalidRequests').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
@@ -55,23 +55,25 @@ describe("api user account management", () => {
 
     afterEach((done) => {
         dropDb()
-            .then(() => oauth.markInvalidRequests.restore())
+            .then(() => oauth.denyInvalidRequests.restore())
             .then(() => done())
             .catch((err) => done(err));
     });
 
     it('should return status 200 if creating a user that already exists', (done) => {
-        done();
+        const existingUser = model.generate("John", "Smith", birthday, "other", "student");
+        requestHelper.postResource(app, headers, `/api/v1/user`, existingUser)
+            .then((res) => assert.equal(res.status, 200))
+            .then(() => done())
+            .catch((err) => done(err));
     });
 
     it('should return status 201 and new resource if creating a new user', (done) => {
         const newUser = model.generate("New", "User", birthday, "other", "professional");
         dropDb()
             .then(() => requestHelper.postResource(app, headers, `/api/v1/user`, newUser))
-            .then((res) => {
-                assert.equal(res.status, 201);
-                done();
-            })
+            .then((res) => assert.equal(res.status, 201))
+            .then(() => done())
             .catch((err) => done(err));
     });
 

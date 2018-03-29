@@ -7,31 +7,31 @@ const sinon = require("sinon");
 let app, oauth;
 
 const config = require('../../../config/db');
-const db = require('monk')(config.mongoUrl);
-const env = require("../../../config/collections").test;
+let db = require('monk')(config.mongoUrl);
 
+const env = require("../../../config/collections").test;
 const userCol = env.users;
 const listingCol = env.listings;
 const landlordCol = env.landlords;
 const applicationCol = env.applications;
 
 const requestHelper = require("./request_helper");
-const userModel = require("../../../routes/v1/models/user");
-const rentalModel = require("../../../routes/v1/models/rental");
-const houseShareModel = require("../../../routes/v1/models/house_share");
-const landlordModel = require("../../../routes/v1/models/landlord");
-const applicationModel = require("../../../routes/v1/models/application");
+const userModel = require("../../../models/user");
+const rentalModel = require("../../../models/rental");
+const houseShareModel = require("../../../models/house_share");
+const landlordModel = require("../../../models/landlord");
+const applicationModel = require("../../../models/application");
 
-const applicationCreationUseCase = require("../../../routes/v1/use_cases/application/application_creation");
-const applicationRetrievalUseCase = require("../../../routes/v1/use_cases/application/application_retrieval");
-const houseShareCreationUseCase = require("../../../routes/v1/use_cases/listing/house_share_creation");
-const houseShareRetrievalUseCase = require("../../../routes/v1/use_cases/listing/house_share_retrieval");
-const rentalCreationUseCase = require("../../../routes/v1/use_cases/listing/rental_creation");
-const rentalRetrievalUseCase = require("../../../routes/v1/use_cases/listing/rental_retrieval");
-const userCreationUseCase = require("../../../routes/v1/use_cases/user/user_account_creation");
-const userRetrievalUseCase = require("../../../routes/v1/use_cases/user/user_account_retrieval");
-const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
-const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
+const applicationCreationUseCase = require("../../../models/use_cases/application/application_creation");
+const applicationRetrievalUseCase = require("../../../models/use_cases/application/application_retrieval");
+const houseShareCreationUseCase = require("../../../models/use_cases/listing/house_share_creation");
+const houseShareRetrievalUseCase = require("../../../models/use_cases/listing/house_share_retrieval");
+const rentalCreationUseCase = require("../../../models/use_cases/listing/rental_creation");
+const rentalRetrievalUseCase = require("../../../models/use_cases/listing/rental_retrieval");
+const userCreationUseCase = require("../../../models/use_cases/user/user_account_creation");
+const userRetrievalUseCase = require("../../../models/use_cases/user/user_account_retrieval");
+const landlordCreationUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
+const landlordRetrievalUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
 
 const headers = {
     oauth_id: "google_id",

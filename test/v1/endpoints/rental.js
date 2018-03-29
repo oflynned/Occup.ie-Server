@@ -11,14 +11,14 @@ const landlordCol = env.landlords;
 const listingCol = env.listings;
 
 const requestHelper = require("./request_helper");
-const landlordModel = require("../../../routes/v1/models/landlord");
-const listingModel = require("../../../routes/v1/models/rental");
+const landlordModel = require("../../../models/landlord");
+const listingModel = require("../../../models/rental");
 
-const listingCreationUseCase = require("../../../routes/v1/use_cases/listing/house_share_creation");
-const listingRetrievalUseCase = require("../../../routes/v1/use_cases/listing/house_share_retrieval");
+const listingCreationUseCase = require("../../../models/use_cases/listing/house_share_creation");
+const listingRetrievalUseCase = require("../../../models/use_cases/listing/house_share_retrieval");
 
-const landlordCreationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
-const landlordRetrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
+const landlordCreationUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
+const landlordRetrievalUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
 
 const sinon = require("sinon");
 let app, oauth;

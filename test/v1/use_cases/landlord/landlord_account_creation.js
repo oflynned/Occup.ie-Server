@@ -4,8 +4,8 @@ const config = require('../../../../config/db');
 const db = require('monk')(config.mongoUrl);
 const collection = require("../../../../config/collections").development.landlords;
 
-let model = require("../../../../routes/v1/models/landlord");
-let useCase = require("../../../../routes/v1/use_cases/landlord/landlord_account_creation");
+let model = require("../../../../models/landlord");
+let useCase = require("../../../../models/use_cases/landlord/landlord_account_creation");
 const birthday = new Date(1960, 1, 1);
 
 function dropDb() {
@@ -26,10 +26,7 @@ describe("landlord account creation tests", () => {
                 assert.equal(record["meta"]["identity_verified"], false);
                 done();
             })
-            .catch((err) => {
-                console.log(err);
-                done(err.message)
-            });
+            .catch((err) => done(err.message));
     });
 
     it("should throw an error on account missing params", (done) => {

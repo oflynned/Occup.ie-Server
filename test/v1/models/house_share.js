@@ -1,5 +1,5 @@
 let assert = require("assert");
-let model = require("../../../routes/v1/models/house_share");
+let model = require("../../../models/house_share");
 
 describe("listing model tests", () => {
     const landlordUuid = "uuid";

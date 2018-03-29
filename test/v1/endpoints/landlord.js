@@ -12,9 +12,9 @@ const db = require('monk')(config.mongoUrl);
 const env = require("../../../config/collections").test;
 const collection = env.landlords;
 
-const model = require("../../../routes/v1/models/landlord");
-const creationUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_creation");
-const retrievalUseCase = require("../../../routes/v1/use_cases/landlord/landlord_account_retrieval");
+const model = require("../../../models/landlord");
+const creationUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
+const retrievalUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
 const requestHelper = require("./request_helper");
 
 const birthday = new Date(1960, 1, 1);
@@ -134,7 +134,6 @@ describe("api landlord account management", () => {
             .then((record) => {
                 uuid = record["_id"];
                 updatedRecord = record;
-                console.log(record);
             })
             .then(() => requestHelper.putResource(app, headers, `/api/v1/landlord/${uuid}`, updatedRecord))
             .then((res) => {
