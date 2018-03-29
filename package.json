@@ -8,12 +8,13 @@
   },
   "nyc": {
     "include": [
+      "models/**/*.js",
       "routes/**/*.js"
     ],
     "exclude": [
-      "routes/v1/ops/**/*.js",
+      "config/ops/**/*.js",
       "routes/v1/endpoints/index.js",
-      "routes/v1/use_cases/common/**/*.js"
+      "models/use_cases/common/**/*.js"
     ]
   },
   "dependencies": {
@@ -27,6 +28,7 @@
     "debug": "~2.6.9",
     "dotenv": "^5.0.1",
     "dynamodb": "^1.1.1",
+    "expect": "^22.4.3",
     "express": "^4.16.2",
     "express-handlebars": "*",
     "express-serve-static-core": "^0.1.1",
