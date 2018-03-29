@@ -1,4 +1,4 @@
-let user = require("../../models/user");
+let user = require("../../user");
 let record = require("../common/record");
 
 function getUserAge(birthday) {

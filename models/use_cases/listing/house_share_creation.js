@@ -1,4 +1,4 @@
-let model = require('../../models/house_share');
+let model = require('../../house_share');
 let record = require("../common/record");
 
 module.exports = {

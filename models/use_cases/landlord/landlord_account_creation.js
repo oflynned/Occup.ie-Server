@@ -1,4 +1,4 @@
-let landlord = require("../../models/landlord");
+let landlord = require("../../landlord");
 let record = require("../common/record");
 
 module.exports = {

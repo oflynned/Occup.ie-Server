@@ -1,4 +1,4 @@
-let applicationModel = require("../../models/application");
+let applicationModel = require("../../application");
 let record = require("../common/record");
 let ObjectId = require("mongodb").ObjectId;
 

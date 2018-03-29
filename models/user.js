@@ -57,8 +57,5 @@ module.exports = {
     },
     validate: function (o) {
         return Joi.validate(o, schema, {allowUnknown: true})
-    },
-    getKeys: function () {
-        return Object.keys(schema);
     }
 };

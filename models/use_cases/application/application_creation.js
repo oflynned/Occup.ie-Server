@@ -1,4 +1,4 @@
-let application = require("../../models/application");
+let application = require("../../application");
 let record = require("../common/record");
 
 module.exports = {
