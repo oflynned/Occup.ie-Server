@@ -115,7 +115,7 @@ describe("api application management", () => {
             .then(() => seedDb())
             .then(() => {
                 oauth = require('../../../common/oauth');
-                sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
+                sinon.stub(oauth, 'denyInvalidRequests').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
@@ -125,7 +125,7 @@ describe("api application management", () => {
 
     afterEach((done) => {
         dropDb()
-            .then(() => oauth.markInvalidRequests.restore())
+            .then(() => oauth.denyInvalidRequests.restore())
             .then(() => done())
             .catch((err) => done(err));
     });
@@ -359,8 +359,12 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then(() => requestHelper.getResource(app, headers, `/api/v1/application?user_id=${user["_id"]}`))
+            .then(() => {
+                let queryUserId = String(user["_id"]);
+                return requestHelper.getResource(app, headers, `/api/v1/application?user_id=${queryUserId}`)
+            })
             .then((res) => {
+                console.log(res.body);
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
                 done()
