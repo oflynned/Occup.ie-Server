@@ -67,6 +67,7 @@ module.exports = (db, col) => {
 
     router.put('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
+        console.log(req.headers);
         createListingUseCase.validatePayload(req.body)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
             .then(() => retrieveLandlordUseCase.doesLandlordOwnListing(db, req.headers, landlordCol, listingsCol, uuid))

@@ -57,15 +57,10 @@ module.exports = {
 
     doesLandlordOwnListing: function (db, headers, landlordCol, listingsCol, uuid) {
         return new Promise((res, rej) => {
-            let landlord = {};
-            let listing = {};
-
-            record.getRecords(db, listingsCol, {_id: uuid})
-                .then((listings) => listing = listings[0])
-                .then(record.getRecords(db, landlordCol, {_id: ObjectId(listing["landlord_uuid"])}))
-                .then((landlords) => landlord = landlords[0])
-                .then(() => {
-                    if (headers["oauth_id"] !== landlord["oauth"]["oauth_id"])
+            record.getRecords(db, listingsCol, {_id: ObjectId(uuid)})
+                .then((listings) => record.getRecords(db, landlordCol, {_id: ObjectId(listings[0]["landlord_uuid"])}))
+                .then((landlords) => {
+                    if (headers["oauth_id"] !== landlords[0]["oauth"]["oauth_id"])
                         rej(new Error("wrong_landlord_account"));
 
                     res();
