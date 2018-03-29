@@ -66,7 +66,8 @@ describe("api user account management", () => {
 
     it('should return status 201 and new resource if creating a new user', (done) => {
         const newUser = model.generate("New", "User", birthday, "other", "professional");
-        requestHelper.postResource(app, headers, `/api/v1/user`, newUser)
+        dropDb()
+            .then(() => requestHelper.postResource(app, headers, `/api/v1/user`, newUser))
             .then((res) => {
                 assert.equal(res.status, 201);
                 done();

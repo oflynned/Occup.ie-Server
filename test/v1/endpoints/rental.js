@@ -63,6 +63,9 @@ describe("api rental management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
+                oauth = require('../../../common/oauth');
+                sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
+                app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
             })
@@ -70,7 +73,10 @@ describe("api rental management", () => {
     });
 
     afterEach((done) => {
-        dropDb().then(() => done()).catch((err) => done(err));
+        dropDb()
+            .then(() => oauth.markInvalidRequests.restore())
+            .then(() => done())
+            .catch((err) => done(err));
     });
 
     it('should return 201 on creating a listing if the landlord is verified', (done) => {
