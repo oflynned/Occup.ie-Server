@@ -3,7 +3,7 @@ let model = require("../../models/house_share");
 
 describe("house share model tests", () => {
     const landlordUuid = "uuid";
-    const address = model.generateAddress("22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
+    const address = model.generateAddress("3", "22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
     const details = model.generateDetails("apartment", "description", 12, 20, 30, ["male"], ["professional"]);
     const bedrooms = [
         {size: "single", deposit: 500, rent: 500},

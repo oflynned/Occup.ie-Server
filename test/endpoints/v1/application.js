@@ -102,7 +102,7 @@ function createListingObject(landlordUuid) {
     return Promise.resolve(
         houseShareModel.generate(
             landlordUuid,
-            houseShareModel.generateAddress("22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
+            houseShareModel.generateAddress("3", "22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
             houseShareModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "shared"],

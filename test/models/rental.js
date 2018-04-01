@@ -3,7 +3,7 @@ let model = require("../../models/rental");
 
 describe("rental model tests", () => {
     const landlordUuid = "uuid";
-    const address = model.generateAddress("22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
+    const address = model.generateAddress("3", "22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
     const details = model.generateDetails("apartment", "description", 12, ["individual"]);
     const bedrooms = ["single", "double", "double"];
     const bathrooms = ["shared"];
