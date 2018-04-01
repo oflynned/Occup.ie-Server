@@ -170,7 +170,7 @@ function seedHouseShares(env, db, size) {
                 let ageLimits = getAgeLimits();
                 let bathrooms = getBathrooms(getRandom(4) + 1);
                 let bedrooms = getBedrooms(getRandom(6) + 1, true);
-                let address = houseShareModel.generateAddress(getRandom(100), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
+                let address = houseShareModel.generateAddress(getRandom(bedrooms.length), getRandom(100), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
                 let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
                 let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
@@ -198,7 +198,7 @@ function seedRentals(env, db, size) {
                 let uuid = landlords[getRandom(landlords.length)]["_id"];
                 let bathrooms = getBathrooms(generateUuid(1));
                 let bedrooms = getBedrooms(generateUuid(1));
-                let address = rentalModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
+                let address = rentalModel.generateAddress(undefined, generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = rentalModel.generateDetails("apartment", generateGibberish(60), 12, [getTargetTenant()]);
                 let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
 
