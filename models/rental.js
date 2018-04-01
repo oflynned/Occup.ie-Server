@@ -34,6 +34,7 @@ const schema = Joi.object().keys({
     },
 
     listing: {
+        deposit: Joi.number().min(1).required(),
         rent: Joi.number().min(1).required(),
         created: Joi.date().required(),
         expires: Joi.date().required(),
@@ -86,12 +87,13 @@ module.exports = {
         }
     },
 
-    generateListing: function (rent, plan, isOwnerOccupied, isFurnished, ber) {
+    generateListing: function (deposit, rent, plan, isOwnerOccupied, isFurnished, ber) {
         const creation = new Date();
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
 
         return {
+            deposit: parseInt(deposit),
             rent: parseInt(rent),
             created: creation,
             expires: expiry,

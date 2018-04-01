@@ -3,7 +3,11 @@ const Joi = require("joi");
 const schema = Joi.object().keys({
     type: Joi.string().valid("house_share").required(),
     landlord_uuid: Joi.string().required(),
-    bedrooms: Joi.array().items(Joi.string().valid("single", "double", "shared")).min(1).required(),
+    bedrooms: Joi.array().items({
+        size: Joi.string().valid("single", "double", "shared").required(),
+        deposit: Joi.number().min(1).required(),
+        rent: Joi.number().min(1).required()
+    }).min(1).required(),
     bathrooms: Joi.array().items(Joi.string().valid("ensuite", "shared").min(1).required()),
     images: Joi.array().items(Joi.string().required()).min(4).unique(),
 
@@ -37,7 +41,6 @@ const schema = Joi.object().keys({
     },
 
     listing: {
-        rent: Joi.number().min(1).required(),
         created: Joi.date().required(),
         expires: Joi.date().required(),
         plan: Joi.string().valid("entry", "medium", "deluxe").required(),
@@ -59,12 +62,20 @@ const schema = Joi.object().keys({
 module.exports = {
     generateAddress: function (houseNumber, street, area, city, county, eircode) {
         return {
-            house_number: houseNumber,
+            house_number: String(houseNumber),
             street: street,
             area: area,
             city: city,
             county: county,
             eircode: eircode
+        }
+    },
+
+    generateBedroom: function (size, deposit, rent) {
+        return {
+            size: size,
+            deposit: parseInt(deposit),
+            rent: parseInt(rent)
         }
     },
 
@@ -92,13 +103,12 @@ module.exports = {
         }
     },
 
-    generateListing: function (rent, plan, isOwnerOccupied, isFurnished, ber) {
+    generateListing: function (plan, isOwnerOccupied, isFurnished, ber) {
         const creation = new Date();
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
 
         return {
-            rent: parseInt(rent),
             created: creation,
             expires: expiry,
             plan: plan,
