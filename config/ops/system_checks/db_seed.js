@@ -80,11 +80,11 @@ function getPhoneNumber() {
     const providerCodes = ["83", "85", "87", "89"];
     let providerCode = providerCodes[getRandom(providerCodes.length)];
 
-    return [prefix, providerCode, generateUuid(3), generateUuid(4)].join(" ");
+    return [prefix, providerCode, generateUuid(3), generateUuid(4)].join("");
 }
 
 function getEircode() {
-    return generateLetter() + generateUuid(1) + generateUuid(1) + " " +
+    return generateLetter() + generateUuid(1) + generateUuid(1) +
         generateLetter() + generateUuid(1) + generateLetter() + generateUuid(1)
 }
 
@@ -108,11 +108,23 @@ function getBathrooms(size) {
     return output;
 }
 
-function getBedrooms(size) {
+function getBedrooms(amount, isHouseShare) {
     let output = [];
     const types = ["single", "double", "shared"];
-    for (let i = 0; i < size; i++) {
-        output.push(types[getRandom(types.length)]);
+    for (let i = 0; i < amount; i++) {
+        let bedroom = {};
+        let rent = getRandom(300) + 400;
+        if (isHouseShare) {
+            bedroom = {
+                size: types[getRandom(types.length)],
+                deposit: rent,
+                rent: rent
+            }
+        } else {
+            bedroom = types[getRandom(types.length)]
+        }
+
+        output.push(bedroom);
     }
 
     return output;
@@ -156,15 +168,16 @@ function seedHouseShares(env, db, size) {
             for (let i = 0; i < size; i++) {
                 let uuid = landlords[getRandom(landlords.length)]["_id"];
                 let ageLimits = getAgeLimits();
-                let bathrooms = getBathrooms(generateUuid(1));
-                let bedrooms = getBedrooms(generateUuid(1));
-                let address = houseShareModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
+                let bathrooms = getBathrooms(getRandom(4) + 1);
+                let bedrooms = getBedrooms(getRandom(6) + 1, true);
+                let address = houseShareModel.generateAddress(getRandom(100), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
                 let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = houseShareModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = houseShareModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
                 let result = houseShareModel.validate(job);
+                console.log(result);
                 if (result["error"] !== null)
                     throw new Error(result);
 
@@ -188,7 +201,9 @@ function seedRentals(env, db, size) {
                 let address = rentalModel.generateAddress(generateUuid(2), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = rentalModel.generateDetails("apartment", generateGibberish(60), 12, [getTargetTenant()]);
                 let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = rentalModel.generateListing(Math.floor(Math.random() * 2500), getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+
+                let rent = getRandom(bedrooms.length * 300) + 600;
+                let listing = rentalModel.generateListing(rent, rent, getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = rentalModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
                 let result = rentalModel.validate(job);
