@@ -202,7 +202,7 @@ function seedRentals(env, db, size) {
                 let details = rentalModel.generateDetails("apartment", generateGibberish(60), 12, [getTargetTenant()]);
                 let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
 
-                let rent = getRandom(bedrooms.length * 300) + 600;
+                let rent = (bedrooms.length * 500) + getRandom(600);
                 let listing = rentalModel.generateListing(rent, rent, getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = rentalModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
