@@ -60,8 +60,9 @@ const schema = Joi.object().keys({
 });
 
 module.exports = {
-    generateAddress: function (houseNumber, street, area, city, county, eircode) {
+    generateAddress: function (apartmentNumber = undefined, houseNumber, street, area, city, county, eircode) {
         return {
+            apartmentNumber: apartmentNumber,
             house_number: String(houseNumber),
             street: street,
             area: area,

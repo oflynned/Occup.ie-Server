@@ -8,6 +8,7 @@ const schema = Joi.object().keys({
     images: Joi.array().items(Joi.string().required()).min(4).unique(),
 
     address: {
+        apartment_number: Joi.string(),
         house_number: Joi.string().required(),
         street: Joi.string().required(),
         area: Joi.string().required(),
@@ -55,8 +56,9 @@ const schema = Joi.object().keys({
 });
 
 module.exports = {
-    generateAddress: function (houseNumber, street, area, city, county, eircode) {
+    generateAddress: function (apartmentNumber = undefined, houseNumber, street, area, city, county, eircode) {
         return {
+            apartment_number: apartmentNumber,
             house_number: houseNumber,
             street: street,
             area: area,
