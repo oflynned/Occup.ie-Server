@@ -97,6 +97,7 @@ function createListingObject(landlordUuid) {
     const today = new Date();
     let expiry = new Date();
     expiry.setDate(today.getDate() + 21);
+    let rent = Math.floor(Math.random() * 2500);
 
     return Promise.resolve(
         houseShareModel.generate(
@@ -106,7 +107,7 @@ function createListingObject(landlordUuid) {
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "shared"],
             houseShareModel.generateFacilities(false, true, true, false, false, true, false),
-            houseShareModel.generateListing(Math.floor(Math.random() * 2500), "entry", false, true, "B1")
+            houseShareModel.generateListing(rent, rent, "entry", false, true, "B1")
         )
     );
 }
