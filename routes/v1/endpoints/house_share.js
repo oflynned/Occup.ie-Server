@@ -41,7 +41,7 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        let hiddenFields = req.headers["restricted"] ? {"address.house_number": false, "address.eircode": false} : {};
+        let hiddenFields = req.headers["restricted"] ? {"address.apartment_number": false, "address.house_number": false, "address.eircode": false} : {};
         retrieveListingUseCase.getListings(db, listingsCol, {type: "house_share"}, hiddenFields)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
@@ -49,7 +49,7 @@ module.exports = (db, col) => {
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        let hiddenFields = req.headers["restricted"] ? {"address.house_number": false, "address.eircode": false} : {};
+        let hiddenFields = req.headers["restricted"] ? {"address.apartment_number": false, "address.house_number": false, "address.eircode": false} : {};
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
             .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}), hiddenFields)
             .then((properties) => res.status(200).json(properties))
