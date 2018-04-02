@@ -45,6 +45,12 @@ module.exports = (db, env) => {
             .catch((err) => res.status(500).json(err))
     });
 
+    router.get("/me", (req, res) => {
+        retrieveUserUseCase.doesUserExist(db, collection, {"oauth.oauth_id": req.headers["oauth_id"]})
+            .then((user) => res.status(200).json(user))
+            .catch(() => res.status(404).send())
+    });
+
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         retrieveUserUseCase.doesUserExist(db, collection, {_id: ObjectId(uuid)})
