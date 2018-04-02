@@ -1,5 +1,6 @@
 let user = require("../../user");
 let record = require("../common/record");
+let utf8 = require("utf8");
 
 function getUserAge(birthday) {
     let date = new Date(birthday);
@@ -45,6 +46,8 @@ module.exports = {
 
     createAccount: function (db, collection, data) {
         delete data["oauth"]["oauth_token"];
+        data["details"]["forename"] = utf8.encode(data["details"]["forename"]);
+        data["details"]["surname"] = utf8.encode(data["details"]["surname"]);
         return record.createRecord(db, collection, data)
     }
 };
