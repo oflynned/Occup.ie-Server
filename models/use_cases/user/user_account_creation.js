@@ -48,6 +48,9 @@ module.exports = {
         delete data["oauth"]["oauth_token"];
         data["details"]["forename"] = utf8.encode(data["details"]["forename"]);
         data["details"]["surname"] = utf8.encode(data["details"]["surname"]);
+
+        if (data["details"]["sex"] !== "male" && data["details"]["sex"] !== "female")
+            data["details"]["sex"] = "other";
         return record.createRecord(db, collection, data)
     }
 };
