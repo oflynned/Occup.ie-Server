@@ -6,6 +6,12 @@ let createListingUseCase = require('../../../models/use_cases/listing/house_shar
 let retrieveListingUseCase = require('../../../models/use_cases/listing/house_share_retrieval');
 let retrieveLandlordUseCase = require('../../../models/use_cases/landlord/landlord_account_retrieval');
 
+const hideExactHouseData = {
+    "address.apartment_number": false,
+    "address.house_number": false,
+    "address.eircode": false
+};
+
 module.exports = (db, col) => {
     const landlordCol = col["landlords"];
     const listingsCol = col["listings"];
@@ -41,7 +47,7 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        let hiddenFields = req.headers["restricted"] ? {"address.apartment_number": false, "address.house_number": false, "address.eircode": false} : {};
+        let hiddenFields = req.headers["restricted"] ? hideExactHouseData : {};
         retrieveListingUseCase.getListings(db, listingsCol, {type: "house_share"}, hiddenFields)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
@@ -49,7 +55,7 @@ module.exports = (db, col) => {
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        let hiddenFields = req.headers["restricted"] ? {"address.apartment_number": false, "address.house_number": false, "address.eircode": false} : {};
+        let hiddenFields = req.headers["restricted"] ? hideExactHouseData: {};
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
             .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}), hiddenFields)
             .then((properties) => res.status(200).json(properties))
