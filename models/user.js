@@ -9,6 +9,8 @@ const schema = Joi.object().keys({
         dob: Joi.date().required(),
         sex: Joi.string().valid("male", "female", "other").required(),
         profession: Joi.valid("student", "professional").required(),
+        hobbies: Joi.array().items(Joi.string()).min(1).max(5).unique().required(),
+        description: Joi.string().required()
     }),
 
     meta: Joi.object().keys({
@@ -36,6 +38,8 @@ module.exports = {
                 dob: dob,
                 sex: sex,
                 profession: profession,
+                hobbies: ["I", "have", "hobbies"],
+                description: "description"
             },
 
             meta: {

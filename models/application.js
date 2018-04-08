@@ -6,7 +6,7 @@ const schema = Joi.object().keys({
     listing_id: Joi.string().required(),
     creation_time: Joi.date().required(),
     last_updated: Joi.date().required(),
-    status: Joi.string().required().valid("pending", "accepted", "rejected", "ceased")
+    status: Joi.string().required().valid("pending", "accepted", "rejected", "expired")
 });
 
 const querySchema = Joi.object().keys({
