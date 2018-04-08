@@ -31,9 +31,18 @@ module.exports = (env) => {
     app.use('/', index);
     app.use('/api/v1/rental', oauth.markInvalidRequests, rental);
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
-    app.use('/api/v1/user', oauth.denyInvalidRequests, user);
-    app.use('/api/v1/landlord', oauth.denyInvalidRequests, landlord);
-    app.use('/api/v1/application', oauth.denyInvalidRequests, application);
+
+    const environment = process.env.ENVIRONMENT;
+
+    environment === "development" ?
+        app.use('/api/v1/user', user) :
+        app.use('/api/v1/user', oauth.denyInvalidRequests, user);
+    environment === "development" ?
+        app.use('/api/v1/landlord', landlord) :
+        app.use('/api/v1/landlord', oauth.denyInvalidRequests, landlord);
+    environment === "development" ?
+        app.use('/api/v1/application', application) :
+        app.use('/api/v1/application', oauth.denyInvalidRequests, application);
 
     return app;
 };
