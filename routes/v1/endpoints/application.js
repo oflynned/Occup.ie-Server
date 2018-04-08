@@ -86,7 +86,7 @@ module.exports = (db, col) => {
             })
     });
 
-    router.put('/:uuid', (req, res) => {
+    router.patch('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createApplicationUseCase.validatePayload(req.body)
             .then(() => retrieveApplicationUseCase.doesApplicationExist(db, applicationCol, uuid))

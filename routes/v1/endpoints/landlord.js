@@ -59,7 +59,7 @@ module.exports = (db, col) => {
             })
     });
 
-    router.put('/:uuid', (req, res) => {
+    router.patch('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createLandlordUseCase.validatePayload(req.body)
             .then(() => retrieveLandlordUseCase.doesLandlordExist(db, collection, {_id: ObjectId(uuid)}))

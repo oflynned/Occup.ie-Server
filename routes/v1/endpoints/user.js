@@ -68,7 +68,7 @@ module.exports = (db, env) => {
             })
     });
 
-    router.put('/:uuid', (req, res) => {
+    router.patch('/:uuid', (req, res) => {
         let uuid = ObjectId(req.params["uuid"]);
         retrieveUserUseCase.getUsers(db, collection, uuid)
             .then((users) => createUserUseCase.generateModifiedRecord(users[0], req.data))

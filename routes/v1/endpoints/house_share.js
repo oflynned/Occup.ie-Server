@@ -71,7 +71,7 @@ module.exports = (db, col) => {
             })
     });
 
-    router.put('/:uuid', (req, res) => {
+    router.patch('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createListingUseCase.validatePayload(req.body)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, uuid))
