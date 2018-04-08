@@ -14,10 +14,10 @@ function postResource(app, headers, endpoint, data) {
     })
 }
 
-function putResource(app, headers, endpoint, data) {
+function patchResource(app, headers, endpoint, data) {
     return new Promise((res, rej) => {
         chai.request(app)
-            .put(endpoint)
+            .patch(endpoint)
             .set("oauth_id", headers["oauth_id"])
             .set("oauth_provider", headers["oauth_provider"])
             .set("Authorization", `Bearer ${headers["oauth_token"]}`)
@@ -57,6 +57,6 @@ function deleteResource(app, headers, endpoint) {
 module.exports = {
     getResource: getResource,
     postResource: postResource,
-    putResource: putResource,
+    patchResource: patchResource,
     deleteResource: deleteResource
 };

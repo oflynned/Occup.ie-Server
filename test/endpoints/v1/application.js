@@ -463,7 +463,7 @@ describe("api application management", () => {
                 _application["status"] = "accepted";
                 return _application
             })
-            .then((application) => requestHelper.putResource(app, headers, `/api/v1/application/${application["_id"]}`, application))
+            .then((application) => requestHelper.patchResource(app, headers, `/api/v1/application/${application["_id"]}`, application))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal([res.body].length, 1);
@@ -493,7 +493,7 @@ describe("api application management", () => {
                 application["bad"] = "param";
                 return application
             })
-            .then((application) => requestHelper.putResource(app, headers, `/api/v1/application/${application["_id"]}`, application))
+            .then((application) => requestHelper.patchResource(app, headers, `/api/v1/application/${application["_id"]}`, application))
             .then(() => done(new Error("Incorrectly validated object not following schema")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -521,7 +521,7 @@ describe("api application management", () => {
                 application["status"] = "accepted";
                 return application
             })
-            .then((application) => requestHelper.putResource(app, headers, `/api/v1/application/${ObjectId()}`, application))
+            .then((application) => requestHelper.patchResource(app, headers, `/api/v1/application/${ObjectId()}`, application))
             .then(() => done("Incorrectly updated a non-existent application resource"))
             .catch((err) => {
                 assert.equal(err.response.status, 404);

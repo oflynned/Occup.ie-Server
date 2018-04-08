@@ -135,7 +135,7 @@ describe("api landlord account management", () => {
                 uuid = record["_id"];
                 updatedRecord = record;
             })
-            .then(() => requestHelper.putResource(app, headers, `/api/v1/landlord/${uuid}`, updatedRecord))
+            .then(() => requestHelper.patchResource(app, headers, `/api/v1/landlord/${uuid}`, updatedRecord))
             .then((res) => {
                 assert.equal(res.status, 200);
                 assert.equal(res.body.details.forename, "ammE");

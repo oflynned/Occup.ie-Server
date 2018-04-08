@@ -15,7 +15,7 @@ describe("application model tests", () => {
         done()
     });
 
-    ["pending", "accepted", "rejected", "ceased"].forEach((status) => {
+    ["pending", "accepted", "rejected", "expired"].forEach((status) => {
         it(`should verify that ${status} is a valid application status`, (done) => {
             let record = model.generate("userId", "landlordId", "listingId");
             record["status"] = status;

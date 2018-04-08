@@ -184,7 +184,7 @@ describe("api house share management", () => {
                 listings[0]["listing"]["ber"] = "A3";
                 return listings[0]
             })
-            .then((listing) => requestHelper.putResource(app, headers, `/api/v1/house-share/${listing["_id"]}`, listing))
+            .then((listing) => requestHelper.patchResource(app, headers, `/api/v1/house-share/${listing["_id"]}`, listing))
             .then((res) => assert.equal(res.status, 200))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then(((listings) => {
@@ -202,7 +202,7 @@ describe("api house share management", () => {
                 delete listing["listing"]["plan"];
                 return listing;
             })
-            .then((listing) => requestHelper.putResource(app, headers, `/api/v1/house-share/${listing["_id"]}`, listing))
+            .then((listing) => requestHelper.patchResource(app, headers, `/api/v1/house-share/${listing["_id"]}`, listing))
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then(() => done(new Error("Incorrectly accepting put request for existent listing with bad params")))
             .catch((err) => {
@@ -214,7 +214,7 @@ describe("api house share management", () => {
     it('should return 404 on updating a non-existing listing resource', (done) => {
         const nonExistentUuid = ObjectId();
         createListingObject(nonExistentUuid)
-            .then((listing) => requestHelper.putResource(app, headers, `/api/v1/house-share/${nonExistentUuid}`, listing))
+            .then((listing) => requestHelper.patchResource(app, headers, `/api/v1/house-share/${nonExistentUuid}`, listing))
             .then(() => done(new Error("Incorrectly accepting put request for non existent listing uuid")))
             .catch((err) => {
                 assert.equal(err.response.status, 404);
