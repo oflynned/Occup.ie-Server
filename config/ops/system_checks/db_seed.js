@@ -177,7 +177,6 @@ function seedHouseShares(env, db, size) {
                 let job = houseShareModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
                 let result = houseShareModel.validate(job);
-                console.log(result);
                 if (result["error"] !== null)
                     throw new Error(result);
 

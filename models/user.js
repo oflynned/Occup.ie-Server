@@ -8,7 +8,7 @@ const schema = Joi.object().keys({
         profile_picture: Joi.string().required(),
         dob: Joi.date().required(),
         sex: Joi.string().valid("male", "female", "other").required(),
-        profession: Joi.valid("student", "professional").required(),
+        profession: Joi.valid("student", "professional", "other").required(),
         hobbies: Joi.array().items(Joi.string()).min(1).max(5).unique().required(),
         description: Joi.string().required()
     }),
