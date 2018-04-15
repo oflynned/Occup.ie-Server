@@ -5,7 +5,6 @@ module.exports = (env) => {
     let cookieParser = require('cookie-parser');
     let bodyParser = require('body-parser');
     let oauth = require("./common/oauth");
-    let favicon = require('serve-favicon');
 
     let app = express();
     app.set('views', path.join(__dirname, 'website', 'html'));
