@@ -5,18 +5,17 @@ module.exports = (env) => {
     let cookieParser = require('cookie-parser');
     let bodyParser = require('body-parser');
     let oauth = require("./common/oauth");
+    let favicon = require('serve-favicon');
 
     let app = express();
-
-    app.set('view engine', 'handlebars');
     app.set('views', path.join(__dirname, 'website', 'html'));
-    app.use(express.static(path.join(__dirname, 'website', 'public')));
+    app.set('view engine', 'handlebars');
 
     app.use(logger('dev'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
-
+    app.use("/public/stylesheets", express.static(path.join(__dirname, 'website', 'public', 'stylesheets')));
 
     const config = require('./config/db');
     let db = require('monk')(config.mongoUrl);
