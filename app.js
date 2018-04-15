@@ -8,15 +8,15 @@ module.exports = (env) => {
 
     let app = express();
 
-    app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'handlebars');
+    app.set('views', path.join(__dirname, 'website', 'html'));
+    app.use(express.static(path.join(__dirname, 'website', 'public')));
 
     app.use(logger('dev'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
 
-    app.use(express.static(path.join(__dirname, 'public')));
 
     const config = require('./config/db');
     let db = require('monk')(config.mongoUrl);

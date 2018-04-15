@@ -14,7 +14,7 @@ function checkParams(seedType, seedSize) {
 
 module.exports = (db, env) => {
     router.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '../../../views/index.html'));
+        res.sendFile(path.join(__dirname, '../../../website/html/index.html'));
     });
 
     router.get('/ping', (req, res) => {
