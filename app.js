@@ -10,7 +10,7 @@ module.exports = (env) => {
     let app = express();
     app.set('views', path.join(__dirname, 'website', 'html'));
     app.set('view engine', 'handlebars');
-    app.use(favicon(path.join(__dirname, 'website', 'public', 'images', 'icon.png')));
+    // app.use(favicon(path.join(__dirname, 'website', 'public', 'images', 'icon.png')));
 
     app.use(logger('dev'));
     app.use(bodyParser.json());
