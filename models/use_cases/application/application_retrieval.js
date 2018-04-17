@@ -3,7 +3,7 @@ let record = require("../common/record");
 let ObjectId = require("mongodb").ObjectId;
 
 module.exports = {
-    doesApplicationExist: function(db, collection, filter) {
+    doesApplicationExist: function (db, collection, filter) {
         return new Promise((res, rej) => {
             record.getRecords(db, collection, filter)
                 .then((records) => records.length > 0 ? res() : rej(new Error("non_existent_application")))
@@ -14,11 +14,11 @@ module.exports = {
     validateQuery: function (query) {
         return new Promise((res, rej) => {
             let result = applicationModel.validateQuery(query);
-            if(result["error"] !== null) rej(new Error("bad_request"));
+            if (result["error"] !== null) rej(new Error("bad_request"));
 
             // now groom params to give back an appropriate query
             let applicationsQuery = {};
-            for(let k in query)
+            for (let k in query)
                 applicationsQuery[k] = ObjectId(query[k]);
 
             res(applicationsQuery);
