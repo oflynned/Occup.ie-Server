@@ -15,7 +15,7 @@ module.exports = (db, col) => {
     const applicationCol = col["applications"];
 
     router.post('/', (req, res) => {
-        let application = req.body;
+        let application = createApplicationUseCase.generate(req.body);
 
         createApplicationUseCase.validatePayload(application)
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(application["listing_id"])}))

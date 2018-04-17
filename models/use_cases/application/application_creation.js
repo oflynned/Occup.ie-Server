@@ -26,5 +26,16 @@ module.exports = {
             let results = application.validate(dataValidation);
             results["error"] === null ? res() : rej(new Error("bad_request"));
         })
+    },
+
+    generate: function (data) {
+        return {
+            user_id: data["user_id"],
+            landlord_id: data["landlord_id"],
+            listing_id: data["listing_id"],
+            status: "pending",
+            creation_time: new Date(),
+            last_updated: new Date()
+        }
     }
 };
