@@ -272,7 +272,8 @@ module.exports = {
             case "user":
                 return seedUsers(db, env.users, seedSize);
             case "application":
-                return seedApplications(env, db, seedSize);
+                // return seedApplications(env, db, seedSize);
+                break;
             case "house-share":
                 return seedHouseShares(env, db, seedSize);
             case "rental":
