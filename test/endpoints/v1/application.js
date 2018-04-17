@@ -362,8 +362,9 @@ describe("api application management", () => {
             .then((_listing) => listing = _listing[0])
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))
             .then((application) => applicationCreationUseCase.createApplication(db, applicationCol, application))
-            .then(() => requestHelper.getResource(app, headers, `/api/v1/application?user_id=${user["_id"]}`))
+            .then(() => requestHelper.getResource(app, headers, `/api/v1/application?user_id=${uuid}`))
             .then((res) => {
+                console.log(res.body);
                 assert.equal(res.status, 200);
                 assert.equal(res.body.length, 1);
                 done()
