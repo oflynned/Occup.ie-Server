@@ -4,7 +4,6 @@ module.exports = (env) => {
     let logger = require('morgan');
     let cookieParser = require('cookie-parser');
     let bodyParser = require('body-parser');
-    let oauth = require("./common/oauth");
     let favicon = require("serve-favicon");
 
     let app = express();
@@ -16,8 +15,10 @@ module.exports = (env) => {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
-    app.use("/public/stylesheets", express.static(path.join(__dirname, 'website', 'public', 'stylesheets')));
+
     app.use("/public/images", express.static(path.join(__dirname, 'website', 'public', 'images')));
+    app.use("/public/content", express.static(path.join(__dirname, 'website', 'public', 'content')));
+    app.use("/public/stylesheets", express.static(path.join(__dirname, 'website', 'public', 'stylesheets')));
 
     const config = require('./config/db');
     let db = require('monk')(config.mongoUrl);
@@ -29,21 +30,22 @@ module.exports = (env) => {
     let houseShare = require('./routes/v1/endpoints/house_share')(db, env);
     let application = require('./routes/v1/endpoints/application')(db, env);
 
+    const environment = process.env.ENVIRONMENT;
+    let oauth = require("./common/oauth")(env, db);
+
     app.use('/', index);
     app.use('/api/v1/rental', oauth.markInvalidRequests, rental);
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
 
-    const environment = process.env.ENVIRONMENT;
-
     environment === "development" ?
         app.use('/api/v1/user', user) :
-        app.use('/api/v1/user', oauth.denyInvalidRequests, user);
+        app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, user);
     environment === "development" ?
         app.use('/api/v1/landlord', landlord) :
-        app.use('/api/v1/landlord', oauth.denyInvalidRequests, landlord);
+        app.use('/api/v1/landlord', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, landlord);
     environment === "development" ?
         app.use('/api/v1/application', application) :
-        app.use('/api/v1/application', oauth.denyInvalidRequests, application);
+        app.use('/api/v1/application', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, application);
 
     return app;
 };
