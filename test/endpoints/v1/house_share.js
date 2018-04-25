@@ -67,7 +67,7 @@ describe("api house share management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
-                oauth = require('../../../common/oauth');
+                oauth = require('../../../common/oauth')(env, db);
                 sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);

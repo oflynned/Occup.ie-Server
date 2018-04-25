@@ -44,8 +44,9 @@ describe("api user account management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
-                oauth = require('../../../common/oauth');
+                oauth = require('../../../common/oauth')(env, db);
                 sinon.stub(oauth, 'denyInvalidRequests').callsFake((req, res, next) => next());
+                sinon.stub(oauth, 'denyMismatchingAccounts').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
@@ -56,6 +57,7 @@ describe("api user account management", () => {
     afterEach((done) => {
         dropDb()
             .then(() => oauth.denyInvalidRequests.restore())
+            .then(() => oauth.denyMismatchingAccounts.restore())
             .then(() => done())
             .catch((err) => done(err));
     });
