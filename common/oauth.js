@@ -1,5 +1,7 @@
 const fb = require("../config/fb");
 let fetch = require("node-fetch");
+let ObjectId = require("mongodb").ObjectId;
+let record = require("../models/use_cases/common/record");
 
 function validateFacebookToken(id, token) {
     if (id === undefined || id === null || token === undefined || token === null)
@@ -46,9 +48,27 @@ function validateOAuthIdentity(req) {
     }
 }
 
-module.exports = {
-    markInvalidRequests: function (req, res, next) {
-        validateOAuthIdentity(req, next)
+function validateAccountOwnership(req, env, db) {
+    let uuid = req.headers["uuid"];
+    let oauthId = req.headers["oauth_id"];
+    let accountType = req.headers["account_type"];
+    let col = accountType === "landlord" ? env.landlords : env.users;
+
+    if (uuid === undefined || uuid === null || accountType === undefined || accountType === null)
+        throw new Error("bad_request");
+
+    return record.getRecords(db, col, {"oauth.oauth_id": oauthId, "_id": ObjectId(uuid)})
+        .then((records) => {
+            if (records.length === 0)
+                throw new Error("id_mismatch");
+        });
+}
+
+module.exports = (env, db) => {
+    let module = {};
+
+    module.markInvalidRequests = (req, res, next) => {
+        validateOAuthIdentity(req)
             .then(() => {
                 req.headers["restricted"] = false;
                 next();
@@ -57,9 +77,9 @@ module.exports = {
                 req.headers["restricted"] = true;
                 next();
             });
-    },
+    };
 
-    denyInvalidRequests: function (req, res, next) {
+    module.denyInvalidRequests = (req, res, next) => {
         validateOAuthIdentity(req, next)
             .then(() => next())
             .catch((err) => {
@@ -78,5 +98,26 @@ module.exports = {
                         break;
                 }
             });
-    }
+    };
+
+    module.denyMismatchingAccounts = (req, res, next) => {
+        validateAccountOwnership(req, env, db)
+            .then(() => next())
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                    case "bad_account_type":
+                        res.status(400).send();
+                        break;
+                    case "id_mismatch":
+                        res.status(401).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
+    };
+
+    return module;
 };
