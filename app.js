@@ -37,15 +37,15 @@ module.exports = (env) => {
     app.use('/api/v1/rental', oauth.markInvalidRequests, rental);
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
 
-    environment === "development" ?
-        app.use('/api/v1/user', user) :
-        app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, user);
-    environment === "development" ?
-        app.use('/api/v1/landlord', landlord) :
-        app.use('/api/v1/landlord', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, landlord);
-    environment === "development" ?
-        app.use('/api/v1/application', application) :
-        app.use('/api/v1/application', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, application);
+    environment === "production" ?
+        app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, user) :
+        app.use('/api/v1/user', user);
+    environment === "production" ?
+        app.use('/api/v1/landlord', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, landlord) :
+        app.use('/api/v1/landlord', landlord);
+    environment === "production" ?
+        app.use('/api/v1/application', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, application) :
+        app.use('/api/v1/application', application);
 
     return app;
 };
