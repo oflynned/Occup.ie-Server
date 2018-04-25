@@ -106,7 +106,6 @@ module.exports = (env, db) => {
             .catch((err) => {
                 switch (err.message) {
                     case "bad_request":
-                    case "bad_account_type":
                         res.status(400).send();
                         break;
                     case "id_mismatch":
