@@ -7,6 +7,7 @@ function validateFacebookToken(id, token) {
     if (id === undefined || id === null || token === undefined || token === null)
         throw new Error("bad_request");
 
+    token = token.replace("Bearer ", "");
     return fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${fb.appId}|${fb.appSecret}`)
         .then((res) => res.json())
         .then((data) => {
@@ -40,15 +41,36 @@ function validateOAuthIdentity(req) {
 
     switch (provider) {
         case "facebook":
-            return Promise.resolve(validateFacebookToken(id, token.replace("Bearer ", "")));
+            return Promise.resolve(validateFacebookToken(id, token));
         case "google":
-            return Promise.resolve(validateGoogleToken(id, token.replace("Bearer ", "")));
+            return Promise.resolve(validateGoogleToken(id, token));
         default:
             return Promise.reject(new Error("bad_request"));
     }
 }
 
 function validateAccountOwnership(req, env, db) {
+    let uuid = req.headers["uuid"];
+    let oauthId = req.headers["oauth_id"];
+    let accountType = req.headers["account_type"];
+    let col = accountType === "landlord" ? env.landlords : env.users;
+
+    if (uuid === undefined || uuid === null || accountType === undefined || accountType === null) {
+        // new account creation requests won't have uuids in tenant/landlord
+        if (req.method === "POST")
+            return Promise.resolve();
+        else
+            throw new Error("bad_request");
+    }
+
+    return record.getRecords(db, col, {"oauth.oauth_id": oauthId, "_id": ObjectId(uuid)})
+        .then((records) => {
+            if (records.length === 0)
+                throw new Error("id_mismatch");
+        });
+}
+
+function enforceAccountOwnership(req, env, db) {
     let uuid = req.headers["uuid"];
     let oauthId = req.headers["oauth_id"];
     let accountType = req.headers["account_type"];
@@ -102,6 +124,24 @@ module.exports = (env, db) => {
 
     module.denyMismatchingAccounts = (req, res, next) => {
         validateAccountOwnership(req, env, db)
+            .then(() => next())
+            .catch((err) => {
+                switch (err.message) {
+                    case "bad_request":
+                        res.status(400).send();
+                        break;
+                    case "id_mismatch":
+                        res.status(401).send();
+                        break;
+                    default:
+                        res.status(500).send();
+                        break;
+                }
+            })
+    };
+
+    module.enforceAccountOwnership = (req, res, next) => {
+        enforceAccountOwnership(req, env, db)
             .then(() => next())
             .catch((err) => {
                 switch (err.message) {

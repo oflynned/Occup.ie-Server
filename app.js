@@ -44,7 +44,7 @@ module.exports = (env) => {
         app.use('/api/v1/landlord', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, landlord) :
         app.use('/api/v1/landlord', landlord);
     environment === "production" ?
-        app.use('/api/v1/application', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, application) :
+        app.use('/api/v1/application', oauth.denyInvalidRequests, oauth.enforceAccountOwnership, application) :
         app.use('/api/v1/application', application);
 
     return app;
