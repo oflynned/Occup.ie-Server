@@ -29,6 +29,7 @@ module.exports = (env) => {
     let landlord = require('./routes/v1/endpoints/landlord')(db, env);
     let houseShare = require('./routes/v1/endpoints/house_share')(db, env);
     let application = require('./routes/v1/endpoints/application')(db, env);
+    let featureFlags = require('./routes/v1/endpoints/feature_flags')();
 
     const environment = process.env.ENVIRONMENT;
     let oauth = require("./common/oauth")(env, db);
@@ -36,6 +37,7 @@ module.exports = (env) => {
     app.use('/', index);
     app.use('/api/v1/rental', oauth.markInvalidRequests, rental);
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
+    app.use('/api/v1/feature-flags', featureFlags);
 
     environment === "production" ?
         app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.enforceAccountOwnershipOnResourceAccess, user) :
