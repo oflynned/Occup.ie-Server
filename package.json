@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "preinstall": "npm install pm2 -g",
+    "start": "pm2-runtime ./bin/www -i max",
     "test": "mocha 'test/**/*.js' --exit"
   },
   "nyc": {
