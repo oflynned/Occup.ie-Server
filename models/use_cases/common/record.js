@@ -1,5 +1,3 @@
-const ObjectId = require("mongodb").ObjectId;
-
 module.exports = {
     createRecord: function (db, collection, data) {
         return new Promise((res, rej) => {
