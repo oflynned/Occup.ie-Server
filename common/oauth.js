@@ -49,7 +49,7 @@ function validateOAuthIdentity(req) {
     }
 }
 
-function validateAccountOwnership(req, env, db) {
+function enforceAccountOwnershipOnResourceAccess(req, env, db) {
     let uuid = req.headers["uuid"];
     let oauthId = req.headers["oauth_id"];
     let accountType = req.headers["account_type"];
@@ -122,8 +122,8 @@ module.exports = (env, db) => {
             });
     };
 
-    module.denyMismatchingAccounts = (req, res, next) => {
-        validateAccountOwnership(req, env, db)
+    module.enforceAccountOwnershipOnResourceAccess = (req, res, next) => {
+        enforceAccountOwnershipOnResourceAccess(req, env, db)
             .then(() => next())
             .catch((err) => {
                 switch (err.message) {
