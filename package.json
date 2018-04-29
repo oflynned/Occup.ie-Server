@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "preinstall": "if test \"$NODE_ENV\" = \"production\"; then sudo npm install pm2 -g --unsafe-perm; fi;",
+    "preinstall": "if test \"$NODE_ENV\" = \"production\"; then npm install pm2 -g; fi;",
     "start": "if test \"$NODE_ENV\" = \"production\"; then pm2-runtime ./bin/www -i max; else node ./bin/www; fi;",
     "test": "mocha 'test/**/*.js' --exit"
   },
