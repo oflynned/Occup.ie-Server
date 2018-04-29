@@ -38,10 +38,10 @@ module.exports = (env) => {
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
 
     environment === "production" ?
-        app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, user) :
+        app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.enforceAccountOwnershipOnResourceAccess, user) :
         app.use('/api/v1/user', user);
     environment === "production" ?
-        app.use('/api/v1/landlord', oauth.denyInvalidRequests, oauth.denyMismatchingAccounts, landlord) :
+        app.use('/api/v1/landlord', oauth.denyInvalidRequests, oauth.enforceAccountOwnershipOnResourceAccess, landlord) :
         app.use('/api/v1/landlord', landlord);
     environment === "production" ?
         app.use('/api/v1/application', oauth.denyInvalidRequests, oauth.enforceAccountOwnership, application) :
