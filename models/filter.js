@@ -15,7 +15,9 @@ const querySchema = Joi.object().keys({
         min_age: Joi.number().min(18),
         max_age: Joi.number().min(Joi.ref('min_age')),
         dwelling: Joi.array().items(Joi.string().valid("studio", "house", "apartment")).min(1),
-        landlord_id: Joi.string()
+        landlord_id: Joi.string(),
+        limit: Joi.number(),
+        offset: Joi.number()
     },
 
     order: {
