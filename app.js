@@ -35,9 +35,10 @@ module.exports = (env) => {
     let oauth = require("./common/oauth")(env, db);
 
     app.use('/', index);
+    app.use('/api/v1/feature-flags', featureFlags);
+
     app.use('/api/v1/rental', oauth.markInvalidRequests, rental);
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
-    app.use('/api/v1/feature-flags', featureFlags);
 
     environment === "production" ?
         app.use('/api/v1/user', oauth.denyInvalidRequests, oauth.enforceAccountOwnershipOnResourceAccess, user) :
