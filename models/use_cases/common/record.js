@@ -8,7 +8,7 @@ module.exports = {
         })
     },
 
-    getRecords: function (db, collection, filter = {}, suppressedFields = {}) {
+    getRecords: function (db, collection, filter = {}, suppressedFields = {}, sorting = {}, limit = -1, offset = -1) {
         return new Promise((res, rej) => {
             db.get(collection)
                 .find(filter, suppressedFields)
@@ -25,6 +25,7 @@ module.exports = {
                 .catch((err) => rej(err));
         })
     },
+
     deleteRecord: function (db, collection, id) {
         return new Promise((res, rej) => {
             db.get(collection)
