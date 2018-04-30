@@ -113,16 +113,16 @@ function getQueryString(filter) {
                 query["$and"].push({"details.lease_length_months": {"$lte": Number(filter["query"]["max_lease_length"])}});
                 break;
             case "min_bathrooms":
-                query["$and"].push({"bathrooms": {"$size": {"$gte": Number(filter["query"]["min_bathrooms"])}}});
+                query["$and"].push({"bathrooms": {"$exists": true}, "$where": `this.bathrooms.length>=${Number(filter["query"]["min_bathrooms"])}`});
                 break;
             case "max_bathrooms":
-                query["$and"].push({"bathrooms": {"$size": {"$lte": Number(filter["query"]["max_bathrooms"])}}});
+                query["$and"].push({"bathrooms": {"$exists": true}, "$where": `this.bathrooms.length<=${Number(filter["query"]["max_bathrooms"])}`});
                 break;
             case "min_bedrooms":
-                query["$and"].push({"bedrooms": {"$size": {"$gte": Number(filter["query"]["min_bedrooms"])}}});
+                query["$and"].push({"bedrooms": {"$exists": true}, "$where": `this.bedrooms.length>=${Number(filter["query"]["min_bedrooms"])}`});
                 break;
             case "max_bedrooms":
-                query["$and"].push({"bedrooms": {"$size": {"$lte": Number(filter["query"]["max_bedrooms"])}}});
+                query["$and"].push({"bedrooms": {"$exists": true}, "$where": `this.bedrooms.length<=${Number(filter["query"]["max_bedrooms"])}`});
                 break;
             case "min_rent":
                 query["$and"].push({"listing.rent": {"$gte": Number(filter["query"]["min_rent"])}});
