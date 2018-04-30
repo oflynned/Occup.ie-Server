@@ -2,9 +2,38 @@ let filter = require("../../filter");
 let record = require("../common/record");
 let ObjectId = require("mongodb").ObjectId;
 
-function transformQuery(params, listingType) {
-    let filter = {query: {listing_type: listingType}, order: {}};
+function groomRentalQuery(filter, params) {
+    for (let param in params) {
+        switch (param) {
+            case "dwelling":
+            case "county":
+                filter["query"][param] = JSON.parse(params[param]);
+                break;
+            case "status":
+            case "limit":
+            case "offset":
+            case "landlord_uuid":
+            case "min_lease_length":
+            case "max_lease_length":
+            case "min_bedrooms":
+            case "max_bedrooms":
+            case "min_bathrooms":
+            case "max_bathrooms":
+            case "min_rent":
+            case "max_rent":
+                filter["query"][param] = params[param];
+                break;
+            case "time_renewed":
+            case "cost":
+                filter["order"][param] = params[param];
+                break;
+        }
+    }
 
+    return filter;
+}
+
+function groomHouseShareQuery(filter, params) {
     for (let param in params) {
         switch (param) {
             case "dwelling":
@@ -34,6 +63,23 @@ function transformQuery(params, listingType) {
                 filter["order"][param] = params[param];
                 break;
         }
+    }
+
+    return filter;
+}
+
+function transformQuery(params, listingType) {
+    let filter = {query: {}, order: {}};
+
+    switch (listingType) {
+        case "rental":
+            filter = groomRentalQuery(filter, params);
+            break;
+        case "house_share":
+            filter = groomHouseShareQuery(filter, params);
+            break;
+        default:
+            throw new Error("endpoint_not_found");
     }
 
     return Promise.resolve(filter);
