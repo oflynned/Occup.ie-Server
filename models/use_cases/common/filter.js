@@ -2,19 +2,21 @@ let filter = require("../../filter");
 let record = require("../common/record");
 let ObjectId = require("mongodb").ObjectId;
 
-function transformQuery(params) {
-    let filter = {query: {}, order: {}};
+function transformQuery(params, listingType) {
+    let filter = {query: {listing_type: listingType}, order: {}};
 
     for (let param in params) {
         switch (param) {
             case "dwelling":
             case "county":
+            case "profession":
             case "sex":
                 filter["query"][param] = JSON.parse(params[param]);
                 break;
+            case "status":
             case "limit":
             case "offset":
-            case "landlord_id":
+            case "landlord_uuid":
             case "min_lease_length":
             case "max_lease_length":
             case "min_bedrooms":
@@ -28,10 +30,8 @@ function transformQuery(params) {
                 filter["query"][param] = params[param];
                 break;
             case "time_renewed":
-            case "rent":
+            case "cost":
                 filter["order"][param] = params[param];
-                break;
-            default:
                 break;
         }
     }
@@ -43,21 +43,22 @@ function getQueryString(filter) {
     let query = {"$and": []};
     for (let param in filter["query"]) {
         switch (param) {
+            case "status":
+                query["$and"].push({"listing.status": filter["query"]["status"]});
+                break;
             case "limit":
                 break;
             case "offset":
                 break;
+
             case "county":
-                query["$and"].push({"address.county": {"$in": filter["query"]["county"]}});
-                break;
-            case "sex":
                 query["$and"].push({"address.county": {"$in": filter["query"]["county"]}});
                 break;
             case "dwelling":
                 query["$and"].push({"details.dwelling": {"$in": filter["query"]["dwelling"]}});
                 break;
             case "landlord_id":
-                query["$and"].push({"landlord_id": ObjectId(filter["query"]["landlord_id"])});
+                query["$and"].push({"landlord_uuid": ObjectId(filter["query"]["landlord_uuid"])});
                 break;
             case "min_lease_length":
                 query["$and"].push({"details.lease_length_months": {"$gte": Number(filter["query"]["min_lease_length"])}});
@@ -83,12 +84,23 @@ function getQueryString(filter) {
             case "max_rent":
                 query["$and"].push({"listing.rent": {"$lte": Number(filter["query"]["max_rent"])}});
                 break;
+
+            case "sex":
+                query["$and"].push({"details.target_tenant": {"$in": filter["query"]["sex"]}});
+                break;
+            case "profession":
+                query["$and"].push({"details.target_profession": {"$in": filter["query"]["profession"]}});
+                break;
             case "min_age":
+                query["$and"].push({"details.min_target_age": {"$gte": Number(filter["query"]["min_age"])}});
+                break;
             case "max_age":
+                query["$and"].push({"details.max_target_age": {"$lte": Number(filter["query"]["max_age"])}});
                 break;
 
             case "time_renewed":
-            case "rent":
+                break;
+            case "price":
                 break;
         }
     }
