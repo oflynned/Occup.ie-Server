@@ -50,7 +50,6 @@ module.exports = (db, col) => {
     });
 
     router.get('/', (req, res) => {
-        // TODO query landlord or user id from header via oauth id lookup
         retrieveApplicationUseCase.validateQuery(req.query)
             .then((query) => retrieveApplicationUseCase.getApplications(db, applicationCol, query))
             .then((applications) => res.status(200).json(applications))

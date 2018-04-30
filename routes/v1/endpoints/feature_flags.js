@@ -9,5 +9,9 @@ module.exports = () => {
             .catch(() => res.status(500).send());
     });
 
+    router.patch("/", (req, res) => {
+        // TODO allow admin console to turn flags on and off
+    });
+
     return router;
 };
