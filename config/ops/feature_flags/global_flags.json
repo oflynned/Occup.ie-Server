@@ -1,3 +1,4 @@
 {
-  "can_tenants_login_to_app": true
+  "sms_verification_required": false,
+  "government_id_verification_required": false
 }
