@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let ObjectId = require('mongodb').ObjectID;
+let ObjectId = require('mongodb').ObjectId;
 
 let createListingUseCase = require('../../../models/use_cases/listing/rental_creation');
 let retrieveListingUseCase = require('../../../models/use_cases/listing/rental_retrieval');
@@ -41,6 +41,7 @@ module.exports = (db, col) => {
             })
     });
 
+    // TODO restrict to development env
     router.get('/', (req, res) => {
         let hiddenFields = req.headers["restricted"] ? {
             "address.apartment_number": false,
@@ -54,7 +55,7 @@ module.exports = (db, col) => {
 
     router.get('/filter', (req, res) => {
         let query = {};
-        filterHousesUseCase.transformQuery(req.query)
+        filterHousesUseCase.transformQuery(req.query, "rental")
             .then((transformedQuery) => {
                 query = transformedQuery;
                 return filterHousesUseCase.validateFilters(query);

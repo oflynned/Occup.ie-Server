@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let ObjectId = require('mongodb').ObjectID;
+let ObjectId = require('mongodb').ObjectId;
 
 let createListingUseCase = require('../../../models/use_cases/listing/house_share_creation');
 let retrieveListingUseCase = require('../../../models/use_cases/listing/house_share_retrieval');

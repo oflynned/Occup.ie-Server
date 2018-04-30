@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let ObjectId = require('mongodb').ObjectID;
+let ObjectId = require('mongodb').ObjectId;
 
 let createApplicationUseCase = require('../../../models/use_cases/application/application_creation');
 let retrieveApplicationUseCase = require('../../../models/use_cases/application/application_retrieval');
