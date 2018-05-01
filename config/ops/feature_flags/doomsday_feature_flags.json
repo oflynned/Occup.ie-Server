@@ -1,0 +1,6 @@
+{
+  "app_killswitch_enabled": false,
+  "app_maintenance_mode_enabled": false,
+  "landlords_can_login": true,
+  "tenants_can_login": true
+}
