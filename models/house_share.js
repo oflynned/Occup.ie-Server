@@ -3,11 +3,7 @@ const Joi = require("joi");
 const schema = Joi.object().keys({
     type: Joi.string().valid("house_share").required(),
     landlord_uuid: Joi.string().required(),
-    bedrooms: Joi.array().items({
-        size: Joi.string().valid("single", "double", "shared").required(),
-        deposit: Joi.number().min(1).required(),
-        rent: Joi.number().min(1).required()
-    }).min(1).required(),
+    bedrooms: Joi.string().valid("single", "double", "shared").required(),
     bathrooms: Joi.array().items(Joi.string().valid("ensuite", "shared").min(1).required()),
     images: Joi.array().items(Joi.string().required()).min(4).unique(),
 
@@ -41,6 +37,8 @@ const schema = Joi.object().keys({
     },
 
     listing: {
+        deposit: Joi.number().min(1).required(),
+        rent: Joi.number().min(1).required(),
         created: Joi.date().required(),
         expires: Joi.date().required(),
         plan: Joi.string().valid("entry", "medium", "deluxe").required(),
@@ -72,14 +70,6 @@ module.exports = {
         }
     },
 
-    generateBedroom: function (size, deposit, rent) {
-        return {
-            size: size,
-            deposit: parseInt(deposit),
-            rent: parseInt(rent)
-        }
-    },
-
     generateDetails: function (dwelling, description, leaseLengthMonths, minAge, maxAge, targetTenant, targetProfession) {
         return {
             dwelling: dwelling,
@@ -104,12 +94,14 @@ module.exports = {
         }
     },
 
-    generateListing: function (plan, isOwnerOccupied, isFurnished, ber) {
+    generateListing: function (plan, isOwnerOccupied, isFurnished, ber, deposit, rent) {
         const creation = new Date();
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
 
         return {
+            deposit: parseInt(deposit),
+            rent: parseInt(rent),
             created: creation,
             expires: expiry,
             plan: plan,
@@ -140,6 +132,6 @@ module.exports = {
     },
 
     validate: function validate(o) {
-        return Joi.validate(o, schema, {allowUnknown: true})
+        return Joi.validate(o, schema, {allowUnknown: true});
     }
 };
