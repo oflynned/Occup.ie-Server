@@ -51,13 +51,9 @@ function createListingObject(landlordUuid) {
             listingModel.generateAddress("3", "22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
             listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
             ["shared", "ensuite", "ensuite"],
-            [
-                {size: "single", deposit: 500, rent: 500},
-                {size: "single", deposit: 500, rent: 500},
-                {size: "double", deposit: 750, rent: 750}
-            ],
+            "single",
             listingModel.generateFacilities(false, true, true, false, false, true, false),
-            listingModel.generateListing("entry", false, true, "B1")
+            listingModel.generateListing("entry", false, true, "B1", 550, 550)
         )
     );
 }
