@@ -78,8 +78,6 @@ function transformQuery(params, listingType) {
         case "house_share":
             filter = groomHouseShareQuery(filter, params);
             break;
-        default:
-            throw new Error("endpoint_not_found");
     }
 
     return Promise.resolve(filter);

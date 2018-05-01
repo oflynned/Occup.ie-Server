@@ -11,7 +11,7 @@ const querySchema = Joi.object().keys({
         min_rent: Joi.number().min(1),
         max_rent: Joi.number().min(1).when("min_rent", {is: 'fieldValue', then: Joi.number().min(Joi.ref("min_rent"))}),
         county: Joi.array().items(Joi.string()),
-        sex: Joi.array().items(Joi.string().valid("male", "female", "other")).min(1),
+        sex: Joi.array().items(Joi.string().valid("male", "female", "other", "couple")).min(1),
         min_age: Joi.number().min(18),
         max_age: Joi.number().min(18).when("min_age", {is: 'fieldValue', then: Joi.number().min(Joi.ref("min_age"))}),
         dwelling: Joi.array().items(Joi.string().valid("studio", "house", "apartment")).min(1),
