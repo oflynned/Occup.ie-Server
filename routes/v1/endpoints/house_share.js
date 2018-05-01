@@ -5,6 +5,7 @@ let ObjectId = require('mongodb').ObjectId;
 let createListingUseCase = require('../../../models/use_cases/listing/house_share_creation');
 let retrieveListingUseCase = require('../../../models/use_cases/listing/house_share_retrieval');
 let retrieveLandlordUseCase = require('../../../models/use_cases/landlord/landlord_account_retrieval');
+let filterHousesUseCase = require("../../../models/use_cases/common/filter");
 
 const hideExactHouseData = {
     "address.apartment_number": false,
@@ -51,6 +52,22 @@ module.exports = (db, col) => {
         retrieveListingUseCase.getListings(db, listingsCol, {type: "house_share"}, hiddenFields)
             .then((properties) => res.status(200).json(properties))
             .catch((err) => res.status(500).json(err))
+    });
+
+    router.get('/filter', (req, res) => {
+        let query = {};
+        filterHousesUseCase.transformQuery(req.query, "house_share")
+            .then((transformedQuery) => {
+                query = transformedQuery;
+                return filterHousesUseCase.validateFilters(query);
+            })
+            .then(() => filterHousesUseCase.getQueryString(query))
+            .then((queryString) => filterHousesUseCase.filterListings(db, col["listings"], queryString))
+            .then((listings) => res.status(200).json(listings))
+            .catch((err) => {
+                console.log(err);
+                res.status(400).send();
+            })
     });
 
     router.get('/:uuid', (req, res) => {
