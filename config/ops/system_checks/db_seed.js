@@ -111,19 +111,14 @@ function getBathrooms(size) {
 function getBedrooms(amount, isHouseShare) {
     let output = [];
     const types = ["single", "double", "shared"];
+
+    if (isHouseShare) {
+        return types[getRandom(types.length)]
+    }
+
     for (let i = 0; i < amount; i++) {
         let bedroom = {};
-        let rent = getRandom(300) + 400;
-        if (isHouseShare) {
-            bedroom = {
-                size: types[getRandom(types.length)],
-                deposit: rent,
-                rent: rent
-            }
-        } else {
-            bedroom = types[getRandom(types.length)]
-        }
-
+        bedroom = types[getRandom(types.length)];
         output.push(bedroom);
     }
 
@@ -170,10 +165,11 @@ function seedHouseShares(env, db, size) {
                 let ageLimits = getAgeLimits();
                 let bathrooms = getBathrooms(getRandom(4) + 1);
                 let bedrooms = getBedrooms(getRandom(6) + 1, true);
+                let rent = getRandom(300) + 400;
                 let address = houseShareModel.generateAddress(getRandom(bedrooms.length), getRandom(100), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
                 let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer(), rent, rent);
                 let job = houseShareModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
                 let result = houseShareModel.validate(job);

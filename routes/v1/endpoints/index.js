@@ -43,7 +43,7 @@ module.exports = (db, env) => {
             .then(() => dbSeed.purge(env, db))
             .then(() => dbSeed.seed(env, db, seedType, seedSize))
             .then(() => res.status(200).json({seed_type: seedType, seed_size: seedSize}))
-            .catch(() => res.status(400).send())
+            .catch((error) => res.status(400).send(error))
     });
 
     return router;
