@@ -7,12 +7,14 @@ function areCredentialsValid(req) {
 function filterRequests(req, res, next) {
     switch (req.method) {
         case "GET":
-            return next;
+            next();
+            break;
         default:
             if (areCredentialsValid(req))
-                return next;
+                next();
             else
-                throw new Error("bad_credentials");
+                res.status(401).send();
+            break;
     }
 }
 
