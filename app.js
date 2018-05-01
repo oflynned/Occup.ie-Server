@@ -32,9 +32,10 @@ module.exports = (env) => {
 
     const environment = process.env.ENVIRONMENT;
     let oauth = require("./common/oauth")(env, db);
+    let adminFeatureFlags = require("./models/use_cases/feature_flags/manage_feature_flag_access");
 
     app.use('/', index);
-    app.use('/api/v1/feature-flags', featureFlags);
+    app.use('/api/v1/feature-flags', adminFeatureFlags.filterRequests, featureFlags);
 
     app.use('/api/v1/rental', oauth.markInvalidRequests, rental);
     app.use('/api/v1/house-share', oauth.markInvalidRequests, houseShare);
