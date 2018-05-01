@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let retrieveFeatureFlags = require("../../../models/use_cases/common/retrieve_feature_flags");
+let retrieveFeatureFlags = require("../../../models/use_cases/feature_flags/retrieve_feature_flags");
 
 module.exports = () => {
     router.get("/", (req, res) => {
