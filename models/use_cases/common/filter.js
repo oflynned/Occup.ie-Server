@@ -75,7 +75,6 @@ function transformQuery(params, listingType, profile = {}) {
             filter = groomRentalQuery(filter, params);
             break;
         case "house_share":
-            console.log(filter);
             filter = groomHouseShareQuery(filter, params);
             break;
     }
@@ -158,8 +157,6 @@ function getQueryString(filter) {
                 break;
         }
     }
-
-    console.log(query);
 
     return query;
 }
