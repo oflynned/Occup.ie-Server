@@ -5,6 +5,7 @@ let ObjectId = require('mongodb').ObjectId;
 let createListingUseCase = require('../../../models/use_cases/listing/house_share_creation');
 let retrieveListingUseCase = require('../../../models/use_cases/listing/house_share_retrieval');
 let retrieveLandlordUseCase = require('../../../models/use_cases/landlord/landlord_account_retrieval');
+let retrieveUserUseCase = require("../../../models/use_cases/user/user_account_retrieval");
 let filterHousesUseCase = require("../../../models/use_cases/common/filter");
 
 const hideExactHouseData = {
@@ -56,7 +57,9 @@ module.exports = (db, col) => {
 
     router.get('/filter', (req, res) => {
         let query = {};
-        filterHousesUseCase.transformQuery(req.query, "house_share")
+
+        retrieveUserUseCase.getUserFilterDetails(req, db, col["users"])
+            .then((profile) => filterHousesUseCase.transformQuery(req.query, "house_share", profile))
             .then((transformedQuery) => {
                 query = transformedQuery;
                 return filterHousesUseCase.validateFilters(query);
@@ -64,15 +67,12 @@ module.exports = (db, col) => {
             .then(() => filterHousesUseCase.getQueryString(query))
             .then((queryString) => filterHousesUseCase.filterListings(db, col["listings"], queryString))
             .then((listings) => res.status(200).json(listings))
-            .catch((err) => {
-                console.log(err);
-                res.status(400).send();
-            })
+            .catch((err) => res.status(400).send(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        let hiddenFields = req.headers["restricted"] ? hideExactHouseData: {};
+        let hiddenFields = req.headers["restricted"] ? hideExactHouseData : {};
         retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(uuid)})
             .then(() => retrieveListingUseCase.getListings(db, listingsCol, {_id: ObjectId(uuid)}), hiddenFields)
             .then((properties) => res.status(200).json(properties))

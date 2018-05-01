@@ -4,6 +4,7 @@ let ObjectId = require('mongodb').ObjectId;
 
 let createListingUseCase = require('../../../models/use_cases/listing/rental_creation');
 let retrieveListingUseCase = require('../../../models/use_cases/listing/rental_retrieval');
+let retrieveUserUseCase = require("../../../models/use_cases/user/user_account_retrieval");
 let retrieveLandlordUseCase = require('../../../models/use_cases/landlord/landlord_account_retrieval');
 let filterHousesUseCase = require("../../../models/use_cases/common/filter");
 
@@ -55,6 +56,7 @@ module.exports = (db, col) => {
 
     router.get('/filter', (req, res) => {
         let query = {};
+        retrieveUserUseCase.getUsers()
         filterHousesUseCase.transformQuery(req.query, "rental")
             .then((transformedQuery) => {
                 query = transformedQuery;
