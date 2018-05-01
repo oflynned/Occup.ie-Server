@@ -38,8 +38,6 @@ function groomHouseShareQuery(filter, params) {
         switch (param) {
             case "dwelling":
             case "county":
-            case "profession":
-            case "sex":
                 filter["query"][param] = JSON.parse(params[param]);
                 break;
             case "status":
@@ -54,8 +52,9 @@ function groomHouseShareQuery(filter, params) {
             case "max_bathrooms":
             case "min_rent":
             case "max_rent":
-            case "min_age":
-            case "max_age":
+            case "age":
+            case "sex":
+            case "profession":
                 filter["query"][param] = params[param];
                 break;
             case "time_renewed":
@@ -68,14 +67,15 @@ function groomHouseShareQuery(filter, params) {
     return filter;
 }
 
-function transformQuery(params, listingType) {
-    let filter = {query: {}, order: {}};
+function transformQuery(params, listingType, profile = {}) {
+    let filter = {query: profile, order: {}};
 
     switch (listingType) {
         case "rental":
             filter = groomRentalQuery(filter, params);
             break;
         case "house_share":
+            console.log(filter);
             filter = groomHouseShareQuery(filter, params);
             break;
     }
@@ -111,16 +111,28 @@ function getQueryString(filter) {
                 query["$and"].push({"details.lease_length_months": {"$lte": Number(filter["query"]["max_lease_length"])}});
                 break;
             case "min_bathrooms":
-                query["$and"].push({"bathrooms": {"$exists": true}, "$where": `this.bathrooms.length>=${Number(filter["query"]["min_bathrooms"])}`});
+                query["$and"].push({
+                    "bathrooms": {"$exists": true},
+                    "$where": `this.bathrooms.length>=${Number(filter["query"]["min_bathrooms"])}`
+                });
                 break;
             case "max_bathrooms":
-                query["$and"].push({"bathrooms": {"$exists": true}, "$where": `this.bathrooms.length<=${Number(filter["query"]["max_bathrooms"])}`});
+                query["$and"].push({
+                    "bathrooms": {"$exists": true},
+                    "$where": `this.bathrooms.length<=${Number(filter["query"]["max_bathrooms"])}`
+                });
                 break;
             case "min_bedrooms":
-                query["$and"].push({"bedrooms": {"$exists": true}, "$where": `this.bedrooms.length>=${Number(filter["query"]["min_bedrooms"])}`});
+                query["$and"].push({
+                    "bedrooms": {"$exists": true},
+                    "$where": `this.bedrooms.length>=${Number(filter["query"]["min_bedrooms"])}`
+                });
                 break;
             case "max_bedrooms":
-                query["$and"].push({"bedrooms": {"$exists": true}, "$where": `this.bedrooms.length<=${Number(filter["query"]["max_bedrooms"])}`});
+                query["$and"].push({
+                    "bedrooms": {"$exists": true},
+                    "$where": `this.bedrooms.length<=${Number(filter["query"]["max_bedrooms"])}`
+                });
                 break;
             case "min_rent":
                 query["$and"].push({"listing.rent": {"$gte": Number(filter["query"]["min_rent"])}});
@@ -130,16 +142,14 @@ function getQueryString(filter) {
                 break;
 
             case "sex":
-                query["$and"].push({"details.target_tenant": {"$in": filter["query"]["sex"]}});
+                query["$and"].push({"details.target_tenant": filter["query"]["sex"]});
                 break;
             case "profession":
-                query["$and"].push({"details.target_profession": {"$in": filter["query"]["profession"]}});
+                query["$and"].push({"details.target_profession": filter["query"]["profession"]});
                 break;
-            case "min_age":
-                query["$and"].push({"details.min_target_age": {"$gte": Number(filter["query"]["min_age"])}});
-                break;
-            case "max_age":
-                query["$and"].push({"details.max_target_age": {"$lte": Number(filter["query"]["max_age"])}});
+            case "age":
+                query["$and"].push({"details.min_target_age": {"$lte": Number(filter["query"]["age"])}});
+                query["$and"].push({"details.max_target_age": {"$gte": Number(filter["query"]["age"])}});
                 break;
 
             case "time_renewed":
