@@ -4,7 +4,13 @@ let retrieveFeatureFlags = require("../../../models/use_cases/common/retrieve_fe
 
 module.exports = () => {
     router.get("/", (req, res) => {
-        retrieveFeatureFlags.loadFeatureFlags("global_flags")
+        retrieveFeatureFlags.loadAllJson()
+            .then((flags) => res.status(200).json(flags))
+            .catch(() => res.status(500).send());
+    });
+
+    router.get("/:filename", (req, res) => {
+        retrieveFeatureFlags.loadFeatureFlags(req.params["filename"])
             .then((flags) => res.status(200).json(flags))
             .catch(() => res.status(500).send());
     });
