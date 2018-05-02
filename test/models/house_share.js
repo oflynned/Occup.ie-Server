@@ -64,7 +64,7 @@ describe("house share model tests", () => {
     });
 
     it(`should not validate object with bad dwelling type`, (done) => {
-        let details = model.generateDetails("bad dwelling type", "description", 12, 20, 30, ["male"], ["professional"]);
+        let details = model.generateDetails("bad_dwelling", "description", 12, 20, 30, ["male"], ["professional"]);
         let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
         let result = model.validate(object)["error"] !== null;
         assert.equal(result, true);
@@ -99,8 +99,7 @@ describe("house share model tests", () => {
     });
 
     it(`should not validate bad bedroom type`, (done) => {
-        let bedrooms = [{size: "bad_bedroom", rent: 500, deposit: 500}];
-        let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
+        let object = model.generate(landlordUuid, address, details, bathrooms, "bad_bedroom", facilities, listing);
         let result = model.validate(object)["error"] !== null;
         assert.equal(result, true);
         done();
