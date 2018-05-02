@@ -51,10 +51,10 @@ describe("landlord model tests", () => {
     });
 
     it('should fail landlord validation if email is invalid', (done) => {
-
+        done();
     });
 
     it('should fail landlord validation if phone number is invalid', (done) => {
-
+        done();
     });
 });
