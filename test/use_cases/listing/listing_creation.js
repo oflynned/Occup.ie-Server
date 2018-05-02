@@ -6,9 +6,9 @@ const config = require('../../../config/db');
 const db = require('monk')(config.mongoUrl);
 const collection = require("../../../config/collections").development.listings;
 
-let model = require("../../../models/landlord");
+let model = require("../../../models/rental");
 let useCase = require("../../../models/use_cases/landlord/landlord_account_validation");
 
-describe("landlord account validation tests", () => {
+describe("listing creation tests", () => {
 
 });

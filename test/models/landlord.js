@@ -2,6 +2,7 @@ let expect = require("expect");
 let model = require("../../models/landlord");
 const birthday = new Date(1960, 1, 1);
 
+// TODO should check for validity of phone number & email
 describe("landlord model tests", () => {
     it("should validate landlord with correct account params", (done) => {
         let landlord = model.generate("John", "Smith", birthday, "john.smith@test.com", "+353 86 123 4567");
@@ -47,5 +48,13 @@ describe("landlord model tests", () => {
         let outcome = model.validate(landlord)["error"] === null;
         expect(outcome).toBe(false);
         done();
+    });
+
+    it('should fail landlord validation if email is invalid', (done) => {
+
+    });
+
+    it('should fail landlord validation if phone number is invalid', (done) => {
+
     });
 });
