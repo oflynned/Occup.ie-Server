@@ -40,4 +40,12 @@ describe("landlord model tests", () => {
         expect(outcome).toBe(false);
         done();
     });
+
+    it('should fail landlord validation with age below age 18', (done) => {
+        let landlord = model.generate("John", "Smith", new Date(), "john.smith@test.com", "+353 86 123 4567");
+        delete landlord.oauth.oauth_id;
+        let outcome = model.validate(landlord)["error"] === null;
+        expect(outcome).toBe(false);
+        done();
+    });
 });
