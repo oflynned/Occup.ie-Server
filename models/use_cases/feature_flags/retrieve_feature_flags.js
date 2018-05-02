@@ -1,5 +1,6 @@
 let fs = require("fs");
 let path = require("path");
+let featureFlag = require("../../feature_flag");
 
 function loadJson(filename) {
     if (filename === "*")
