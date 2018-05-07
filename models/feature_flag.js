@@ -1,6 +1,5 @@
 let Joi = require("joi");
 
-// TODO promote feature flags to 1st class objects on implementation
 const schema = Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string().required(),

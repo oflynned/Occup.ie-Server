@@ -16,14 +16,16 @@ function loadJson(filename) {
 }
 
 function loadAllJson() {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
         const flagsLocation = "../../../config/ops/feature_flags";
         let jsonPath = path.join(__dirname, flagsLocation);
-        let output = {};
+        let output = [];
         fs.readdirSync(jsonPath, "utf8").forEach((fileName) => {
             let file = path.join(__dirname, `${flagsLocation}/${fileName}`);
             let data = JSON.parse(fs.readFileSync(file));
-            Object.assign(output, data);
+            console.log(data);
+            if (data.length > 0)
+                data.forEach((flag) => output.push(flag));
         });
         res(output);
     });
