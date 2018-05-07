@@ -1,6 +1,54 @@
-{
-  "app_killswitch_enabled": false,
-  "app_maintenance_mode_enabled": false,
-  "landlords_can_login": true,
-  "tenants_can_login": true
-}
+[
+  {
+    "app_killswitch": {
+      "title": "App Killswitch",
+      "description": "Master control for enabling/disabling the service. Turns off all services, paid & unpaid. Kicks everyone's session.",
+      "enabled": false,
+      "effects": {
+        "should_kick_session": true,
+        "should_show_dialog": true,
+        "dialog_title": "Occup.ie has been disabled",
+        "dialog_body": "We regret to inform that the app is no longer available :("
+      }
+    }
+  },
+  {
+    "app_maintenance_mode": {
+      "title": "App Maintenance Mode",
+      "description": "Master control for enabling/disabling maintenance mode on the app. Kicks everyone's session.",
+      "enabled": false,
+      "effects": {
+        "should_kick_session": true,
+        "should_show_dialog": true,
+        "dialog_title": "Maintenance Mode",
+        "dialog_body": "Occup.ie is currently undergoing maintenance, please check back later."
+      }
+    }
+  },
+  {
+    "landlord_login": {
+      "title": "Landlord Login",
+      "description": "Allows/disallows any new landlord signups/logins",
+      "enabled": true,
+      "effects": {
+        "should_kick_session": true,
+        "should_show_dialog": true,
+        "dialog_title": "Login Current Unavailable",
+        "dialog_body": "Landlord login has temporarily been disabled, please check back later."
+      }
+    }
+  },
+  {
+    "tenant_login": {
+      "title": "Tenant Login",
+      "description": "Allows/disallows any new tenant signups/logins",
+      "enabled": true,
+      "effects": {
+        "should_kick_session": true,
+        "should_show_dialog": true,
+        "dialog_title": "Login Current Unavailable",
+        "dialog_body": "Tenant login has temporarily been disabled, please check back later."
+      }
+    }
+  }
+]

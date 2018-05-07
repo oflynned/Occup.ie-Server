@@ -1,4 +1,24 @@
-{
-  "sms_verification_required": false,
-  "government_id_verification_required": false
-}
+[
+  {
+    "sms_verification": {
+      "title": "SMS Verification",
+      "description": "Allows/disallows any new SMS verifications to be sent out.",
+      "enabled": false,
+      "effects": {
+        "should_kick_session": false,
+        "should_show_dialog": false
+      }
+    }
+  },
+  {
+    "government_id_verification": {
+      "title": "Government ID Verification",
+      "description": "Allows/disallows any new requests for ID verification.",
+      "enabled": false,
+      "effects": {
+        "should_kick_session": false,
+        "should_show_dialog": false
+      }
+    }
+  }
+]

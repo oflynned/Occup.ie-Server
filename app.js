@@ -30,6 +30,9 @@ module.exports = (env) => {
     let application = require('./routes/v1/endpoints/application')(db, env);
     let featureFlags = require('./routes/v1/endpoints/feature_flags')();
 
+    let admin = require("./routes/v1/endpoints/admin")(db, env);
+    app.use('/admin', admin);
+
     const environment = process.env.ENVIRONMENT;
     let oauth = require("./common/oauth")(env, db);
     let adminFeatureFlags = require("./models/use_cases/feature_flags/manage_feature_flag_access");
