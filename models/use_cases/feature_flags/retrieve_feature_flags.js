@@ -23,9 +23,7 @@ function loadAllJson() {
         fs.readdirSync(jsonPath, "utf8").forEach((fileName) => {
             let file = path.join(__dirname, `${flagsLocation}/${fileName}`);
             let data = JSON.parse(fs.readFileSync(file));
-            console.log(data);
-            if (data.length > 0)
-                data.forEach((flag) => output.push(flag));
+            if (data.length > 0) data.forEach((flag) => output.push(flag));
         });
         res(output);
     });
