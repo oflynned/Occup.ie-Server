@@ -10,7 +10,7 @@ const env = require("../../../config/collections").test;
 const landlordCol = env.landlords;
 const listingCol = env.listings;
 
-const requestHelper = require("./request_helper");
+const requestHelper = require("../common/request_helper");
 const landlordModel = require("../../../models/landlord");
 const listingModel = require("../../../models/house_share");
 

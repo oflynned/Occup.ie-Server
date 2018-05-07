@@ -11,7 +11,7 @@ const db = require('monk')(config.mongoUrl);
 const env = require("../../../config/collections").test;
 const collection = env.users;
 
-const requestHelper = require("./request_helper");
+const requestHelper = require("../common/request_helper");
 const model = require("../../../models/user");
 const creationUseCase = require("../../../models/use_cases/user/user_account_creation");
 const retrievalUseCase = require("../../../models/use_cases/user/user_account_retrieval");

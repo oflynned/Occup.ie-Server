@@ -15,7 +15,7 @@ const listingCol = env.listings;
 const landlordCol = env.landlords;
 const applicationCol = env.applications;
 
-const requestHelper = require("./request_helper");
+const requestHelper = require("../common/request_helper");
 const userModel = require("../../../models/user");
 const rentalModel = require("../../../models/rental");
 const houseShareModel = require("../../../models/house_share");

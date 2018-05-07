@@ -15,7 +15,7 @@ const collection = env.landlords;
 const model = require("../../../models/landlord");
 const creationUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
 const retrievalUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
-const requestHelper = require("./request_helper");
+const requestHelper = require("../common/request_helper");
 
 const birthday = new Date(1960, 1, 1);
 const headers = {
