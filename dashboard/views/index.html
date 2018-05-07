@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Occup.ie Admin</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+    <link href="../../website/public/stylesheets/margins.css" rel="stylesheet" type="text/css"/>
+    <link href="../../website/public/stylesheets/colour.css" rel="stylesheet" type="text/css"/>
+    <link href="../../website/public/stylesheets/style.css" rel="stylesheet" type="text/css"/>
+
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+</head>
+
+<body>
+<div class="container" id="app">
+    <div v-for="(value) in flags">
+        <div class="row">
+            <div class="col-sm-12 my-auto">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="item">
+                            <div class="heading">
+                                <h3>{{ value[Object.keys(value)[0]]["title"] }}</h3>
+                                <h4>{{ value[Object.keys(value)[0]]["description"] }}</h4>
+                            </div>
+                            <div>
+                                <div>
+                                    <h5 style="margin: 1em; display: inline-block;">Enabled?</h5>
+                                    <input style="margin: 1em;display: inline-block;" type="checkbox" checked data-toggle="toggle">
+                                </div>
+                                <div>
+                                    <h5 style="margin: 1em; display: inline-block;">Kick Session?</h5>
+                                    <input style="margin: 1em;display: inline-block;" type="checkbox" checked data-toggle="toggle">
+                                </div>
+                                <div>
+                                    <h5 style="margin: 1em; display: inline-block;">Dialog title: </h5>
+                                    <h5 style="margin: 1em; display: inline-block;">{{ value[Object.keys(value)[0]]["effects"]["dialog_title"] }}</h5>
+                                </div>
+                                <div>
+                                    <h5 style="margin: 1em; display: inline-block;">Dialog body:</h5>
+                                    <h5 style="margin: 1em; display: inline-block;">{{ value[Object.keys(value)[0]]["effects"]["dialog_body"] }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        <p>{{ Object.keys(value)[0] }} -> {{ value[Object.keys(value)[0]] }}</p>
+    -->
+</body>
+
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="../app.js"></script>
+</html>
+
