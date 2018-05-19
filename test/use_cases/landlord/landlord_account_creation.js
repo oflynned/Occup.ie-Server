@@ -22,8 +22,6 @@ describe("landlord account creation tests", () => {
             .then(() => useCase.createAccount(db, collection, landlord))
             .then((record) => {
                 assert.equal(record, landlord);
-                assert.equal(record["meta"]["phone_verified"], false);
-                assert.equal(record["meta"]["identity_verified"], false);
                 done();
             })
             .catch((err) => done(err.message));

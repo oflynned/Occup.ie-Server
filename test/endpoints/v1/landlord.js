@@ -19,9 +19,9 @@ const requestHelper = require("../common/request_helper");
 
 const birthday = new Date(1960, 1, 1);
 const headers = {
-    oauth_id: "google_id",
-    oauth_token: "google_token",
-    oauth_provider: "google"
+    oauth_id: "facebook_id",
+    oauth_token: "facebook_token",
+    oauth_provider: "facebook"
 };
 
 function dropDb() {
@@ -29,9 +29,9 @@ function dropDb() {
 }
 
 function seedDb() {
-    const landlord1 = model.generate("John", "Smith", birthday, "john.smith@test.com", "0");
-    const landlord2 = model.generate("Emma", "Sheeran", birthday, "emma.sheeran@test.com", "1");
-    const landlord3 = model.generate("Edmond", "Ó Floinn", birthday, "edmond.ofloinn@test.com", "2");
+    const landlord1 = model.generate("John", "Smith", birthday, "other", "0");
+    const landlord2 = model.generate("Emma", "Sheeran", birthday, "female", "1");
+    const landlord3 = model.generate("Edmond", "Ó Floinn", birthday, "male", "2");
 
     return Promise.all([
         creationUseCase.createAccount(db, collection, landlord1),
@@ -45,9 +45,6 @@ describe("api landlord account management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
-                oauth = require('../../../common/oauth')(env, db);
-                sinon.stub(oauth, 'denyInvalidRequests').callsFake((req, res, next) => next());
-                sinon.stub(oauth, 'enforceAccountOwnershipOnResourceAccess').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
@@ -57,18 +54,49 @@ describe("api landlord account management", () => {
 
     afterEach((done) => {
         dropDb()
-            .then(() => oauth.denyInvalidRequests.restore())
-            .then(() => oauth.enforceAccountOwnershipOnResourceAccess.restore())
+            .then(() => done())
+            .catch((err) => done(err));
+    });
+
+    it('should seed db with landlords on calling seedDb()', (done) => {
+        dropDb()
+            .then(() => retrievalUseCase.getLandlords(db, collection))
+            .then((landlords) => assert.equal(landlords.length, 0))
+            .then(() => seedDb())
+            .then(() => retrievalUseCase.getLandlords(db, collection))
+            .then((landlords) => assert.equal(landlords.length, 3))
+            .then(() => done());
+    });
+
+    it('should drop all landlords on calling dropDb()', (done) => {
+        retrievalUseCase.getLandlords(db, collection)
+            .then((landlords) => assert.equal(landlords.length, 3))
+            .then(() => dropDb())
+            .then(() => retrievalUseCase.getLandlords(db, collection))
+            .then((landlords) => assert.equal(landlords.length, 0))
+            .then(() => done());
+    });
+
+    it('should return status 200 if creating a user that already exists', (done) => {
+        const existingLandlord = model.generate("John", "Smith", birthday, "other", "0");
+        requestHelper.postResource(app, headers, `/api/v1/landlord`, existingLandlord)
+            .then((res) => assert.equal(res.status, 200))
+            .then(() => done())
+            .catch((err) => done(err));
+    });
+
+    it('should return status 201 and new resource if creating a new user', (done) => {
+        const newUser = model.generate("New", "User", birthday, "male", "4");
+        dropDb()
+            .then(() => requestHelper.postResource(app, headers, `/api/v1/landlord`, newUser))
+            .then((res) => assert.equal(res.status, 201))
             .then(() => done())
             .catch((err) => done(err));
     });
 
     it('should return status 201 and new resource if creating a new landlord', (done) => {
-        let newLandlord = model.generate("New", "Landlord", birthday, "new.user@test.com", "4");
-
+        let newLandlord = model.generate("New", "Landlord", birthday, "male", "4");
         dropDb()
-            .then(() => retrievalUseCase.getLandlords(db, collection))
-            .then((landlords) => assert.equal(landlords.length, 0))
             .then(() => requestHelper.postResource(app, headers, `/api/v1/landlord`, newLandlord))
             .then((res) => {
                 assert.equal(res.status, 201);
