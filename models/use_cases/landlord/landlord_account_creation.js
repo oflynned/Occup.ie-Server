@@ -10,9 +10,9 @@ function getUserAge(birthday) {
 }
 
 module.exports = {
-    validateUserAge: function (data) {
+    validateLandlordAge: function (data) {
         return new Promise((res, rej) => {
-            getUserAge(data["details"]["dob"] >= 18 ? res() : rej(new Error("underage_landlord")));
+            getUserAge(data["details"]["dob"]) >= 18 ? res() : rej(new Error("underage_landlord"));
         });
     },
 
@@ -23,7 +23,7 @@ module.exports = {
         })
     },
 
-    validateUserIsUnique: function (db, collection, data) {
+    validateLandlordIsUnique: function (db, collection, data) {
         return new Promise((res, rej) => {
             db.get(collection)
                 .find({"oauth.oauth_id": data["oauth"]["oauth_id"]})
@@ -36,7 +36,7 @@ module.exports = {
         data["details"]["forename"] = utf8.encode(data["details"]["forename"]);
         data["details"]["surname"] = utf8.encode(data["details"]["surname"]);
 
-        if (data["details"]["sex"] !== "male" && data["details"]["sex"] !== "female")
+        if (!["male", "female"].includes(data["details"]["sex"]))
             data["details"]["sex"] = "other";
         return record.createRecord(db, collection, data)
     }

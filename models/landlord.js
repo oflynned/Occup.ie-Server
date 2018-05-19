@@ -2,17 +2,17 @@ const Joi = require("joi");
 
 const schema = Joi.object().keys({
     details: Joi.object().keys({
+        email: Joi.string().email().required(),
         forename: Joi.string().required(),
         surname: Joi.string().required(),
-        dob: Joi.date().required(),
-        email: Joi.string().email().required(),
         profile_picture: Joi.string().required(),
+        dob: Joi.date().required(),
+        sex: Joi.string().required(),
         phone_number: Joi.string().required()
     }),
 
     meta: Joi.object().keys({
         identity_verified: Joi.boolean(),
-        phone_verified: Joi.boolean(),
         creation_time: Joi.date().required(),
         firebase_token: Joi.string().required(),
         tos_version_accepted: Joi.number().required(),
@@ -32,20 +32,19 @@ module.exports = {
     validate: function (o) {
         return Joi.validate(o, schema, {allowUnknown: true})
     },
-    generate: function (forename, surname, dob, phoneNumber) {
+    generate: function (forename, surname, dob, sex, phoneNumber) {
         return {
             details: {
                 forename: forename,
                 surname: surname,
                 dob: dob,
+                sex: sex,
                 email: `${forename}.${surname}@test.com`,
-                phone_number: phoneNumber,
                 profile_picture: "http://users.aber.ac.uk/rbh/britain-ireland/parnell.jpg",
+                phone_number: phoneNumber
             },
 
             meta: {
-                phone_verified: false,
-                identity_verified: false,
                 creation_time: new Date(),
                 firebase_token: "firebase_token",
                 tos_version_accepted: 1,

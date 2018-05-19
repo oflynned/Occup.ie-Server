@@ -48,7 +48,7 @@ module.exports = {
         data["details"]["forename"] = utf8.encode(data["details"]["forename"]);
         data["details"]["surname"] = utf8.encode(data["details"]["surname"]);
 
-        if (data["details"]["sex"] !== "male" && data["details"]["sex"] !== "female")
+        if (!["male", "female"].includes(data["details"]["sex"]))
             data["details"]["sex"] = "other";
         return record.createRecord(db, collection, data)
     }
