@@ -10,8 +10,6 @@ function getUserAge(birthday) {
 }
 
 module.exports = {
-    getUserAge: getUserAge,
-
     validateUserAge: function (data) {
         return new Promise((res, rej) => {
             getUserAge(data["details"]["dob"]) >= 18 ? res() : rej(new Error("underage_user"));
@@ -47,7 +45,6 @@ module.exports = {
     },
 
     createAccount: function (db, collection, data) {
-        delete data["oauth"]["oauth_token"];
         data["details"]["forename"] = utf8.encode(data["details"]["forename"]);
         data["details"]["surname"] = utf8.encode(data["details"]["surname"]);
 
