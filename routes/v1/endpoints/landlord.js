@@ -10,12 +10,28 @@ module.exports = (db, col) => {
 
     router.post("/", (req, res) => {
         createLandlordUseCase.validatePayload(req.body)
-            .then(() => createLandlordUseCase.createAccount(db, collection, req.body))
-            .then((data) => res.status(201).json(data))
+            .then(() => createLandlordUseCase.validateLandlordAge(req.body))
+            .then(() => createLandlordUseCase.validateLandlordIsUnique(db, collection, req.body))
+            .then(() => {
+                let filter = {"oauth.oauth_id": req.body["oauth"]["oauth_id"]};
+                return retrieveLandlordUseCase.getLandlords(db, collection, filter);
+            })
+            .then((landlords) => {
+                if (landlords.length === 0) {
+                    return createLandlordUseCase.createAccount(db, collection, req.body)
+                        .then((data) => res.status(201).json(data))
+                } else {
+                    res.status(200).json(landlords[0])
+                }
+            })
             .catch((err) => {
+                console.log(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
+                        break;
+                    case "underage_landlord":
+                        res.status(403).json(err);
                         break;
                     default:
                         res.status(500).send();
