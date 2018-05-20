@@ -1,4 +1,4 @@
-const DB_NAME = "RentAppDevelopment";
+const DB_NAME = "occupie";
 
 module.exports = {
     get dbName() {

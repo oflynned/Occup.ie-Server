@@ -25,7 +25,6 @@ module.exports = (db, col) => {
                 }
             })
             .catch((err) => {
-                console.log(err);
                 switch (err.message) {
                     case "bad_request":
                         res.status(400).send();
@@ -53,6 +52,12 @@ module.exports = (db, col) => {
                         break;
                 }
             })
+    });
+
+    router.get("/me", (req, res) => {
+        retrieveLandlordUseCase.doesLandlordExist(db, collection, {"oauth.oauth_id": req.headers["oauth_id"]})
+            .then((landlord) => res.status(200).json({"_id": landlord["_id"]}))
+            .catch((err) => res.status(404).send())
     });
 
     router.get('/:uuid', (req, res) => {
