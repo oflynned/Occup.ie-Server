@@ -142,7 +142,7 @@ function seedUsers(db, col, size) {
 function seedLandlords(db, col, size) {
     let jobs = [];
     for (let i = 0; i < size; i++) {
-        let landlord = landlordModel.generate(`landlord_${i}_forename`, `landlord_${i}_surname`, getDob(), getPhoneNumber());
+        let landlord = landlordModel.generate(`landlord_${i}_forename`, `landlord_${i}_surname`, getDob(), "male", getPhoneNumber());
         let result = landlordModel.validate(landlord);
         if (result["error"] !== null)
             throw new Error(result);
@@ -200,8 +200,8 @@ function seedRentals(env, db, size) {
                 let rent = (bedrooms.length * 500) + getRandom(600);
                 let listing = rentalModel.generateListing(rent, rent, getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
                 let job = rentalModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
-
                 let result = rentalModel.validate(job);
+
                 if (result["error"] !== null)
                     throw new Error(result);
 
@@ -264,9 +264,11 @@ module.exports = {
     seed: function (env, db, seedType, seedSize) {
         switch (seedType) {
             case "landlord":
-                return seedLandlords(db, env.landlords, seedSize);
+                //return seedLandlords(db, env.landlords, seedSize);
+                break;
             case "user":
-                return seedUsers(db, env.users, seedSize);
+                //return seedUsers(db, env.users, seedSize);
+                break;
             case "application":
                 // return seedApplications(env, db, seedSize);
                 break;
