@@ -2,23 +2,29 @@ let express = require('express');
 let router = express.Router();
 
 let ObjectId = require("mongodb").ObjectId;
+
 let createLandlordUseCase = require("../../../models/use_cases/landlord/landlord_account_creation");
 let retrieveLandlordUseCase = require("../../../models/use_cases/landlord/landlord_account_retrieval");
+let retrieveRentalUseCase = require("../../../models/use_cases/listing/rental_retrieval");
+let retrieveHouseShareUseCase = require("../../../models/use_cases/listing/house_share_retrieval");
+let sortListingsUseCase = require("../../../models/use_cases/listing/listing_sorting");
 
 module.exports = (db, col) => {
-    const collection = col["landlords"];
+    const landlordCol = col["landlords"];
+    const houseShareCol = col["house_shares"];
+    const rentalCol = col["rentals"];
 
     router.post("/", (req, res) => {
         createLandlordUseCase.validatePayload(req.body)
             .then(() => createLandlordUseCase.validateLandlordAge(req.body))
-            .then(() => createLandlordUseCase.validateLandlordIsUnique(db, collection, req.body))
+            .then(() => createLandlordUseCase.validateLandlordIsUnique(db, landlordCol, req.body))
             .then(() => {
                 let filter = {"oauth.oauth_id": req.body["oauth"]["oauth_id"]};
-                return retrieveLandlordUseCase.getLandlords(db, collection, filter);
+                return retrieveLandlordUseCase.getLandlords(db, landlordCol, filter);
             })
             .then((landlords) => {
                 if (landlords.length === 0) {
-                    return createLandlordUseCase.createAccount(db, collection, req.body)
+                    return createLandlordUseCase.createAccount(db, landlordCol, req.body)
                         .then((data) => res.status(201).json(data))
                 } else {
                     res.status(200).json(landlords[0])
@@ -40,7 +46,7 @@ module.exports = (db, col) => {
     });
 
     router.get("/", (req, res) => {
-        retrieveLandlordUseCase.getLandlords(db, collection)
+        retrieveLandlordUseCase.getLandlords(db, landlordCol)
             .then((landlords) => res.status(200).json(landlords))
             .catch((err) => {
                 switch (err.message) {
@@ -55,15 +61,15 @@ module.exports = (db, col) => {
     });
 
     router.get("/me", (req, res) => {
-        retrieveLandlordUseCase.doesLandlordExist(db, collection, {"oauth.oauth_id": req.headers["oauth_id"]})
+        retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {"oauth.oauth_id": req.headers["oauth_id"]})
             .then((landlord) => res.status(200).json({"_id": landlord["_id"]}))
-            .catch((err) => res.status(404).send())
+            .catch((err) => res.status(404).send(err))
     });
 
     router.get('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveLandlordUseCase.doesLandlordExist(db, collection, {_id: ObjectId(uuid)})
-            .then(() => retrieveLandlordUseCase.getLandlords(db, collection, {_id: ObjectId(uuid)}))
+        retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveLandlordUseCase.getLandlords(db, landlordCol, {_id: ObjectId(uuid)}))
             .then((landlords) => res.status(200).json(landlords[0]))
             .catch((err) => {
                 switch (err.message) {
@@ -80,11 +86,27 @@ module.exports = (db, col) => {
             })
     });
 
+    router.get('/:uuid/listings', (req, res) => {
+        let uuid = req.params["uuid"];
+
+        retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {_id: ObjectId(uuid)})
+            .then(() => retrieveHouseShareUseCase.getListings(db, houseShareCol, {landlord_uuid: ObjectId(uuid)}))
+            .then((houseShares) => sortListingsUseCase.sortListings(houseShares))
+            .then((listings) => res.status(200).json(listings))
+            .catch((err) => {
+                switch (err.message) {
+                    case "non_existent_landlord":
+                        res.status(404);
+                        break;
+                }
+            })
+    });
+
     router.patch('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
         createLandlordUseCase.validatePayload(req.body)
-            .then(() => retrieveLandlordUseCase.doesLandlordExist(db, collection, {_id: ObjectId(uuid)}))
-            .then(() => retrieveLandlordUseCase.modifyLandlord(db, collection, req.body, uuid))
+            .then(() => retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {_id: ObjectId(uuid)}))
+            .then(() => retrieveLandlordUseCase.modifyLandlord(db, landlordCol, req.body, uuid))
             .then((landlord) => res.status(200).json(landlord))
             .catch((err) => {
                 switch (err.message) {
@@ -103,7 +125,7 @@ module.exports = (db, col) => {
 
     router.delete('/:uuid', (req, res) => {
         let uuid = req.params["uuid"];
-        retrieveLandlordUseCase.deleteLandlord(db, collection, uuid)
+        retrieveLandlordUseCase.deleteLandlord(db, landlordCol, uuid)
             .then((landlord) => res.status(200).json(landlord))
             .catch((err) => {
                 switch (err.message) {

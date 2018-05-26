@@ -21,7 +21,7 @@ module.exports = (db, col) => {
             .then(() => retrieveListingUseCase.doesListingExist(db, listingsCol, {_id: ObjectId(application["listing_id"])}))
             .then(() => retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {_id: ObjectId(application["landlord_id"])}))
             .then(() => retrieveUserUseCase.doesUserExist(db, userCol, {_id: ObjectId(application["user_id"])}))
-            .then(() => retrieveListingUseCase.validateListingIsOpen(db, listingsCol, {_id: application["listing_id"]}))
+            .then(() => retrieveListingUseCase.validateListingIsActive(db, listingsCol, {_id: application["listing_id"]}))
             .then(() => retrieveListingUseCase.validateListingIsFitting(db, userCol, listingsCol, application))
             .then(() => createApplicationUseCase.validateApplicationIsUnique(db, applicationCol, application))
             .then(() => createApplicationUseCase.createApplication(db, applicationCol, application))
