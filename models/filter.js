@@ -18,7 +18,7 @@ const querySchema = Joi.object().keys({
         landlord_uuid: Joi.string(),
         limit: Joi.number(),
         offset: Joi.number(),
-        status: Joi.string().valid("open", "closed", "expired")
+        status: Joi.string().valid("active", "paused", "expired")
     },
 
     order: {

@@ -9,10 +9,10 @@ module.exports = {
         })
     },
 
-    validateListingIsOpen: function (db, collection, filter) {
+    validateListingIsActive: function (db, collection, filter) {
         return new Promise((res, rej) => {
             record.getRecords(db, collection, filter)
-                .then((records) => records[0]["listing"]["status"] === "open" ? res() : rej("non_applicable_listing"))
+                .then((records) => records[0]["listing"]["status"] === "active" ? res() : rej("non_applicable_listing"))
         });
     },
 

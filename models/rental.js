@@ -40,7 +40,7 @@ const schema = Joi.object().keys({
         created: Joi.date().required(),
         expires: Joi.date().required(),
         plan: Joi.string().valid("entry", "medium", "deluxe").required(),
-        status: Joi.string().valid("open", "closed", "expired").required(),
+        status: Joi.string().valid("active", "paused", "expired").required(),
         owner_occupied: Joi.boolean().required(),
         furnished: Joi.boolean().required(),
         ber: Joi.string().valid(
@@ -89,7 +89,7 @@ module.exports = {
         }
     },
 
-    generateListing: function (deposit, rent, plan, isOwnerOccupied, isFurnished, ber) {
+    generateListing: function (deposit, rent, plan, isOwnerOccupied, isFurnished, ber, status = "active") {
         const creation = new Date();
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
@@ -100,7 +100,7 @@ module.exports = {
             created: creation,
             expires: expiry,
             plan: plan,
-            status: "open",
+            status: status,
             owner_occupied: isOwnerOccupied,
             furnished: isFurnished,
             ber: ber
