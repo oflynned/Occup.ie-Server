@@ -107,7 +107,7 @@ function createListingObject(landlordUuid) {
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "shared"],
             houseShareModel.generateFacilities(false, true, true, false, false, true, false),
-            houseShareModel.generateListing(rent, rent, "entry", false, true, "B1")
+            houseShareModel.generateListing(rent, rent, "entry", false, true, "B1", "active")
         )
     );
 }
@@ -117,9 +117,6 @@ describe("api application management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
-                oauth = require('../../../common/oauth')(env, db);
-                sinon.stub(oauth, 'denyInvalidRequests').callsFake((req, res, next) => next());
-                sinon.stub(oauth, 'enforceAccountOwnershipOnResourceAccess').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
@@ -129,8 +126,6 @@ describe("api application management", () => {
 
     afterEach((done) => {
         dropDb()
-            .then(() => oauth.denyInvalidRequests.restore())
-            .then(() => oauth.enforceAccountOwnershipOnResourceAccess.restore())
             .then(() => done())
             .catch((err) => done(err));
     });
@@ -161,10 +156,7 @@ describe("api application management", () => {
     });
 
     it('should return 400 to a user who makes an application with missing parameters', (done) => {
-        requestHelper.postResource(app, headers, `/api/v1/application`, {
-            "user_id": ObjectId(),
-            "landlord_id": ObjectId()
-        })
+        requestHelper.postResource(app, headers, `/api/v1/application`, {"user_id": ObjectId(), "landlord_id": ObjectId()})
             .then(() => done(new Error("Incorrectly created application with missing params")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);
@@ -339,7 +331,7 @@ describe("api application management", () => {
                 listing = _listing[0];
                 let uuid = listing["_id"];
                 let modifiedListing = listing;
-                modifiedListing["listing"]["status"] = "closed";
+                modifiedListing["listing"]["status"] = "expired";
                 return houseShareRetrievalUseCase.modifyListing(db, listingCol, modifiedListing, ObjectId(uuid))
             })
             .then(() => applicationModel.generate(user["_id"], landlord["_id"], listing["_id"]))

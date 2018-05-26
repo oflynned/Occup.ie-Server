@@ -92,7 +92,7 @@ describe("api house share management", () => {
             .then(() => listingRetrievalUseCase.getListings(db, listingCol))
             .then((listings) => {
                 assert.equal(listings.length, 1);
-                assert.equal(listings[0]["listing"]["status"], "open");
+                assert.equal(listings[0]["listing"]["status"], "active");
                 assert.equal(listings[0]["listing"]["plan"], "entry");
                 done()
             })
