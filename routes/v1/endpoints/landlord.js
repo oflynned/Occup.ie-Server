@@ -11,8 +11,7 @@ let sortListingsUseCase = require("../../../models/use_cases/listing/listing_sor
 
 module.exports = (db, col) => {
     const landlordCol = col["landlords"];
-    const houseShareCol = col["house_shares"];
-    const rentalCol = col["rentals"];
+    const listingsCol = col["listings"];
 
     router.post("/", (req, res) => {
         createLandlordUseCase.validatePayload(req.body)
@@ -89,14 +88,20 @@ module.exports = (db, col) => {
     router.get('/:uuid/listings', (req, res) => {
         let uuid = req.params["uuid"];
 
+
+        // TODO use filter {landlord_uuid: ObjectId(uuid)}
         retrieveLandlordUseCase.doesLandlordExist(db, landlordCol, {_id: ObjectId(uuid)})
-            .then(() => retrieveHouseShareUseCase.getListings(db, houseShareCol, {landlord_uuid: ObjectId(uuid)}))
+            .then(() => retrieveHouseShareUseCase.getListings(db, listingsCol, {}))
             .then((houseShares) => sortListingsUseCase.sortListings(houseShares))
             .then((listings) => res.status(200).json(listings))
             .catch((err) => {
                 switch (err.message) {
                     case "non_existent_landlord":
                         res.status(404);
+                        break;
+                    default:
+                        console.log(err);
+                        res.status(500).send(err);
                         break;
                 }
             })

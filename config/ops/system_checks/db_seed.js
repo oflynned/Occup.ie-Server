@@ -25,6 +25,11 @@ function getRandom(limit) {
     return Math.floor(Math.random() * limit);
 }
 
+function getState() {
+    const states = ["active", "paused", "expired"];
+    return states[getRandom(states.length)];
+}
+
 function getSex() {
     const sexes = ["male", "female", "other"];
     return sexes[getRandom(sexes.length)];
@@ -169,7 +174,7 @@ function seedHouseShares(env, db, size) {
                 let address = houseShareModel.generateAddress(getRandom(bedrooms.length), getRandom(100), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
                 let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
                 let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer(), rent, rent);
+                let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer(), rent, rent, getState());
                 let job = houseShareModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
                 let result = houseShareModel.validate(job);
@@ -198,7 +203,7 @@ function seedRentals(env, db, size) {
                 let facilities = rentalModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
 
                 let rent = (bedrooms.length * 500) + getRandom(600);
-                let listing = rentalModel.generateListing(rent, rent, getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer());
+                let listing = rentalModel.generateListing(rent, rent, getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer(), getState());
                 let job = rentalModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
                 let result = rentalModel.validate(job);
 
@@ -275,7 +280,8 @@ module.exports = {
             case "house-share":
                 return seedHouseShares(env, db, seedSize);
             case "rental":
-                return seedRentals(env, db, seedSize);
+                //return seedRentals(env, db, seedSize);
+                break;
         }
     },
 
