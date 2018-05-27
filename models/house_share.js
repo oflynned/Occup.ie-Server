@@ -23,7 +23,18 @@ const schema = Joi.object().keys({
         min_target_age: Joi.number().min(18).required(),
         max_target_age: Joi.number().min(Joi.ref('min_target_age')).required(),
         target_tenant: Joi.array().items(Joi.string().valid("male", "female", "other", "couple")).min(1).unique().required(),
-        target_profession: Joi.array().items(Joi.string().valid("student", "professional")).min(1).unique().required()
+        target_profession: Joi.array().items(Joi.string().valid("student", "professional")).min(1).unique().required(),
+        owner_occupied: Joi.boolean().required(),
+        furnished: Joi.boolean().required(),
+        ber: Joi.string().valid(
+            "A1", "A2", "A3",
+            "B1", "B2", "B3",
+            "C1", "C2", "C3",
+            "D1", "D2",
+            "E1", "E2",
+            "F", "G",
+            "Exempt"
+        ).required()
     },
 
     facilities: {
@@ -42,18 +53,7 @@ const schema = Joi.object().keys({
         created: Joi.date().required(),
         expires: Joi.date().required(),
         plan: Joi.string().valid("entry", "medium", "deluxe").required(),
-        status: Joi.string().valid("active", "paused", "expired").required(),
-        owner_occupied: Joi.boolean().required(),
-        furnished: Joi.boolean().required(),
-        ber: Joi.string().valid(
-            "A1", "A2", "A3",
-            "B1", "B2", "B3",
-            "C1", "C2", "C3",
-            "D1", "D2",
-            "E1", "E2",
-            "F", "G",
-            "Exempt"
-        ).required()
+        status: Joi.string().valid("active", "paused", "expired").required()
     }
 });
 
@@ -70,7 +70,7 @@ module.exports = {
         }
     },
 
-    generateDetails: function (dwelling, description, leaseLengthMonths, minAge, maxAge, targetTenant, targetProfession) {
+    generateDetails: function (dwelling, description, leaseLengthMonths, minAge, maxAge, targetTenant, targetProfession, isOwnerOccupied, isFurnished, ber) {
         return {
             dwelling: dwelling,
             description: description,
@@ -79,6 +79,9 @@ module.exports = {
             max_target_age: maxAge,
             target_tenant: targetTenant,
             target_profession: targetProfession,
+            owner_occupied: isOwnerOccupied,
+            furnished: isFurnished,
+            ber: ber
         }
     },
 
@@ -94,7 +97,7 @@ module.exports = {
         }
     },
 
-    generateListing: function (plan, isOwnerOccupied, isFurnished, ber, deposit, rent, status = "active") {
+    generateListing: function (plan, deposit, rent, status = "active") {
         const creation = new Date();
         let expiry = new Date();
         expiry.setDate(creation.getDate() + 21);
@@ -106,9 +109,6 @@ module.exports = {
             expires: expiry,
             plan: plan,
             status: status,
-            owner_occupied: isOwnerOccupied,
-            furnished: isFurnished,
-            ber: ber
         }
     },
 

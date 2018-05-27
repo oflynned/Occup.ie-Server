@@ -56,8 +56,10 @@ module.exports = (db, col) => {
 
     router.get('/filter', (req, res) => {
         let query = {};
-        retrieveUserUseCase.getUsers()
-        filterHousesUseCase.transformQuery(req.query, "rental")
+        let uuid = req.headers["uuid"];
+
+        retrieveUserUseCase.getUsers({_id: ObjectId(uuid)})
+            .then((user) => filterHousesUseCase.transformQuery(req.query, "rental", user))
             .then((transformedQuery) => {
                 query = transformedQuery;
                 return filterHousesUseCase.validateFilters(query);
@@ -66,8 +68,11 @@ module.exports = (db, col) => {
             .then((queryString) => filterHousesUseCase.filterListings(db, col["listings"], queryString))
             .then((listings) => res.status(200).json(listings))
             .catch((err) => {
-                console.log(err);
-                res.status(400).send();
+                switch (err.message) {
+                    default:
+                        res.status(400).send(err);
+                        break;
+                }
             })
     });
 
