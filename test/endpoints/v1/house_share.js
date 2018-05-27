@@ -49,7 +49,7 @@ function createListingObject(landlordUuid) {
         listingModel.generate(
             landlordUuid,
             listingModel.generateAddress("3", "22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
-            listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"], false, true, "B1",),
+            listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"], false, true, "B1"),
             ["shared", "ensuite", "ensuite"],
             "single",
             listingModel.generateFacilities(false, true, true, false, false, true, false),
