@@ -4,11 +4,11 @@ let model = require("../../models/house_share");
 describe("house share model tests", () => {
     const landlordUuid = "uuid";
     const address = model.generateAddress("3", "22", "Goldsmith St", "Phibsborough", "Dublin", "Dublin", "D07 FK2W");
-    const details = model.generateDetails("apartment", "description", 12, 20, 30, ["male"], ["professional"]);
+    const details = model.generateDetails("apartment", "description", 12, 20, 30, ["male"], ["professional"], true, true, "A1");
     const bedrooms = "double";
     const bathrooms = ["shared"];
     const facilities = model.generateFacilities(false, true, true, true, true, true, true);
-    const listing = model.generateListing("entry", true, true, "A1", 550, 550);
+    const listing = model.generateListing("entry", 550, 550);
 
     it("should validate object with correct params", (done) => {
         let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
@@ -19,7 +19,7 @@ describe("house share model tests", () => {
 
     ["entry", "medium", "deluxe"].forEach((plan) => {
         it(`should validate object with correct plan as ${plan}`, (done) => {
-            let listing = model.generateListing(plan, true, true, "A1", 550, 550);
+            let listing = model.generateListing(plan, 550, 550);
             let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
             let result = model.validate(object)["error"] === null;
             assert.equal(result, true);
@@ -28,7 +28,7 @@ describe("house share model tests", () => {
     });
 
     it(`should not validate object with incorrect plan type`, (done) => {
-        let listing = model.generateListing("bad plan", true, true, "A1", 550, 550);
+        let listing = model.generateListing("bad plan", 550, 550);
         let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
         let result = model.validate(object)["error"] !== null;
         assert.equal(result, true);
@@ -37,7 +37,7 @@ describe("house share model tests", () => {
 
     ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D1", "D2", "E1", "E2", "F", "G", "Exempt"].forEach((ber) => {
         it(`should validate object with correct ${ber} BER rating`, (done) => {
-            let listing = model.generateListing("entry", true, true, ber, 550, 550);
+            let details = model.generateDetails("apartment", "description", 12, 20, 30, ["male"], ["professional"], true, true, `${ber}`);
             let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
             let result = model.validate(object)["error"] === null;
             assert.equal(result, true);
@@ -46,7 +46,7 @@ describe("house share model tests", () => {
     });
 
     it(`should not validate object with incorrect BER rating`, (done) => {
-        let listing = model.generateListing("entry", true, true, "bad ber rating", 550, 550);
+        let details = model.generateDetails("apartment", "description", 12, 20, 30, ["male"], ["professional"], true, true, `bad ber`);
         let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
         let result = model.validate(object)["error"] !== null;
         assert.equal(result, true);
@@ -55,7 +55,7 @@ describe("house share model tests", () => {
 
     ["apartment", "house"].forEach((dwelling) => {
         it(`should validate object with ${dwelling} dwelling type`, (done) => {
-            let details = model.generateDetails(dwelling, "description", 12, 20, 30, ["male"], ["professional"]);
+            let details = model.generateDetails(dwelling, "description", 12, 20, 30, ["male"], ["professional"], true, true, `A1`);
             let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, listing);
             let result = model.validate(object)["error"] === null;
             assert.equal(result, true);
@@ -138,7 +138,7 @@ describe("house share model tests", () => {
     });
 
     it('should not validate object with rent being 0', (done) => {
-        let rejectedListing = model.generateListing("entry", true, true, "A1", 550, 0);
+        let rejectedListing = model.generateListing("entry", 500, 0);
         let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, rejectedListing);
         let result = model.validate(object)["error"] !== null;
         assert.equal(result, true);
@@ -146,7 +146,7 @@ describe("house share model tests", () => {
     });
 
     it('should not validate object with rent having a decimal point', (done) => {
-        let rejectedListing = model.generateListing("entry", true, true, "A1", 550, 1.23);
+        let rejectedListing = model.generateListing("entry", 550, 1.23);
         let object = model.generate(landlordUuid, address, details, bathrooms, bedrooms, facilities, rejectedListing);
         assert.equal(object["listing"]["rent"], 1);
         done();

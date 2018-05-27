@@ -103,11 +103,11 @@ function createListingObject(landlordUuid) {
         houseShareModel.generate(
             landlordUuid,
             houseShareModel.generateAddress("3", "22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
-            houseShareModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
+            houseShareModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"], false, true, "B1"),
             ["shared", "ensuite", "ensuite"],
             ["single", "double", "shared"],
             houseShareModel.generateFacilities(false, true, true, false, false, true, false),
-            houseShareModel.generateListing(rent, rent, "entry", false, true, "B1", "active")
+            houseShareModel.generateListing(rent, rent, "entry")
         )
     );
 }
@@ -156,7 +156,10 @@ describe("api application management", () => {
     });
 
     it('should return 400 to a user who makes an application with missing parameters', (done) => {
-        requestHelper.postResource(app, headers, `/api/v1/application`, {"user_id": ObjectId(), "landlord_id": ObjectId()})
+        requestHelper.postResource(app, headers, `/api/v1/application`, {
+            "user_id": ObjectId(),
+            "landlord_id": ObjectId()
+        })
             .then(() => done(new Error("Incorrectly created application with missing params")))
             .catch((err) => {
                 assert.equal(err.response.status, 400);

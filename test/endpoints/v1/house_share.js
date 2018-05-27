@@ -49,11 +49,11 @@ function createListingObject(landlordUuid) {
         listingModel.generate(
             landlordUuid,
             listingModel.generateAddress("3", "22", "Goldsmith St.", "Phibsborough", "Dublin", "Dublin", "D07 FK2W"),
-            listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"]),
+            listingModel.generateDetails("apartment", "Awesome apartment", 12, 20, 25, ["male"], ["professional"], false, true, "B1",),
             ["shared", "ensuite", "ensuite"],
             "single",
             listingModel.generateFacilities(false, true, true, false, false, true, false),
-            listingModel.generateListing("entry", false, true, "B1", 550, 550)
+            listingModel.generateListing("entry", 550, 550)
         )
     );
 }
@@ -63,8 +63,6 @@ describe("api house share management", () => {
         dropDb()
             .then(() => seedDb())
             .then(() => {
-                oauth = require('../../../common/oauth')(env, db);
-                sinon.stub(oauth, 'markInvalidRequests').callsFake((req, res, next) => next());
                 app = require('../../../app')(env);
                 chai.use(chaiHttp);
                 done()
@@ -74,7 +72,6 @@ describe("api house share management", () => {
 
     afterEach((done) => {
         dropDb()
-            .then(() => oauth.markInvalidRequests.restore())
             .then(() => done())
             .catch((err) => done(err));
     });
