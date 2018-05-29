@@ -172,9 +172,9 @@ function seedHouseShares(env, db, size) {
                 let bedrooms = getBedrooms(getRandom(6) + 1, true);
                 let rent = getRandom(300) + 400;
                 let address = houseShareModel.generateAddress(getRandom(bedrooms.length), getRandom(100), generateGibberish(5), generateGibberish(10), `Dublin`, `Co. Dublin`, getEircode());
-                let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()]);
+                let details = houseShareModel.generateDetails("apartment", generateGibberish(60), 12, ageLimits[0], ageLimits[1], [getSex()], [getProfession()], getRandomTruth(), getRandomTruth(), getRandomBer());
                 let facilities = houseShareModel.generateFacilities(getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth(), getRandomTruth());
-                let listing = houseShareModel.generateListing(getRandomPlan(), getRandomTruth(), getRandomTruth(), getRandomBer(), rent, rent, getState());
+                let listing = houseShareModel.generateListing(getRandomPlan(), rent, rent, getState());
                 let job = houseShareModel.generate(uuid, address, details, bathrooms, bedrooms, facilities, listing);
 
                 let result = houseShareModel.validate(job);
@@ -184,7 +184,8 @@ function seedHouseShares(env, db, size) {
                 jobs.push(houseShareCreationUseCase.createListing(db, env.listings, job));
             }
         })
-        .then(() => Promise.all(jobs));
+        .then(() => Promise.all(jobs))
+        .catch((err) => console.log(err));
 }
 
 function seedRentals(env, db, size) {
