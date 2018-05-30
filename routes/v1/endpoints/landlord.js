@@ -100,7 +100,6 @@ module.exports = (db, col) => {
                         res.status(404);
                         break;
                     default:
-                        console.log(err);
                         res.status(500).send(err);
                         break;
                 }

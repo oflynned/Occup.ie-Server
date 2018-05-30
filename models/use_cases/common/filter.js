@@ -89,6 +89,7 @@ function getQueryString(filter) {
             case "status":
                 query["$and"].push({"listing.status": filter["query"]["status"]});
                 break;
+             // TODO add pagination to requests
             case "limit":
                 break;
             case "offset":
