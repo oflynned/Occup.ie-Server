@@ -19,7 +19,7 @@ module.exports = {
             // now groom params to give back an appropriate query
             let applicationsQuery = {};
             for (let k in query)
-                applicationsQuery[k] = ObjectId(query[k]);
+                applicationsQuery[k] = query[k];
 
             res(applicationsQuery);
         })

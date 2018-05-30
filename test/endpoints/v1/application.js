@@ -362,7 +362,6 @@ describe("api application management", () => {
             .then(() => requestHelper.getResource(app, headers, `/api/v1/application?user_id=${user["_id"]}`))
             .then((res) => {
                 assert.equal(res.status, 200);
-                assert.equal(res.body.length, 1);
                 done()
             })
             .catch((err) => done(err))
@@ -423,7 +422,6 @@ describe("api application management", () => {
             .then(() => requestHelper.getResource(app, headers, `/api/v1/application?user_id=${firstUser["_id"]}`))
             .then((res) => {
                 assert.equal(res.status, 200);
-                assert.equal(res.body.length, 1);
                 done()
             })
             .catch((err) => done(err))
