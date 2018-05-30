@@ -64,18 +64,18 @@ function groomHouseShareQuery(filter, params) {
         }
     }
 
+    filter["query"]["type"] = "house_share";
     return filter;
 }
 
 function transformQuery(params, listingType, profile = {}) {
     let filter = {query: profile, order: {}};
-
     switch (listingType) {
-        case "rental":
-            filter = groomRentalQuery(filter, params);
-            break;
         case "house_share":
             filter = groomHouseShareQuery(filter, params);
+            break;
+        case "rental":
+            filter = groomRentalQuery(filter, params);
             break;
     }
 
@@ -86,10 +86,13 @@ function getQueryString(filter) {
     let query = {"$and": []};
     for (let param in filter["query"]) {
         switch (param) {
+            case "type":
+                query["$and"].push({"type": filter["query"]["type"]});
+                break;
             case "status":
                 query["$and"].push({"listing.status": filter["query"]["status"]});
                 break;
-             // TODO add pagination to requests
+            // TODO add pagination to requests
             case "limit":
                 break;
             case "offset":

@@ -2,6 +2,7 @@ const Joi = require("joi");
 
 const querySchema = Joi.object().keys({
     query: {
+        type: Joi.string().valid("house_share", "rental"),
         min_lease_length: Joi.number().min(1),
         max_lease_length: Joi.number().min(1).when("min_lease_length", {is: 'fieldValue', then: Joi.number().min(Joi.ref("min_lease_length"))}),
         min_bedrooms: Joi.number().min(1),
